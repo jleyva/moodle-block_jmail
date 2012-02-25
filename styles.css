@@ -1,0 +1,190 @@
+#jmailtoolbar .yui-button {
+    width: 80px;
+    float: left;
+    height: 25px;
+    position: relative;
+    color: black;
+}
+
+#jmailtoolbar .yui-button .first-child a {
+   font-size: 13px;
+   color: black;
+}
+
+#label_list {
+    padding: 5px;
+    padding-top: 30px;
+}
+
+#label_list ul li {
+    list-style: none;
+}
+
+#label_list ul li em {    
+    background-repeat: no-repeat;
+    float: left;
+    width: 16px;
+    height: 16px;
+}
+
+#label_list li.inbox em {
+    background-image: url(pix/inbox.png);
+}
+
+#label_list li.draft em {
+    background-image: url(pix/draft.png);
+}
+
+#label_list li.sent em {
+    background-image: url(pix/email.png);
+}
+
+#label_list li.trash em {
+    background-image: url(pix/trash.png);
+}
+
+#label_list li.folder em {
+    background-image: url(pix/folder.png);
+}
+
+#label_list li a {
+    padding: 3px;   
+}
+
+.yui-skin-sam .yui-layout .yui-layout-hd { 
+    background: none; 
+    border: 1px solid #808080;
+    background-color: #F2F2F2;
+}
+
+.yui-skin-sam .yui-layout .yui-layout-unit div.yui-layout-hd h2 { 
+    font-weight: normal;
+    background-color: #F2F2F2;
+    color: black; 
+    padding: 2px;
+    font-size: 1em;
+}
+
+#jmailtoolbar {
+    clear: both;
+}
+
+#maillist {
+    clear: both;
+}
+
+#jmailtoolbar .yui-button, #action_buttons .yui-button {
+    position: relative;
+    display: block;
+    float: left;
+}
+
+#jmailtoolbar button, #action_buttons button  {
+    padding: 0 2px 0 23px;
+}
+
+#jmailtoolbar .icon, #action_buttons .icon  {
+    display: block;
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    top: 6px;
+    left: 4px;
+    background-image: url(pix/trash.png);
+    background-repeat: no-repeat;
+}
+
+#checkmail .icon {
+    background-image: url(pix/email.png);
+}
+
+#newmail .icon {
+    background-image: url(pix/new.png);
+}
+
+#deleteb .icon {
+    background-image: url(pix/trash.png);
+}
+
+#replyb .icon {
+    background-image: url(pix/reply.png);
+}
+
+#moveb .icon {
+    background-image: url(pix/move.png);
+}
+
+#forwardb .icon {
+    background-image: url(pix/forward.png);
+}
+
+#printb .icon {
+    background-image: url(pix/print.png);
+}
+
+#contact_list {
+    padding: 5px;
+}
+
+#user_labels .labelactions {
+    float: right;
+}
+
+#contact_list_users .profileimage{
+    float: left;
+}
+
+#contact_list_users .fullname{
+    float: left;
+}
+
+#contact_list_users .fullname input{
+    font-size: 0.7em;
+    width: 50px;
+    height: 15px;
+}
+
+.jmail-even{
+    background-color: white;
+}
+
+.jmail-odd{
+    background-color: #EDF5FF;
+}
+
+#search_bar {
+    clear: both;
+    margin-top: 15px;
+    padding: 6px;
+}
+
+#search_bar input{
+    width: 90%;
+    background-image: url(pix/search.png);
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+
+.loading_big {
+    background-image: url(pix/loading_big.gif);
+    background-repeat: no-repeat;
+    width: 66px;
+    height: 66px;
+    text-align: center;
+    margin: auto;
+}
+
+#mail_header {
+    background-color: #dddddd;
+}
+
+#mail_header .mail_el {
+    width: 75px;
+    float: left;
+}
+
+.destinatary {
+    border: outset 1px #dddddd;
+    padding: 1px;
+    margin: 5px;
+}
