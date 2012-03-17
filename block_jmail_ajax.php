@@ -37,10 +37,14 @@ $PAGE->set_url(new moodle_url('/blocks/jmail/block_jmail_ajax.php', array('id'=>
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 $context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
 
+if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
+    $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id);
+}
+
 $PAGE->set_context($context);
 
 require_login($course);
-require_capability('block/jmail:viewmailbox', $context);
+require_capability('block/jmail:viewmailbox', $blockcontext);
 require_sesskey();
 
 // TODO, check block disabled or instance not visible?
@@ -51,7 +55,8 @@ if (isguestuser()) {
     die(json_encode($err));
 }
 
-$mailbox = new block_jmail_mailbox($course, $context);
+$data = null;
+$mailbox = new block_jmail_mailbox($course, $context, $blockcontext);
 
 echo $OUTPUT->header(); // send headers
 
@@ -86,17 +91,18 @@ switch ($action) {
     case 'send_message':
     case 'save_message':
         $messageid =      optional_param('messageid', 0,PARAM_INT);
-        $to =      required_param('to', PARAM_SEQUENCE);
-        $cc =      optional_param('cc', '',  PARAM_SEQUENCE);
-        $bcc =     optional_param('bcc', '', PARAM_SEQUENCE);
-        $subject = required_param('subject', PARAM_TEXT);
-        $body = optional_param('body ', '', PARAM_RAW);
-        $attachments = optional_param('attachments ', '', PARAM_RAW);
+        $to =       required_param('to', PARAM_SEQUENCE);
+        $cc =       optional_param('cc', '',  PARAM_SEQUENCE);
+        $bcc =      optional_param('bcc', '', PARAM_SEQUENCE);
+        $subject =  required_param('subject', PARAM_TEXT);
+        $body =     optional_param('body', '', PARAM_RAW);
+        $attachments = optional_param('attachments', '', PARAM_INT);
+        $editoritemid = optional_param('editoritemid', '', PARAM_INT);
         $timesent = 0;
         if ($action == 'send_message') {
             $timesent = time();
         }
-        $data = $mailbox->save_message($messageid, $to, $cc, $bcc, $subject, $body, $timesent,$attachments);
+        $data = $mailbox->save_message($messageid, $to, $cc, $bcc, $subject, $body, $timesent, $attachments, $editoritemid);
         
         break;
     case 'send_draft':
@@ -111,14 +117,27 @@ switch ($action) {
             }
         }
         break;
+    case 'approve_message':
+        $messageid = required_param('messageid', PARAM_INT);
+        $data = $mailbox->approve_message($messageid);
+        break;
+    case 'mark_read':
+        $messageid = required_param('messageid', PARAM_INT);
+        $status = required_param('status', PARAM_INT);
+        $data = $mailbox->mark_read($messageid, $status);
+        break;   
     case 'label_message':
     case 'unlabel_message':
-        $messageid = required_param('messageid', PARAM_INT);
-        $labelid = required_param('labelid', PARAM_INT);
-        if ($action == 'label_message') {
-            $data = $mailbox->label_message($messageid, $labelid);
-        } else {
-            $data = $mailbox->unlabel_message($messageid, $labelid);
+        $messageids = required_param('messageids', PARAM_SEQUENCE);
+        $labelid = required_param('labelid', PARAM_ALPHANUM);
+        if ($messages = explode(',', $messageids)) {
+            foreach ($messages as $messageid) {
+                if ($action == 'label_message') {
+                    $data = $mailbox->label_message($messageid, $labelid);
+                } else {
+                    $data = $mailbox->unlabel_message($messageid, $labelid);
+                }
+            }
         }
         break;
     case 'get_labels':
@@ -154,6 +173,13 @@ switch ($action) {
         break;
     case 'refresh_contacts':
         $data = $mailbox->refresh_contacts();
+        break;
+    case 'get_preferences':
+        $data = $mailbox->get_preferences();
+        break;
+    case 'save_preferences':
+        $preferences = required_param('preferences', PARAM_RAW);
+        $data = $mailbox->save_preferences($preferences);
         break;
 }
 

@@ -49,7 +49,7 @@ function block_jmail_pluginfile($course, $cm, $context, $filearea, $args, $force
         send_file_not_found();
     }
 
-    if ($filearea !== 'attachment') {
+    if ($filearea !== 'attachment' and $filearea !== 'body') {
         send_file_not_found();
     }
     

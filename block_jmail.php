@@ -101,7 +101,7 @@ class block_jmail extends block_list {
         }
         
         if (!count($this->content->items)) {
-			$this->content->items[] = get_string('emptymailbox', 'block_jmail');
+			$this->content->items[] = get_string('nonewmessages', 'block_jmail');
 		}
 
         return $this->content;

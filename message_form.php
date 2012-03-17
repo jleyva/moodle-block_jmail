@@ -42,29 +42,21 @@ class block_jmail_message_form extends moodleform {
         $blockcontext    = $this->_customdata['context'];
 
         $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'trusttext'=>true, 'context'=>$blockcontext);
-
-        $mform->addElement('text', 'subject', get_string('subject', 'block_jmail'), 'size="48"');
-        $mform->setType('subject', PARAM_TEXT);
-        $mform->addRule('subject', get_string('required'), 'required', null, 'client');
-        $mform->addRule('subject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-
+        
         $mform->addElement('editor', 'body', get_string('body', 'block_jmail'), null, $editoroptions);
         $mform->setType('body', PARAM_RAW);
-        $mform->addRule('body', get_string('required'), 'required', null, 'client');
 
         $mform->addElement('filemanager', 'attachments', get_string('attachment', 'block_jmail'), null,
             array('subdirs'=>0,
                   'accepted_types'=>'*',
                   'maxbytes'=>$course->maxbytes,
                   'return_types'=>FILE_INTERNAL));
-
-        $submit_string = get_string('send', 'block_jmail');
-
-        $this->add_action_buttons(false, $submit_string);
-
+        
         $mform->addElement('hidden', 'messageid');
         $mform->setType('messageid', PARAM_INT);
 
+        $submit_string = get_string('send', 'block_jmail');
+        //$this->add_action_buttons(false, $submit_string);
     }
 
     function validation($data, $files) {

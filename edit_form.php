@@ -31,6 +31,9 @@ class block_jmail_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_title', get_string('name'));
         $mform->setType('config_title', PARAM_MULTILANG);
         $mform->setDefault('config_title', get_string('pluginname', 'block_jmail'));
+        
+        $mform->addElement('selectyesno', 'config_approvemode', get_string('approvemode', 'block_jmail'));
+        $mform->setDefault('config_approvemode', 0);
 
     }
 }

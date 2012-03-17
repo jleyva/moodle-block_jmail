@@ -13,7 +13,7 @@
 
 #label_list {
     padding: 5px;
-    padding-top: 30px;
+    padding-top: 10px;
 }
 
 #label_list ul li {
@@ -83,6 +83,12 @@
     padding: 0 2px 0 23px;
 }
 
+#moveb button, #moreb button  {
+    padding: 0px;
+    padding-left: 23px;
+    padding-right: 30px;
+}
+
 #jmailtoolbar .icon, #action_buttons .icon  {
     display: block;
     height: 20px;
@@ -102,6 +108,10 @@
     background-image: url(pix/new.png);
 }
 
+#editb .icon {
+    background-image: url(pix/new.png);
+}
+
 #deleteb .icon {
     background-image: url(pix/trash.png);
 }
@@ -110,8 +120,16 @@
     background-image: url(pix/reply.png);
 }
 
+#replytoallb .icon {
+    background-image: url(pix/reply.png);
+}
+
 #moveb .icon {
     background-image: url(pix/move.png);
+}
+
+#moreb .icon {
+    background-image: url(pix/settings.png);
 }
 
 #forwardb .icon {
@@ -183,8 +201,27 @@
     float: left;
 }
 
-.destinatary {
-    border: outset 1px #dddddd;
-    padding: 1px;
-    margin: 5px;
+.destinatary, .labelactions {
+    border: 1px outset #E6E6E6;
+    background-color: #EEE;
+    line-height: 10px;
+    font-size: 10px;
+}
+
+.contact {
+    clear: both;
+}
+
+.attachments {
+    border: 2px dotted green;
+}
+
+.attachmentsbottom {
+    display: none;
+}
+
+.messageaction {
+    width: 50px;
+    border: 1px solid black;
+    text-align: center;
 }

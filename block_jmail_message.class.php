@@ -29,7 +29,7 @@ class block_jmail_message {
     /** @var integer  */
     public $id = 0;
     /** @var integer  Receiver*/
-    public $course = 0;
+    public $courseid = 0;
     /** @var integer  */
     public $sentid = 0;
     /** @var integer  */
@@ -44,6 +44,12 @@ class block_jmail_message {
     public $timecreated = 0;
     /** @var integer  Receiver*/
     public $userid = 0;
+    /** @var integer  */
+    public $approved = 0;
+    /** @var integer  */
+    public $deleted = 0;
+    /** @var integer  */
+    public $read = 1;
 
 
     /**
@@ -54,8 +60,8 @@ class block_jmail_message {
         if (!empty($message->id)) {
             $this->id = $message->id;
         }
-        if (!empty($message->course)) {
-            $this->courseid = $message->course;
+        if (!empty($message->courseid)) {
+            $this->courseid = $message->courseid;
         }
         if (!empty($message->subject)) {
             $this->subject = $message->subject;
@@ -72,6 +78,9 @@ class block_jmail_message {
         if (!empty($message->sender)) {            
             $this->sender = $message->sender;
         }
+        if (!empty($message->approved)) {            
+            $this->approved = $message->approved;
+        }
         // Reference to message sent
         if (!empty($message->sentid)) {            
             $this->sentid = $message->sentid;
@@ -79,6 +88,12 @@ class block_jmail_message {
         if (!empty($message->userid)) {            
             $this->userid = $message->userid;
         }
+        if (isset($message->deleted)) {            
+            $this->deleted = $message->deleted;
+        }
+        if (isset($message->mread)) {            
+            $this->read = $message->mread;
+        }       
     }
 
     /**
@@ -93,8 +108,10 @@ class block_jmail_message {
         $header->id = $this->id;
         $header->from = fullname($user);
         $header->subject = format_string($this->subject);
-        $header->date = userdate($this->timesent, get_string('strftimedatetimeshort', 'langconfig'));
-        
+        $time = (!empty($this->timesent)) ? $this->timesent : $this->timecreated;
+        $header->date = userdate($time, get_string('strftimedatetimeshort', 'langconfig'));
+        $header->read = $this->read;
+               
         return $header;
     }
     
@@ -103,20 +120,27 @@ class block_jmail_message {
      * @return object Message
      */ 
     public function full() {
-        global $DB, $USER;
+        global $DB, $USER, $OUTPUT, $CFG;
+        require_once($CFG->libdir.'/filelib.php');
+        
+        $user = $DB->get_record('user', array('id' => $this->sender, 'deleted' => 0));
         
         $message = new stdClass;
-        $user = $DB->get_record('user', array('id' => $this->sender, 'deleted' => 0));
+        $message->id = $this->id;
         $message->from = fullname($user);
+        $message->sender = $this->sender;
         $message->subject = format_string($this->subject);        
         if ($this->timesent) {
             $message->date = userdate($this->timesent);
         } else {
             $message->date = userdate($this->timecreated);
         }
-        $message->body = format_text($this->body);
+        $message->body = $this->body;
+        $message->approved = $this->approved;
+        $message->deleted = $this->deleted;
         $message->destinataries = array();
         $message->attachments = array();
+        $message->labels = array();
         
         // Destinataries
         if ($destinataries = $DB->get_records('block_jmail_sent', array('messageid' => $this->id))) {
@@ -124,9 +148,9 @@ class block_jmail_message {
                 if ($dest->type == 'bcc' and $this->sender != $USER->id) {
                     continue;
                 }
-                if ($user = $DB->get_record('user', array('id'=>$dest->userid, 'deleted'=>0))) {
+                if ($user = $DB->get_record('user', array('id'=>$dest->userid, 'deleted'=>0), 'id, firstname, lastname, username')) {
                     $dest->fullname = fullname($user);                    
-                    $message->destinataries[] = $dest;
+                    $message->destinataries[$dest->type][] = $dest;
                 }
             }
         }
@@ -144,10 +168,47 @@ class block_jmail_message {
                     $attachment = new stdClass;                    
                     $attachment->filename = $file->get_filename();
                     $attachment->iconimage = '<img src="'.$OUTPUT->pix_url(file_mimetype_icon($mimetype)).'" class="icon" alt="'.$mimetype.'" />';
-                    $attachment->path = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$context->id.'/block_jmail/attachment/'.$this->id.'/'.$filename);
+                    $attachment->path = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$context->id.'/block_jmail/attachment/'.$this->id.'/'.$attachment->filename);
                     $message->attachments[] = $attachment;
                 }
             }
+            $message->body = file_rewrite_pluginfile_urls($message->body, 'pluginfile.php', $context->id, 'block_jmail', 'body', $this->id);
+            $message->body = format_text($message->body);
+        }
+        
+        // Labels        
+        $sql = "SELECT l.id, l.name
+                FROM
+                    {block_jmail_label} l
+                    JOIN {block_jmail_m_label} m
+                    ON l.id = m.labelid
+                WHERE
+                    m.messagesentid = ?
+                ";
+        if ($labels = $DB->get_records_sql($sql, array($this->sentid))) {
+            foreach ($labels as $label) {
+                $message->labels[] = $label;
+            }
+        }
+        
+        if ($this->timesent and $this->sender == $USER->id) {
+            $message->labels[] = 'sent';
+        }
+        
+        if (!$this->timesent and $this->sender == $USER->id) {
+            $message->labels[] = 'draft';
+        }
+        
+        if ($message->deleted) {
+            $message->labels[] = 'trash';
+        }
+        
+        if (!$message->approved) {
+            $message->labels[] = 'toapprove';
+        }        
+        
+        if (empty($message->labels)) {
+            $message->labels[] = 'inbox';
         }
         
         return $message;
@@ -159,18 +220,17 @@ class block_jmail_message {
      * @param array $attachments File attachments
      * @return mixed Message id or false if something fails
      */ 
-    public function update($destinataries, $attachments) {
-        global $USER, $DB;
+    public function update($destinataries, $attachments, $editoritemid) {
+        global $USER, $DB, $CFG;
         
         if (!$message = $DB->get_record('block_jmail', array('id'=>$this->id))) {
             return false;
         }
         $message->sender = $USER->id;
-        $message->course = $this->courseid;
+        $message->courseid = $this->courseid;
         $message->subject = $this->subject;
         
         $message->body = $this->body;
-        //$post->message = file_save_draft_area_files($post->itemid, $context->id, 'mod_forum', 'post', $post->id, array('subdirs'=>true), $post->message);
         
         $message->timesent = $this->timesent;
         $message->timecreated = $this->timecreated;
@@ -180,16 +240,20 @@ class block_jmail_message {
             $DB->delete_records('block_jmail_sent', array('messageid'=>$this->id));
             
             foreach ($destinataries as $d) {
+                if (!$d->userid) {
+                    continue;
+                }
                 $to = new stdClass;
                 $to->userid = $d->userid;
                 $to->messageid = $this->id;
                 $to->type = $d->type;
-                $to->read = 0;
+                $to->mread = 0;
                 $to->answered = 0;
+                $to->deleted = 0;
+                $to->labeled = 0;
                 $DB->insert_record('block_jmail_sent', $to);
             }
-            
-            
+                        
             $context = get_context_instance(CONTEXT_COURSE, $this->courseid);
             
             // We need the block instance for saving the attachments
@@ -198,17 +262,23 @@ class block_jmail_message {
                 // attachments
                 $context = get_context_instance(CONTEXT_BLOCK, $instance->id);
     
+                require_once($CFG->libdir.'/filelib.php');
+
+                $message->body = file_save_draft_area_files($editoritemid,  $context->id, 'block_jmail', 'body', $this->id, array('subdirs'=>true), $message->body);
+                $DB->set_field('block_jmail', 'body', $message->body, array('id'=>$this->id));                
+
                 $info = file_get_draft_area_info($attachments);
                 $present = ($info['filecount']>0) ? '1' : '';
                 file_save_draft_area_files($attachments, $context->id, 'block_jmail', 'attachment', $this->id);
       
                 $DB->set_field('block_jmail', 'attachment', $present, array('id'=>$this->id));
             }
-            return $messageid;
+            
+            return $this->id;
         }
 
         return false;        
-        
+
     }
 
     /**
@@ -217,28 +287,36 @@ class block_jmail_message {
      * @param array $attachments File attachments
      * @return mixed Message id or false if something fails
      */ 
-    public function save($destinataries, $attachments) {
-        global $USER, $DB;
+    public function save($destinataries, $attachments, $editoritemid) {
+        global $USER, $DB, $CFG;
 
         $message = new stdClass;
         $message->sender = $USER->id;
-        $message->course = $this->courseid;
+        $message->courseid = $this->courseid;
         $message->subject = $this->subject;
         
         $message->body = $this->body;
         //$post->message = file_save_draft_area_files($post->itemid, $context->id, 'mod_forum', 'post', $post->id, array('subdirs'=>true), $post->message);
         
+        $message->attachment = 0;
+        $message->approved = $this->approved;
+
         $message->timesent = $this->timesent;
         $message->timecreated = $this->timecreated;
 
         if ($messageid = $DB->insert_record('block_jmail', $message)) {
             foreach ($destinataries as $d) {
+                if (!$d->userid) {
+                    continue;
+                }
                 $to = new stdClass;
                 $to->userid = $d->userid;
                 $to->messageid = $messageid;
                 $to->type = $d->type;
-                $to->read = 0;
+                $to->mread = 0;
                 $to->answered = 0;
+                $to->deleted = 0;
+                $to->labeled = 0;
                 $DB->insert_record('block_jmail_sent', $to);
             }
             $this->id = $messageid;
@@ -249,19 +327,25 @@ class block_jmail_message {
             if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
             
                 // attachments
-                $context = get_context_instance(CONTEXT_BLOCK, $instance->id);
-    
+                $context = get_context_instance(CONTEXT_BLOCK, $instance->id);    
+                require_once($CFG->libdir.'/filelib.php');
+                
+                $message->body = file_save_draft_area_files($editoritemid,  $context->id, 'block_jmail', 'body', $messageid, array('subdirs'=>true), $message->body);
+                $DB->set_field('block_jmail', 'body', $message->body, array('id'=>$messageid));
+                
                 $info = file_get_draft_area_info($attachments);
                 $present = ($info['filecount']>0) ? '1' : '';
                 file_save_draft_area_files($attachments, $context->id, 'block_jmail', 'attachment', $messageid);
       
                 $DB->set_field('block_jmail', 'attachment', $present, array('id'=>$messageid));
             }
+
             return $messageid;
         }
 
         return false;
     }
+      
     
     /**
      * Mark as deleted the current message in database
@@ -279,11 +363,60 @@ class block_jmail_message {
     }
     
     /**
+     * Mark as undeleted the current message in database
+     * @return boolean True if the message have been undeleted succesfully
+     */ 
+    public function undelete() {
+        global $DB;
+        
+        // TODO, there is no way for deleting drafts right now
+        if (!$this->sentid) {
+            return false;
+        }
+        
+        return $DB->set_field('block_jmail_sent', 'deleted', 0, array('id' => $this->sentid));
+    }
+    
+    /**
      * Mark as sent the current message in database
      * @return boolean True if the message have been sent succesfully
      */ 
     public function mark_sent() {
+        global $DB;
+        
+        if (!$this->sentid) {
+            return false;
+        }
+        
         return $DB->set_field('block_jmail_sent', 'timesent', time(), array('id' => $this->sentid));
+    }
+    
+    /**
+     * Mark as read the current message in database
+     * @return boolean True if the message have been sent succesfully
+     */ 
+    public function mark_read() {
+        global $DB;
+        
+        if (!$this->sentid) {
+            return false;
+        }
+        
+        return $DB->set_field('block_jmail_sent', 'mread', 1, array('id' => $this->sentid));
+    }
+    
+    /**
+     * Mark as unread the current message in database
+     * @return boolean True if the message have been sent succesfully
+     */ 
+    public function mark_unread() {
+        global $DB;
+        
+        if (!$this->sentid) {
+            return false;
+        }
+        
+        return $DB->set_field('block_jmail_sent', 'mread', 0, array('id' => $this->sentid));
     }
     
     /**
@@ -291,6 +424,8 @@ class block_jmail_message {
      * @return boolean True if the message have been sent succesfully
      */ 
     public function mark_labeled() {
+        global $DB;
+        
         return $DB->set_field('block_jmail_sent', 'labeled', 1, array('id' => $this->sentid));
     }
     
@@ -299,11 +434,23 @@ class block_jmail_message {
      * @return boolean True if the message have been sent succesfully
      */ 
     public function mark_unlabeled() {
-        if ($DB->count_records('block_jmail_m_label', array('messagesentid' => $this->sentid)) <= 1) {
+        global $DB;
+        
+        if ($DB->count_records('block_jmail_m_label', array('messagesentid' => $this->sentid)) == 0) {
             return $DB->set_field('block_jmail_sent', 'labeled', 0, array('id' => $this->sentid));
         }
         return true;
     }
+    
+    /**
+     * Approve a message
+     * @return boolean True if the message have been approved succesfully
+     */ 
+    public function approve() {
+        global $DB;
+        
+        return $DB->set_field('block_jmail', 'approved', 1, array('id' => $this->id));
+    }    
 
     /**
      * Checks if the message has been created for the current user or has been sent to the current user
@@ -312,7 +459,7 @@ class block_jmail_message {
     public function is_mine() {
         global $USER;
         
-        return $this->sender == $USER->id or ($this->userid == $USER->id and $this->timesent > 0);
+        return $this->sender == $USER->id or ($this->userid == $USER->id and $this->timesent > 0 and $this->approved);
     }
 
     /**
@@ -329,6 +476,7 @@ class block_jmail_message {
                 if ($messagesent = $DB->get_record('block_jmail_sent', array('messageid'=>$id,'userid'=>$USER->id))) {
                     $message->userid = $messagesent->userid;
                     $message->sentid = $messagesent->id;
+                    $message->deleted = $messagesent->deleted;
                 }
             }
             return new block_jmail_message($message);
@@ -351,6 +499,7 @@ class block_jmail_message {
         if ($message = $DB->get_record('block_jmail', array('id'=>$messagesent->messageid))) {
             $message->sentid = $messagesent->id;
             $message->userid = $messagesent->userid;
+            $message->deleted = $messagesent->deleted;
             return new block_jmail_message($message);
         } else {
             return false;

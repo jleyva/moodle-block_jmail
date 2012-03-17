@@ -45,7 +45,7 @@ class block_jmail_renderer extends plugin_renderer_base {
      */
     function global_inbox() {
         $url = new moodle_url('/blocks/jmail/mailbox.php');
-        $inboxname = get_string('view_all', 'block_jmail');        
+        $inboxname = get_string('viewall', 'block_jmail');        
         return html_writer::link($url, $inboxname, array('title'=>$inboxname));
     }
     
@@ -56,7 +56,7 @@ class block_jmail_renderer extends plugin_renderer_base {
      */
     function course_inbox($course) {
         $url = new moodle_url('/blocks/jmail/mailbox.php', array('id'=>$course->id));
-        $str = get_string('view_inbox', 'block_jmail');        
+        $str = get_string('viewinbox', 'block_jmail');        
         return html_writer::link($url, $str, array('title'=>$str));
     }
     
@@ -70,32 +70,71 @@ class block_jmail_renderer extends plugin_renderer_base {
         $coursename = format_string($mailbox->course->fullname);
         return html_writer::link($url, "$coursename ({$mailbox->unreadcount})", array('title'=>$coursename));
     }
+    
+    /**
+     * Load the html of the message print window
+     * @param block_jmail_message $message A message object
+     * @return string The html for the print window
+     */
+    function message_print($message) {
+        $message = $message->full();
+        
+        $destname = array('to' => get_string('to', 'block_jmail'),
+                          'cc' => get_string('cc', 'block_jmail'),
+                          'bcc' => get_string('bcc', 'block_jmail'));
+        
+        $output = html_writer::start_tag('html');
+        $output .= html_writer::start_tag('head');
+        $output .= html_writer::tag('script', 'function Print(){document.body.offsetHeight;window.print()};');
+        $output .= html_writer::end_tag('head');
+        $output .= html_writer::start_tag('body', array('onload'=>'Print();'));
+        $output .= $this->output->heading($message->subject, 2);
+        $output .= $this->output->heading(get_string('from', 'block_jmail').': '.$message->from, 3);
+        $output .= $this->output->heading($message->date, 4);
+        
+        if ($message->destinataries) {
+            foreach ($message->destinataries as $type => $destinataries) {                
+                foreach ($destinataries as $dest) {
+                    $output .= $this->output->heading($destname[$type].': '.$dest->fullname, 5);
+                }
+            }
+        }
+        
+        $output .= html_writer::tag('p', $message->body);
+        $output .= html_writer::end_tag('body');
+        $output .= html_writer::end_tag('html');
+        
+        return $output;
+    }
 
     /**
      * Loads the user interface
      */
     function load_ui($mailbox) {
-        $strcheck = get_string('check', 'block_jmail');
-        $strnew = get_string('newmail', 'block_jmail');
-        $strinbox = get_string('inbox', 'block_jmail');
-        $strdrafts = get_string('draft', 'block_jmail');
-        $strsent = get_string('sendbox', 'block_jmail');
-        $strtrash = get_string('trash', 'block_jmail');
-        $strdelete = get_string('removemail', 'block_jmail');
-        $strreply = get_string('reply', 'block_jmail');
-        $strmove = get_string('move', 'block_jmail');
-        $strforward = get_string('forward', 'block_jmail');
-        $strprint = get_string('print', 'block_jmail');
-        $straddalabel = get_string('addlabel', 'block_jmail');
+        global $CFG;
+        
+        $mystrings = array('subject','check','new'=>'newmail','inbox', 'drafts' => 'draft',
+                           'sent'=>'sent', 'bin','toapprove','delete',
+                           'reply','move','forward','print','addlabel','to','cc','bcc',
+                           'send','save','more','preferences', 'markread', 'markunread', 'addlabel',
+                           'replytoall' => 'replyall', 'receivecopies' , 'subscription', 'none'
+                           );
+        
+        foreach ($mystrings as $key=>$value) {
+            $varname = 'str';
+            $varname .= is_numeric($key)? $value : $key;
+            $$varname = get_string($value, 'block_jmail');
+        }
+        
         $strfirstname = get_string('firstname');
         $strlastname = get_string('lastname');
         $strroles = get_string('roles');
         $strgroups = get_string('groups');
         $strall = get_string('all');
         $strname = get_string('name');
-        $strto = get_string('for','block_jmail');
-        $strcc = get_string('cc','block_jmail');
-        $strbcc = get_string('bcc','block_jmail');
+        $stredit = get_string('edit');
+        
+        $cansend = $mailbox->cansend;
         
         $loadingicon = $this->plugin_icon('loading');
         
@@ -117,7 +156,7 @@ class block_jmail_renderer extends plugin_renderer_base {
         
         if (count($groups) > 0) {            
             $selector = html_writer::select($groups, 'groupselector', '', array(''=>'choosedots'), array('id'=>'groupselector'));
-            $groupsselect = '<input type="submit" id="groupselectorb" name="groupselectorb" value="'.$strroles.'">'.$selector;
+            $groupsselect = '<input type="submit" id="groupselectorb" name="groupselectorb" value="'.$strgroups.'">'.$selector;
         }
         
         if (count($roles) > 1) {
@@ -129,12 +168,89 @@ class block_jmail_renderer extends plugin_renderer_base {
             $alphabetfilter .= '<a href="#" class="alphabet">'.$letter.'</a> ';            
         }
         
+        // Main toolbar html
+        $toolbar = '<button type="button" id="deleteb" name="deleteb" value="'.$strdelete.'">'.$strdelete.'</button>';
+        
+        $toolbar .= '<button type="button" id="editb" name="editb" value="'.$stredit.'">'.$stredit.'</button>';
+        
+        if ($cansend) {
+            $toolbar .= '<button type="button" id="replyb" name="replyb" value="'.$strreply.'">'.$strreply.'</button>';
+            $toolbar .= '<button type="button" id="replytoallb" name="replytoallb" value="'.$strreplytoall.'">'.$strreplytoall.'</button>';
+            $toolbar .= '<button type="button" id="forwardb" name="forwardb" value="'.$strforward.'">'.$strforward.'</button>';
+        }
+        
+        $toolbar .= '<button type="button" id="moveb" name="moveb" value="'.$strmove.'">'.$strmove.'</button>';
+        $toolbar .= '    <select id="labelsmenu" name="labelsmenu"> 
+                                <option value="inbox">'.$strinbox.'</option>
+                                '.$optionslabels.'
+                            </select> ';
+        $toolbar .= '<button type="button" id="moreb" name="moreb" value="'.$strmore.'">'.$strmore.'</button>';
+        $toolbar .= '    <select id="moremenu" name="moremenu"> 
+                                <option value="markread">'.$strmarkread.'</option>
+                                <option value="markunread">'.$strmarkunread.'</option>                                
+                            </select> ';
+        $toolbar .= '<button type="button" id="printb" name="printb" value="'.$strprint.'">'.$strprint.'</button>';                            
+
+        // Action buttons html
+        $actionbuttons = '<button type="button" id="checkmail" name="checkmail" value="'.$strcheck.'">'.$strcheck.'</button>';        
+        if ($cansend) {
+            $actionbuttons .= '<button type="button" id="newmail" name="newmail" value="'.$strnew.'">'.$strnew.'</button>';
+        }
+        
+        // Contacts html
+        $contacts = '';
+        
+        if ($cansend) {
+            $contacts = '
+                    <div id="contact_list_filter">
+                        <div>'.$groupsselect.'</div>
+                        <div>'.$rolesselect.'</div>
+                        <b>'.$strfirstname.'</b>
+                        <div id="firstnamefilter">'.$alphabetfilter.'</div>
+                        <b>'.$strlastname.'</b>
+                        <div id="lastnamefilter">'.$alphabetfilter.'</div>                        
+                    </div>
+                    <div id="contact_list_users">'.$loadingicon.'</div>';
+        }
+
+        $approvelabel = '';
+        if (!empty($mailbox->config->approvemode) and has_capability('block/jmail:approvemessages', $mailbox->blockcontext)) {
+            $approvelabel = '
+            <li class="inbox">
+                <em></em>
+                <a href="#" id="toapprove">'.$strtoapprove.'</a>
+            </li>';                            
+        }
+        
+        // Preferences and labels
+        
+        $preferences = '';
+
+        if ($mailbox->canmanagelabels) {
+            $preferences .= '<p><img src="'.$this->output->pix_url('add', 'block_jmail').'"><a href="#" id="addlabel">&nbsp;&nbsp;'.$straddlabel.'</a></p>';
+        }
+        
+        if ($mailbox->canmanagelabels) {
+            $preferences .= '<p><img src="'.$this->output->pix_url('settings', 'block_jmail').'"><a href="#" id="preferences">&nbsp;&nbsp;'.$strpreferences.'</a></p>';
+        }
+        
+        // Tinymce editor
+        $editor = editors_get_preferred_editor(FORMAT_HTML);
+        $editor->use_editor('body');
+
         return '
+    
+    <script type="text/javascript">
+//<![CDATA[
+M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"http:\/\/localhost\/moodle21\/lib\/editor\/tinymce\/module.js","requires":[]},"form_filemanager":{"name":"form_filemanager","fullpath":"http:\/\/localhost\/moodle21\/lib\/form\/filemanager.js","requires":["core_filepicker","base","io","node","json","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview"]}});
+
+//]]>
+</script>
+    
             <div id="jmailui">
                 <div id="jmailleft">
                     <div id="action_buttons">                        
-                        <button type="button" id="checkmail" name="checkmail" value="'.$strcheck.'">'.$strcheck.'</button>
-                        <button type="button" id="newmail" name="newmail" value="'.$strnew.'">'.$strnew.'</button>
+                        '.$actionbuttons.'
                     </div>
                     <div id="search_bar">
                         <input type="text" name="search" id="input_search"><span id="search_button"></span>
@@ -155,78 +271,23 @@ class block_jmail_renderer extends plugin_renderer_base {
                             </li>
                             <li class="trash">
                                 <em></em>
-                                <a href="#" id="trash">'.$strtrash.'</a>
+                                <a href="#" id="trash">'.$strbin.'</a>
                             </li>
+                            '.$approvelabel.'
                         </ul>
                         <div id="user_labels">
                         '.$loadingicon.'
                         </div>
                         <div id="menulabel">
                         </div>
-                        <img src="'.$this->output->pix_url('add', 'block_jmail').'"><a href="#" id="addlabel">&nbsp;&nbsp;'.$straddalabel.'</a>
+                        
+                        '.$preferences.'
                     </div>
                 </div>
                 <div id="jmailcenter">
-                    <div id="newemailpanel" style="display: none">
-                        <div class="hd">'.$strnew.'</div>
-                        <div id="newemailform" class="bd mform">                                     
-                            <div class="fitem">
-                                <div class="fitemtitle">
-                                    <label for="composetoac">'.$strto.'</label>
-                                </div>
-                                <div class="felement ftext">
-                                    <input type="text" name="composetoac" id="composetoac" value=""  size="50">
-                                    <div id="composetolist"></div>
-                                </div>
-                            </div>                            
-                            <div class="fitem">
-                                <div class="fitemtitle">
-                                    <label for="composeccac">'.$strcc.'</label>
-                                </div>
-                                <div class="felement ftext">
-                                    <input type="text" name="composeccac" id="composeccac" value=""  size="50">
-                                    <div id="composecclist"></div>
-                                </div>
-                            </div>
-                            <div class="fitem">
-                                <div class="fitemtitle">
-                                    <label for="composebccac">'.$strbcc.'</label><br>                            
-                                </div>
-                                <div class="felement ftext">
-                                    <input type="text" name="composebccac" id="composebccac" value=""  size="50">
-                                    <div id="composebcclist"></div>
-                                </div>
-                            </div>
-                            
-                            <input type="hidden" name="to" id="hiddento">
-                            <input type="hidden" name="cc" id="hiddencc">
-                            <input type="hidden" name="bcc" id="hiddenbcc">
-                        </div>
-                        <div class="ft"></div>
-                    </div>
-                    <div id="newlabelpanel">
-                        <div class="yui3-widget-bd">
-                            <form>
-                                <fieldset>
-                                    <p>
-                                        <label for="id">'.$strname.'</label><br/>
-                                        <input type="text" name="newlabelname" id="newlabelname" placeholder="">
-                                    </p>
-                                </fieldset>
-                            </form>
-                        </div>
-                    </div>
                     <div id="mailarea">
                         <div id="jmailtoolbar">
-                            <button type="button" id="deleteb" name="deleteb" value="'.$strdelete.'">'.$strdelete.'</button>
-                            <button type="button" id="replyb" name="replyb" value="'.$strreply.'">'.$strreply.'</button>
-                            <button type="button" id="forwardb" name="forwardb" value="'.$strforward.'">'.$strforward.'</button>
-                            <button type="button" id="moveb" name="moveb" value="'.$strmove.'">'.$strmove.'</button>
-                            <select id="labelsmenu" name="labelsmenu"> 
-                                <option value="trash">'.$strtrash.'</option>
-                                '.$optionslabels.'
-                            </select> 
-                            <button type="button" id="printb" name="printb" value="'.$strprint.'">'.$strprint.'</button>
+                            '.$toolbar.'
                         </div>
                         <div id="maillist">                                        
                         </div>                                    
@@ -235,35 +296,96 @@ class block_jmail_renderer extends plugin_renderer_base {
                     </div>                                                   
                 </div>
                 <div id="jmailright">
-                    <div id="contact_list_filter">
-                        <div>'.$groupsselect.'</div>
-                        <div>'.$rolesselect.'</div>
-                        <b>'.$strfirstname.'</b>
-                        <div id="firstnamefilter">'.$alphabetfilter.'</div>
-                        <b>'.$strlastname.'</b>
-                        <div id="lastnamefilter">'.$alphabetfilter.'</div>                        
-                    </div>
-                    <div id="contact_list_users">'.$loadingicon.'</div>
+                    '.$contacts.'
                 </div>
             </div>
-            
-            <div id="demo" class="yui3-skin-sam">
-  <label for="ac-input">Enter a GitHub username:</label><br>
-  <input id="ac-input" type="text">
-</div>
-
-<script>
-YUI().use(\'autocomplete\', \'autocomplete-highlighters\', function (Y) {
-  Y.one(\'#ac-input\').plug(Y.Plugin.AutoComplete, {
-    resultHighlighter: \'phraseMatch\',
-    resultListLocator: \'users\',
-    resultTextLocator: \'username\',
-    source: \'http://github.com/api/v2/json/user/search/{query}?callback={callback}\'
-  });
-});
-</script>
-            
-            
+            <div id="messagepanel"></div>
+            <div id="newemailpanel" style="display: none">
+                <div class="hd">'.$strnew.'</div>
+                <div id="newemailform" class="bd mform">                                     
+                    <div class="fitem">
+                        <div class="fitemtitle">
+                            <label for="composetoac">'.$strto.'</label>
+                        </div>
+                        <div class="felement ftext">
+                            <input type="text" name="composetoac" id="composetoac" value=""  size="50">
+                            <div id="composetolist"></div>
+                        </div>
+                    </div>                            
+                    <div class="fitem">
+                        <div class="fitemtitle">
+                            <label for="composeccac">'.$strcc.'</label>
+                        </div>
+                        <div class="felement ftext">
+                            <input type="text" name="composeccac" id="composeccac" value=""  size="50">
+                            <div id="composecclist"></div>
+                        </div>
+                    </div>
+                    <div class="fitem">
+                        <div class="fitemtitle">
+                            <label for="composebccac">'.$strbcc.'</label><br>                            
+                        </div>
+                        <div class="felement ftext">
+                            <input type="text" name="composebccac" id="composebccac" value=""  size="50">
+                            <div id="composebcclist"></div>
+                        </div>
+                    </div>
+                    <div class="fitem">
+                        <div class="fitemtitle">
+                            <label for="subject">'.$strsubject.'</label><br>                            
+                        </div>
+                        <div class="felement ftext">
+                            <input type="text" name="subject" id="subject" value=""  size="50">                                    
+                        </div>
+                    </div>
+    
+                    <div id="newemailformremote"></div>
+                    
+                    <div class="fitem">
+                        <div class="fitemtitle">                                
+                        </div>
+                        <div class="felement ftext">
+                            <input type="button" name="sendbutton" id="sendbutton" value="'.$strsend.'">
+                            <input type="button" name="savebutton" id="savebutton" value="'.$strsave.'">
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="to" id="hiddento">
+                    <input type="hidden" name="cc" id="hiddencc">
+                    <input type="hidden" name="bcc" id="hiddenbcc">
+                </div>
+                <div class="ft"></div>
+            </div>
+            <div id="newlabelpanel" style="display: none">
+                <div class="yui3-widget-bd">
+                    <form>
+                        <fieldset>
+                            <p>
+                                <label for="id">'.$strname.'</label><br/>
+                                <input type="text" name="newlabelname" id="newlabelname" placeholder="">
+                            </p>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+            <div id="preferencespanel">
+                <div id="panelContent">
+                    <div class="yui3-widget-bd">
+                        <form>
+                            <fieldset>
+                                <p>
+                                    <label for="subscription">'.$strsubscription.'</label><br/>
+                                    <select name="subscription" id="subscription">
+                                        <option value="">'.$strnone.'</option>
+                                        <option value="receivecopies">'.$strreceivecopies.'</option>
+                                    </select>
+                                </p>                               
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id="rendertarget"></div>
         ';
     }
 

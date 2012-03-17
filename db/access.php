@@ -29,13 +29,39 @@
 
 $capabilities = array(
 
-    'block/jmail:sendmessages' => array(
+    'block/jmail:sendtomanagers' => array(
 
         'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+    
+    'block/jmail:sendtoall' => array(
+
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+    
+    'block/jmail:approvemessages' => array(
+
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'student' => CAP_PREVENT,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
@@ -45,7 +71,7 @@ $capabilities = array(
     'block/jmail:viewmailbox' => array(
         
         'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
@@ -57,7 +83,19 @@ $capabilities = array(
     'block/jmail:managelabels' => array(        
 
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'block/jmail:managepreferences' => array(        
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
