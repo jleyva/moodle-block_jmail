@@ -849,29 +849,40 @@ M.block_jmail.addLabel = function() {
         });
         M.block_jmail.app.panel = panel;
         
+        Y.one('#newlabelname').on('key', function(e) {
+            M.block_jmail.addLabelAction();
+            e.preventDefault();
+        }, 'enter');
+        
         M.block_jmail.app.panel.addButton({
             value  : M.str.moodle.add,
             section: Y.WidgetStdMod.FOOTER,
             action : function (e) {
-                var cfg = M.block_jmail.cfg;
-                var name = Y.one('#newlabelname').get('value');
-                var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=create_label&sesskey='+cfg.sesskey+'&name='+name;
-                var cfg = {
-                    on: {
-                        complete: function(id, o, args) {
-                            M.block_jmail.app.panel.hide();
-                            M.block_jmail.loadLabels();
-                        }
-                    }
-                };
-                Y.io(url, cfg);                              
                 e.preventDefault();
+                M.block_jmail.addLabelAction();                
             }
         });
     }
     
     Y.one('#newlabelname').set('value', '');
     M.block_jmail.app.panel.show();
+    Y.one('#newlabelname').focus();
+}
+
+M.block_jmail.addLabelAction = function() {
+    var Y = M.block_jmail.Y;
+    var cfg = M.block_jmail.cfg;
+    var name = Y.one('#newlabelname').get('value');
+    var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=create_label&sesskey='+cfg.sesskey+'&name='+name;
+    var cfg = {
+        on: {
+            complete: function(id, o, args) {
+                M.block_jmail.app.panel.hide();
+                M.block_jmail.loadLabels();
+            }
+        }
+    };
+    Y.io(url, cfg);    
 }
 
 M.block_jmail.loadLabels = function() {
