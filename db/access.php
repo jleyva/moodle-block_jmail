@@ -57,7 +57,7 @@ $capabilities = array(
     
     'block/jmail:approvemessages' => array(
 
-        'riskbitmask' => RISK_SPAM,
+        'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(

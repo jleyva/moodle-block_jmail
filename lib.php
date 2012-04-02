@@ -40,25 +40,27 @@ function block_jmail_pluginfile($course, $cm, $context, $filearea, $args, $force
     global $SCRIPT;
 
     if ($context->contextlevel != CONTEXT_BLOCK) {
-        send_file_not_found();
+        //send_file_not_found();
     }
 
     require_course_login($course);
-    
-    if (!has_capability('block/jmail:viewmailbox', $context)) {
-        send_file_not_found();
-    }
+    $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
 
-    if ($filearea !== 'attachment' and $filearea !== 'body') {
-        send_file_not_found();
-    }
-    
+    // The mailbox constructor does the permission validation
+    $mailbox = new block_jmail_mailbox($course, $coursecontext, $context);
+
     $messageid = (int)array_shift($args);
-    
+
     $message = block_jmail_message::get_from_id($messageid);
     
     // We check if we are the senders or the receivers
-    if (!$message or !$message->is_mine()) {
+    if (!$message) {
+        send_file_not_found();
+    }
+    
+    $pendingaprobal = !$message->approved and has_capability('block/jmail:approvemessages', $context);
+    
+    if (!$message->is_mine() and !$pendingaprobal) {
         send_file_not_found();
     }
 
@@ -67,7 +69,7 @@ function block_jmail_pluginfile($course, $cm, $context, $filearea, $args, $force
     
     $fullpath = "/$context->id/block_jmail/$filearea/$messageid/$relativepath";
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-        return false;
+        send_file_not_found();
     }
 
     $forcedownload = true;

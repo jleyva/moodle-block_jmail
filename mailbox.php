@@ -39,22 +39,16 @@ if (! ($block = $DB->get_record('block', array('name'=>'jmail', 'visible'=>1))))
 }
 
 require_login($course->id);
+
 $context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
-if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
-    $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id);
-} else {
-    throw new moodle_exception('invalidcourseid', 'error');
-}
+$PAGE->set_context($context);
 
-require_capability('block/jmail:viewmailbox', $blockcontext);
-
-$mailbox = new block_jmail_mailbox($course, $context, $blockcontext);
+$mailbox = new block_jmail_mailbox($course, $context);
 
 add_to_log($course->id, 'jmail', 'view mailbox');
 
 // TODO, check block disabled or instance not visible?
 
-$PAGE->set_context($context);
 $PAGE->blocks->show_only_fake_blocks();
 
 $renderer = $PAGE->get_renderer('block_jmail');
@@ -75,8 +69,11 @@ $module = array(
                                      array('messagesdeleted','block_jmail'),array('errortorequired','block_jmail'),array('errorsubjectrequired','block_jmail'),
                                      array('to','block_jmail'),array('confirmdelete','block_jmail'), array('label','block_jmail'), array('labels','block_jmail'),
                                      array('nomessagesfound','block_jmail'),array('re','block_jmail'),array('fw','block_jmail'),array('attachments','block_jmail'),
-                                     array('preferences','block_jmail'),
-                                     array('add','moodle'),array('delete','moodle'),array('rename','moodle'),array('edit','moodle'), array('ok','moodle'),
+                                     array('preferences','block_jmail'),array('approvalpending','block_jmail'),array('messagehastobeapproved','block_jmail'),
+                                     array('first','block_jmail'),array('last','block_jmail'),array('next','block_jmail'),array('previous','block_jmail'),
+                                     array('delete','block_jmail'), array('save','block_jmail'),array('download','block_jmail'),array('savetomyprivatefiles','block_jmail'),array('filesaved','block_jmail'),
+                                     array('mailbox','block_jmail'),array('delivertodifferentcourse','block_jmail'),array('delivertoglobalinbox','block_jmail'),
+                                     array('add','moodle'),array('deletem','block_jmail'),array('rename','moodle'),array('edit','moodle'), array('ok','moodle'),
                                      array('cancel','moodle'))
             );
 
@@ -86,11 +83,15 @@ $jmailcfg = array(
         'sesskey' => sesskey(),
         'pagesize' => $mailbox->pagesize,
         'cansend' => $mailbox->cansend,
+        'canapprovemessages' => $mailbox->canapprovemessages,
         'canmanagelabels' => $mailbox->canmanagelabels,
         'canmanagepreferences' => $mailbox->canmanagepreferences,
+        'userid' => $USER->id,
+        'globalinbox' => $mailbox->globalinbox,
         'approvemode' => (! empty($mailbox->config->approvemode))? $mailbox->config->approvemode : false
-                  );
+        );
 
+//$PAGE->requires->js('/lib/editor/tinymce/tiny_mce/3.4.2/tiny_mce.js');
 $PAGE->requires->yui2_lib(array('event', 'dragdrop', 'element', 'animation', 'resize', 'layout', 'widget', 'button', 'editor', 'get', 'connection', 'datasource', 'datatable', 'container', 'utilities', 'menu', 'json', 'paginator'));
 $PAGE->requires->js_init_call('M.block_jmail.init', array($jmailcfg), true, $module);
 $PAGE->requires->css(new moodle_url('styles.css'));

@@ -42,15 +42,12 @@ if (! ($block = $DB->get_record('block', array('name'=>'jmail', 'visible'=>1))))
 
 require_login($course->id);
 $context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
-if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
-    $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id);
-}
+$PAGE->set_context($context);
 
-require_capability('block/jmail:viewmailbox', $blockcontext);
+$mailbox = new block_jmail_mailbox($course, $context);
 
 $message = block_jmail_message::get_from_id($messageid);
 
-$PAGE->set_context($context);
 $renderer = $PAGE->get_renderer('block_jmail');
 
 if ($message and $message->is_mine() and $message->courseid == $course->id) {    

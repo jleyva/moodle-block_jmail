@@ -103,6 +103,13 @@ class block_jmail_message {
     public function headers() {
         global $DB;
         
+        if (isset($SESSION->jmailcache->courses[$this->courseid])) {
+            $course = $SESSION->jmailcache->courses[$this->courseid];
+        } else {
+            $course = $DB->get_record('course', array('id'=>$this->courseid),'id, fullname, shortname', MUST_EXIST);
+            $SESSION->jmailcache->courses[$this->courseid] = $course;            
+        }
+        
         $header = new stdClass;
         $user = $DB->get_record('user', array('id' => $this->sender, 'deleted' => 0));
         $header->id = $this->id;
@@ -111,6 +118,9 @@ class block_jmail_message {
         $time = (!empty($this->timesent)) ? $this->timesent : $this->timecreated;
         $header->date = userdate($time, get_string('strftimedatetimeshort', 'langconfig'));
         $header->read = $this->read;
+        $header->approved = $this->approved;
+        $header->courseid = $course->id;
+        $header->courseshortname = $course->shortname;
                
         return $header;
     }
@@ -141,6 +151,15 @@ class block_jmail_message {
         $message->destinataries = array();
         $message->attachments = array();
         $message->labels = array();
+        
+        if (isset($SESSION->jmailcache->courses[$this->courseid])) {
+            $course = $SESSION->jmailcache->courses[$this->courseid];
+        } else {
+            $course = $DB->get_record('course', array('id'=>$this->courseid),'id, fullname, shortname', MUST_EXIST);
+            $SESSION->jmailcache->courses[$this->courseid] = $course;            
+        }
+        $message->courseid = $course->id;
+        $message->courseshortname = $course->shortname;
         
         // Destinataries
         if ($destinataries = $DB->get_records('block_jmail_sent', array('messageid' => $this->id))) {
@@ -459,7 +478,13 @@ class block_jmail_message {
     public function is_mine() {
         global $USER;
         
-        return $this->sender == $USER->id or ($this->userid == $USER->id and $this->timesent > 0 and $this->approved);
+        if ($this->sender == $USER->id) {
+            return true;
+        }
+        
+        if ($this->userid == $USER->id and $this->timesent > 0 and $this->approved) {
+            return true;
+        }
     }
 
     /**
@@ -471,14 +496,13 @@ class block_jmail_message {
         global $DB, $USER;
         
         if ($message = $DB->get_record('block_jmail', array('id'=>$id))) {
-            // We are loading a message not send by this user
-            if ($message->sender != $USER->id) {
-                if ($messagesent = $DB->get_record('block_jmail_sent', array('messageid'=>$id,'userid'=>$USER->id))) {
-                    $message->userid = $messagesent->userid;
-                    $message->sentid = $messagesent->id;
-                    $message->deleted = $messagesent->deleted;
-                }
+            
+            if ($messagesent = $DB->get_record('block_jmail_sent', array('messageid'=>$id,'userid'=>$USER->id))) {
+                $message->userid = $messagesent->userid;
+                $message->sentid = $messagesent->id;
+                $message->deleted = $messagesent->deleted;
             }
+            
             return new block_jmail_message($message);
         } else {
             return false;

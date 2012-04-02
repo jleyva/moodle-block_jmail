@@ -44,9 +44,10 @@ class block_jmail_renderer extends plugin_renderer_base {
      * @return moodle_url
      */
     function global_inbox() {
-        $url = new moodle_url('/blocks/jmail/mailbox.php');
-        $inboxname = get_string('viewall', 'block_jmail');        
+        $url = new moodle_url('/blocks/jmail/mailbox.php', array('id'=>SITEID));
+        $inboxname = get_string('viewglobalinbox', 'block_jmail');        
         return html_writer::link($url, $inboxname, array('title'=>$inboxname));
+        return '';
     }
     
     /**
@@ -67,8 +68,8 @@ class block_jmail_renderer extends plugin_renderer_base {
      */
     function unread_messages($mailbox) {
         $url = new moodle_url('/blocks/jmail/mailbox.php', array('id'=>$mailbox->course->id));
-        $coursename = format_string($mailbox->course->fullname);
-        return html_writer::link($url, "$coursename ({$mailbox->unreadcount})", array('title'=>$coursename));
+        $coursename = format_string($mailbox->course->shortname);
+        return html_writer::link($url, "$coursename (".get_string('unreadmessages', 'block_jmail', $mailbox->unreadcount).")", array('title'=>$coursename));
     }
     
     /**
@@ -114,10 +115,10 @@ class block_jmail_renderer extends plugin_renderer_base {
         global $CFG;
         
         $mystrings = array('subject','check','new'=>'newmail','inbox', 'drafts' => 'draft',
-                           'sent'=>'sent', 'bin','toapprove','delete',
+                           'sent'=>'sent', 'bin','toapprove','approve','delete','mymailboxes',
                            'reply','move','forward','print','addlabel','to','cc','bcc',
                            'send','save','more','preferences', 'markread', 'markunread', 'addlabel',
-                           'replytoall' => 'replyall', 'receivecopies' , 'subscription', 'none'
+                           'replytoall' => 'replyall', 'receivecopies' , 'subscription', 'none', 'selected'
                            );
         
         foreach ($mystrings as $key=>$value) {
@@ -173,6 +174,10 @@ class block_jmail_renderer extends plugin_renderer_base {
         
         $toolbar .= '<button type="button" id="editb" name="editb" value="'.$stredit.'">'.$stredit.'</button>';
         
+        if (!empty($mailbox->config->approvemode) and has_capability('block/jmail:approvemessages', $mailbox->blockcontext)) {
+            $toolbar .= '<button type="button" id="approveb" name="approveb" value="'.$strapprove.'">'.$strapprove.'</button>';
+        }
+        
         if ($cansend) {
             $toolbar .= '<button type="button" id="replyb" name="replyb" value="'.$strreply.'">'.$strreply.'</button>';
             $toolbar .= '<button type="button" id="replytoallb" name="replytoallb" value="'.$strreplytoall.'">'.$strreplytoall.'</button>';
@@ -210,7 +215,16 @@ class block_jmail_renderer extends plugin_renderer_base {
                         <b>'.$strlastname.'</b>
                         <div id="lastnamefilter">'.$alphabetfilter.'</div>                        
                     </div>
-                    <div id="contact_list_users">'.$loadingicon.'</div>';
+                    <div id="contact_list">
+                        <div id="contact_list_users">'.$loadingicon.'</div>
+                        <div id="selbuttons" style="clear: both">
+                            <input type="checkbox" id="selectall">'.$strselected.'
+                            <input type="button" class="selto" value=" '.$strto.' ">&nbsp;
+                            <input type="button" class="selcc" value=" '.$strcc.' ">&nbsp;
+                            <input type="button" class="selbcc" value=" '.$strbcc.' ">
+                        </div>
+                    </div>
+                    ';
         }
 
         $approvelabel = '';
@@ -230,9 +244,25 @@ class block_jmail_renderer extends plugin_renderer_base {
             $preferences .= '<p><img src="'.$this->output->pix_url('add', 'block_jmail').'"><a href="#" id="addlabel">&nbsp;&nbsp;'.$straddlabel.'</a></p>';
         }
         
-        if ($mailbox->canmanagelabels) {
+        if ($mailbox->canmanagepreferences) {
             $preferences .= '<p><img src="'.$this->output->pix_url('settings', 'block_jmail').'"><a href="#" id="preferences">&nbsp;&nbsp;'.$strpreferences.'</a></p>';
         }
+        
+        // My mailboxes
+        
+        $mymailboxes = '';
+        if ($mailboxes = $mailbox::get_my_mailboxes()) {
+            $mymailboxes .= '<button type="button" id="mailboxesb" name="mailboxesb" value="'.$strmymailboxes.'">'.$strmymailboxes.'</button>';
+            $mymailboxes .= '<select id="mailboxesmenu" name="mailboxesmenu">';
+            foreach ($mailboxes as $box) {
+                if ($box->id == $mailbox->course->id) {
+                    continue;
+                }
+                $mymailboxes .= '<option value="'.$box->id.'">'.format_string($box->shortname).'</option>';
+            }
+            $mymailboxes .= '</select> ';
+        }
+        
         
         // Tinymce editor
         $editor = editors_get_preferred_editor(FORMAT_HTML);
@@ -282,6 +312,10 @@ M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"http:\/\
                         </div>
                         
                         '.$preferences.'
+                        
+                        <div id="mymailboxes">
+                        '.$mymailboxes.'
+                        </div>
                     </div>
                 </div>
                 <div id="jmailcenter">
@@ -368,7 +402,7 @@ M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"http:\/\
                     </form>
                 </div>
             </div>
-            <div id="preferencespanel">
+            <div id="preferencespanel" style="display: none">
                 <div id="panelContent">
                     <div class="yui3-widget-bd">
                         <form>

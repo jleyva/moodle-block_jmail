@@ -20,12 +20,17 @@ M.block_jmail.currentLabel = 0;
 M.block_jmail.currentMessage = {};
 M.block_jmail.searchTimeout = null;
 M.block_jmail.searchText = '';
-M.block_jmail.magicNumSubject = 375;
+M.block_jmail.magicNumSubject = 0;
+M.block_jmail.magicNumTop = 125;
+M.block_jmail.magicNumDataTableWidth = 10;
+M.block_jmail.currentComposeCourse = {id: 0, shortname: ''};
 
 M.block_jmail.init = function(Y, cfg) {
     
     M.block_jmail.Y = Y;
     M.block_jmail.cfg = cfg;
+    
+    M.block_jmail.magicNumSubject = (cfg.globalinbox)? 550 : 400;
     
     // Panel for composing messages, this is the first we have to do for avoid problems with the tinymce editor
     // We must render first the panel
@@ -33,7 +38,7 @@ M.block_jmail.init = function(Y, cfg) {
     Y.one('#newemailpanel').setStyle('display', 'block');
     var panel = new YAHOO.widget.Panel("newemailpanel", {
         draggable: true,
-        modal: true,
+        modal: false,
         width: "800px",
         height: "600px",
         autofillheight: "body",
@@ -59,6 +64,20 @@ M.block_jmail.init = function(Y, cfg) {
     // Load all the contacts users
     if (cfg.cansend) {
         M.block_jmail.loadContacts();
+        Y.one("#selectall").on('click', function(e){
+                Y.all("#contact_list_users input[type=checkbox]").set('checked', e.target.get('checked'));                
+            });
+        Y.all('#selbuttons input[type=button]').on('click', function(e) {
+                Y.all("#contact_list_users input[type=checkbox]").each(function(node){
+                        if (node.get('checked') == true) {
+                            M.block_jmail.composeMessage('new');
+                            var type = e.target.get('className').replace('sel','');
+                            var userid = node.ancestor('div').ancestor('div').get('id').replace('user', '');
+                            var fullname = node.ancestor('div').ancestor('div').one('.fullname').get('text');                            
+                            M.block_jmail.addContact(userid, fullname, type);
+                        }
+                    });
+            });
     }
     
     // Old Yui2 shortcuts 
@@ -88,7 +107,7 @@ M.block_jmail.init = function(Y, cfg) {
     if (cfg.cansend) {
         layout.on('resize', function() {            
             if (M.block_jmail.app.dataTable) {                                
-                M.block_jmail.app.dataTable.set('width', this.getSizes().center.w + 'px');                
+                M.block_jmail.app.dataTable.set('width', this.getSizes().center.w - M.block_jmail.magicNumDataTableWidth + 'px');                
                 M.block_jmail.app.dataTable.setColumnWidth(M.block_jmail.app.dataTable.getColumn('subject'), (this.getSizes().center.w - M.block_jmail.magicNumSubject));
                 M.block_jmail.app.dataTable._syncColWidths();
                 
@@ -104,9 +123,16 @@ M.block_jmail.init = function(Y, cfg) {
             parent: layout,
             units: [
                 { position: 'top', body: 'mailarea', height: 300, gutter: '2px', resize: true },                
-                { position: 'center', body: 'mailcontents', gutter: '2px'}
+                { position: 'center', body: 'mailcontents', gutter: '2px', scroll: true}
             ]
         });
+        
+        layout2.on('resize', function() {
+            if (M.block_jmail.app.dataTable) {                                
+                M.block_jmail.app.dataTable.set('height', this.getSizes().top.h - M.block_jmail.magicNumTop + 'px');                                
+                M.block_jmail.app.dataTable._syncColWidths();                
+            }
+        }, layout2, true);  
         layout2.render();
         
         if (cfg.cansend) {
@@ -115,7 +141,7 @@ M.block_jmail.init = function(Y, cfg) {
                 parent: layout,
                 units: [
                     { position: 'top', body: 'contact_list_filter', height: 200, gutter: '2px', resize: true },                
-                    { position: 'center', body: 'contact_list_users', gutter: '2px', scroll: true}
+                    { position: 'center', body: 'contact_list', gutter: '2px', scroll: true}
                 ]
             });
             layout3.render();
@@ -143,7 +169,7 @@ M.block_jmail.init = function(Y, cfg) {
         var newmailButton = new YAHOO.widget.Button("newmail");
         newmailButton.appendChild(icon);
         Y.one("#newmail").on('click', function(e){
-            M.block_jmail.composeMessage('new');           
+            M.block_jmail.composeMessage('new');
         });
     }
     
@@ -152,7 +178,7 @@ M.block_jmail.init = function(Y, cfg) {
     var checkmailButton = new YAHOO.widget.Button("checkmail");
     checkmailButton.appendChild(icon);
     Y.one('#checkmail').on('click', function(e){
-            M.block_jmail.checkMail('inbox', '');
+            M.block_jmail.checkMail('inbox');
         });
 
     
@@ -169,6 +195,14 @@ M.block_jmail.init = function(Y, cfg) {
     editButton.appendChild(icon);
     editButton.on("click", function() { M.block_jmail.composeMessage('edit', M.block_jmail.currentMessage); });
     
+    if (cfg.approvemode && cfg.canapprovemessages) {
+        var icon = document.createElement('span'); 
+        icon.className = 'icon'; 
+        var approveButton = new YAHOO.widget.Button("approveb");
+        approveButton.appendChild(icon);
+        approveButton.on("click", function() { M.block_jmail.approveMessage(); });
+    }
+    
     if (cfg.cansend) {
         var icon = document.createElement('span'); 
         icon.className = 'icon';
@@ -180,7 +214,7 @@ M.block_jmail.init = function(Y, cfg) {
         icon.className = 'icon';
         var replyAllButton = new YAHOO.widget.Button("replytoallb");
         replyAllButton.appendChild(icon);
-        //replyAllButton.on("click", M.block_jmail.replyAllMessage);
+        replyAllButton.on("click", M.block_jmail.replyAllMessage);
         
         var icon = document.createElement('span'); 
         icon.className = 'icon';
@@ -211,16 +245,20 @@ M.block_jmail.init = function(Y, cfg) {
 
     // Group and role filter buttons
     if (cfg.cansend) {
-        var rolesselectorB = new YAHOO.widget.Button("rolesselectorb", {type: "menu", menu: "rolesselector"});
-        rolesselectorB.getMenu().subscribe("click", function(p_sType, p_aArgs) {            
-                var item = p_aArgs[1];
-                rolesselectorB.set("label", item.cfg.getProperty("text"));
-                M.block_jmail.filterUser.role = item.value;
-                M.block_jmail.loadContacts();                
-            });
+        
+        if (Y.one('#rolesselectorb')) {
+            var rolesselectorB = new YAHOO.widget.Button("rolesselectorb", {type: "menu", menu: "rolesselector"});
+            rolesselectorB.getMenu().subscribe("click", function(p_sType, p_aArgs) {            
+                    var item = p_aArgs[1];
+                    rolesselectorB.set("label", item.cfg.getProperty("text"));
+                    M.block_jmail.filterUser.role = item.value;
+                    M.block_jmail.loadContacts();                
+                });
+            M.block_jmail.app.rolesselectorB = rolesselectorB;
+        }
         
     
-        if (Y.one('#groupselectorb')) {    
+        if (Y.one('#groupselectorb')) {   
             var groupselectorB = new YAHOO.widget.Button("groupselectorb", {type: "menu", menu: "groupselector"});
         
             groupselectorB.getMenu().subscribe("click", function(p_sType, p_aArgs) {            
@@ -229,39 +267,64 @@ M.block_jmail.init = function(Y, cfg) {
                 M.block_jmail.filterUser.group = item.value;
                 M.block_jmail.loadContacts();
             });
+            M.block_jmail.app.groupselectorB = groupselectorB;
         }
     }
     
+    if (Y.one('#mailboxesb')) {        
+        var mailboxesB = new YAHOO.widget.Button("mailboxesb", {type: "menu", menu: "mailboxesmenu"});
+        mailboxesB.getMenu().subscribe("click", function(p_sType, p_aArgs) {            
+                var item = p_aArgs[1];
+                mailboxesB.set("label", item.cfg.getProperty("text"));                
+                document.location.href = M.block_jmail.cfg.wwwroot+"/blocks/jmail/mailbox.php?id="+item.value;
+            });
+        M.block_jmail.app.mailboxesB = mailboxesB;
+    }
+
     // Mail list table
     
     var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=get_message_headers&sesskey='+cfg.sesskey;
     
-    generateRequest = null;
+    M.block_jmail.generateRequest = null;
     
     var initDataTable = function(h, w) {
         
         var unreadFormatter = function(elCell, oRecord, oColumn, oData){
             if (oRecord.getData('read')+'' == '0') {
                 oData = '<strong>'+oData+'</strong>';
-            }            
+            }
+            if (oColumn.field == 'subject') {
+                if (oRecord.getData('approved')+'' == '0') {
+                    oData += ' (<span class="approvalpending">'+M.str.block_jmail.approvalpending+'</span>)';
+                }
+            }
             elCell.innerHTML = oData;
         }
         
         //Create the Column Definitions
-        var myColumnDefs = [
-            {key:'', formatter:YAHOO.widget.DataTable.formatCheckbox, width: 10 },
-            {key:"from", 'label' : M.str.block_jmail.from, sortable:true, width: 150, formatter:  unreadFormatter},
-            {key:"subject", 'label' : M.str.block_jmail.subject, sortable:true, width: (w - M.block_jmail.magicNumSubject), formatter:  unreadFormatter },
-            {key:"date", 'label' : M.str.block_jmail.date,sortable:true, width: 150, formatter:  unreadFormatter }
-        ];
-        //Create the datasource       
+        if (cfg.globalinbox) {            
+            var myColumnDefs = [            
+                {key:"from", 'label' : M.str.block_jmail.from, sortable:true, width: 160, formatter:  unreadFormatter},
+                {key:"courseshortname", 'label' : M.str.block_jmail.mailbox, sortable: false, width: 120, formatter:  unreadFormatter},
+                {key:"subject", 'label' : M.str.block_jmail.subject, sortable:true, width: (w - M.block_jmail.magicNumSubject), formatter:  unreadFormatter },
+                {key:"date", 'label' : M.str.block_jmail.date,sortable:true, width: 160, formatter:  unreadFormatter }
+            ];
+            console.log('abc');
+        } else {
+            var myColumnDefs = [            
+                {key:"from", 'label' : M.str.block_jmail.from, sortable:true, width: 160, formatter:  unreadFormatter},
+                {key:"subject", 'label' : M.str.block_jmail.subject, sortable:true, width: (w - M.block_jmail.magicNumSubject), formatter:  unreadFormatter },
+                {key:"date", 'label' : M.str.block_jmail.date,sortable:true, width: 160, formatter:  unreadFormatter }
+            ];
+        }
+        
         
         // DataSource instance
         var myDataSource = new YAHOO.util.DataSource(url);
         myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
         myDataSource.responseSchema = {
             resultsList: "messages",
-            fields: ["id","from","subject","date","read"],
+            fields: ["id","from","subject","date","read","approved","courseid","courseshortname"],
             // Access to values in the server response
             metaFields: {
                 totalRecords: "total",
@@ -270,7 +333,7 @@ M.block_jmail.init = function(Y, cfg) {
         };
         
         // Customize request sent to server to be able to set total # of records
-        generateRequest = function(oState, oSelf) {
+        M.block_jmail.generateRequest = function(oState, oSelf) {
             // Get states or use defaults
             oState = oState || { pagination: null, sortedBy: null };
             var sort = (oState.sortedBy) ? oState.sortedBy.key : M.block_jmail.filterMessage.sort;
@@ -290,22 +353,22 @@ M.block_jmail.init = function(Y, cfg) {
 
         // DataTable configuration
         var myConfigs = {
-            generateRequest: generateRequest,
-            initialRequest: generateRequest(), // Initial request for first page of data
+            generateRequest: M.block_jmail.generateRequest,
+            initialRequest: M.block_jmail.generateRequest(), // Initial request for first page of data
             dynamicData: true, // Enables dynamic server-driven data
-            paginator: new YAHOO.widget.Paginator({ rowsPerPage:25 }), // Enables pagination
+            paginator: new YAHOO.widget.Paginator({ rowsPerPage: cfg.pagesize}), // Enables pagination
             scrollable: true,
             height: h + 'px', width: w + 'px'
         };
 
-        dataTable = new YAHOO.widget.DataTable("maillist", myColumnDefs, myDataSource, myConfigs);
-        dataTable.set('MSG_EMPTY', M.str.block_jmail.nomessagesfound);
+        M.block_jmail.app.dataTable = new YAHOO.widget.DataTable("maillist", myColumnDefs, myDataSource, myConfigs);
+        M.block_jmail.app.dataTable.set('MSG_EMPTY', M.str.block_jmail.nomessagesfound);
         
         // Subscribe to events for row selection
-        dataTable.subscribe("rowMouseoverEvent", dataTable.onEventHighlightRow);
-        dataTable.subscribe("rowMouseoutEvent", dataTable.onEventUnhighlightRow);
-        dataTable.subscribe("rowClickEvent", dataTable.onEventSelectRow);
-        dataTable.subscribe("rowSelectEvent", function() {
+        M.block_jmail.app.dataTable.subscribe("rowMouseoverEvent", M.block_jmail.app.dataTable.onEventHighlightRow);
+        M.block_jmail.app.dataTable.subscribe("rowMouseoutEvent", M.block_jmail.app.dataTable.onEventUnhighlightRow);
+        M.block_jmail.app.dataTable.subscribe("rowClickEvent", M.block_jmail.app.dataTable.onEventSelectRow);
+        M.block_jmail.app.dataTable.subscribe("rowSelectEvent", function() {
             
             Y.one('#mailcontents').setContent('<div class = "loading_big"></div>');
 
@@ -315,23 +378,52 @@ M.block_jmail.init = function(Y, cfg) {
             // Ajax call for mark it as read
             M.block_jmail.markRead(data, 1);
             
-            M.block_jmail.loadMessage(data.id);
+            M.block_jmail.loadMessage(data.id, data.courseid);
             // All rows selected
             //console.log(this.getSelectedRows());
             
-        }, dataTable, true);
+        }, M.block_jmail.app.dataTable, true);
         
-        dataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
-            oPayload.totalRecords = oResponse.meta.total;
-            oPayload.pagination.recordOffset = oResponse.meta.start;
+        M.block_jmail.app.dataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
+            oPayload.totalRecords = oResponse.meta.totalRecords;
+            oPayload.pagination.recordOffset = oResponse.meta.startIndex;
             return oPayload;
         };
-        M.block_jmail.app.dataTable = dataTable;
+        
+        M.block_jmail.app.dataTable.subscribe("postRenderEvent", function(){
+            var Y = M.block_jmail.Y;        
+            Y.all("#maillist .yui-pg-first").set('text', M.str.block_jmail.first);
+            Y.all("#maillist .yui-pg-last").set('text', M.str.block_jmail.last);
+            Y.all("#maillist .yui-pg-next").set('text', M.str.block_jmail.next);
+            Y.all("#maillist .yui-pg-previous").set('text', M.str.block_jmail.previous);
+        }, M.block_jmail.app.dataTable, true);
+        
+        M.block_jmail.app.dataTable.subscribe("tbodyKeyEvent", function(event, target){
+            var cfg = M.block_jmail.cfg;            
+            var keyCode = event.event.keyCode;
+            
+            if (keyCode == 46) {                
+                M.block_jmail.deleteMessage();
+            }
+            else if (keyCode == 82 && cfg.cansend) {                
+                M.block_jmail.replyMessage();
+            }
+            else if (keyCode == 70 && cfg.cansend) {                
+                M.block_jmail.forwardMessage();
+            }
+            else if (keyCode == 80) {
+                M.block_jmail.printMessage();
+            }
+            else if (keyCode == 65 && cfg.canapprovemessages) {
+                M.block_jmail.approveMessage();
+            }
+        });
+        
         M.block_jmail.app.dataSource = myDataSource;
     };
 
-    initDataTable(layout2.getSizes().top.h, layout2.getSizes().top.w);
-    
+    initDataTable(layout2.getSizes().top.h - M.block_jmail.magicNumTop, layout2.getSizes().top.w - M.block_jmail.magicNumDataTableWidth);
+
     
     // Alphabet filter    
     if (cfg.cansend) {
@@ -371,11 +463,15 @@ M.block_jmail.init = function(Y, cfg) {
     }
     
     // Labels
-    Y.one('#addlabel').on('click', function(e){
+    var addlabel = Y.one('#addlabel');
+    if (addlabel) {
+        addlabel.on('click', function(e){
+            M.block_jmail.processMenuButtons();
             Y.one('#newlabelpanel').setStyle('display', 'block');
             M.block_jmail.addLabel();
             e.preventDefault();
         });
+    }
     
     // Build the labels action menu
     // TODO - Add rename options
@@ -383,7 +479,7 @@ M.block_jmail.init = function(Y, cfg) {
     var labelsMenu = new YAHOO.widget.Menu("basicmenu");
     labelsMenu.addItems([
 
-        { text: "&nbsp;&nbsp;"+M.str.moodle.delete, onclick: { fn: M.block_jmail.deleteLabel } }
+        { text: "&nbsp;&nbsp;"+M.str.block_jmail.delete, onclick: { fn: M.block_jmail.deleteLabel } }
 
     ]);
     labelsMenu.render("menulabel");
@@ -393,7 +489,7 @@ M.block_jmail.init = function(Y, cfg) {
     // Actions for fixed labels inbox, draft, bin
     
     Y.one('#label_list ul').all('a').on('click', function(e){        
-        M.block_jmail.checkMail(e.target.get('id'), '');
+        M.block_jmail.checkMail(e.target.get('id'));
         e.preventDefault();
     });
     
@@ -434,21 +530,27 @@ M.block_jmail.init = function(Y, cfg) {
         }
     });
     
-    Y.one('#preferences').on('click', function(e){
-        var cfg = M.block_jmail.cfg;
-        var Y = M.block_jmail.Y;
-        
-        var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=get_preferences&sesskey='+cfg.sesskey;        
-        var request = Y.io(url, {sync: true});        
-        var preferences = Y.JSON.parse(request.responseText);
-        if (preferences.receivecopies == '1') {
-            Y.one('#subscription').set('value', 'receivecopies');
-        } else {
-            Y.one('#subscription').set('value', '');
-        }
-        preferencesPanel.show();
-        e.preventDefault();
-    });
+    var prefs = Y.one('#preferences');
+    if (prefs) {
+        prefs.on('click', function(e){
+            var cfg = M.block_jmail.cfg;
+            var Y = M.block_jmail.Y;
+            
+            M.block_jmail.processMenuButtons();
+            
+            var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=get_preferences&sesskey='+cfg.sesskey;        
+            var request = Y.io(url, {sync: true});        
+            var preferences = Y.JSON.parse(request.responseText);
+            if (preferences.receivecopies == '1') {
+                Y.one('#subscription').set('value', 'receivecopies');
+            } else {
+                Y.one('#subscription').set('value', '');
+            }
+            Y.one('#preferencespanel').setStyle('display', 'block');
+            preferencesPanel.show();
+            e.preventDefault();
+        });
+    }
     
     // Search
     
@@ -458,7 +560,7 @@ M.block_jmail.init = function(Y, cfg) {
             clearTimeout(M.block_jmail.searchTimeout);
             setTimeout(function() { M.block_jmail.checkMail('search', M.block_jmail.searchText) }, 600);
         } else if (M.block_jmail.searchText.length == 0) {
-            M.block_jmail.checkMail('inbox', '');
+            M.block_jmail.checkMail('inbox');
         }
      });
 
@@ -504,6 +606,7 @@ M.block_jmail.init = function(Y, cfg) {
 
     // Toolbar
     M.block_jmail.hideToolbar();
+    
 
 }
 
@@ -515,7 +618,7 @@ M.block_jmail.addContact = function(userId, fullName, type) {
 
     if(Y.Array.indexOf(hidden.get('value').split(','), userId) < 0) {
         hidden.set('value', hidden.get('value') + userId + ',');
-        Y.one('#compose'+type+'list').append('<span id="destinatary'+type+userId+'" class="destinatary">'+fullName+' <img id="delete'+type+userId+'" src="pix/delete.gif" alt="'+M.str.block_jmail.delete+'"></span>');
+        Y.one('#compose'+type+'list').append('<span id="destinatary'+type+userId+'" class="destinatary">'+fullName+' <img id="delete'+type+userId+'" src="pix/delete.gif" alt="'+M.str.block_jmail.deletem+'"></span>');
         Y.one("#delete"+type+userId).on('click', function(e){
                 var todelete = e.target.get("id").replace('delete'+type,'');
                 var dest = hidden.get('value').split(',');
@@ -549,6 +652,10 @@ M.block_jmail.deleteLabel = function(p_sType, p_aArgs, p_oValue) {
 
 M.block_jmail.checkMail = function(label, searchtext) {
     
+    if (typeof searchtext == 'undefined') {
+        searchtext = '';
+    }
+    
     M.block_jmail.hideToolbar();
     this.Y.one('#mailcontents').setContent('');
     
@@ -564,7 +671,7 @@ M.block_jmail.checkMail = function(label, searchtext) {
         M.block_jmail.searchTimeout = null;
     }
     
-    M.block_jmail.app.dataSource.sendRequest(generateRequest(), {
+    M.block_jmail.app.dataSource.sendRequest(M.block_jmail.generateRequest(), {
         success : M.block_jmail.app.dataTable.onDataReturnSetRows,
         failure : M.block_jmail.app.dataTable.onDataReturnSetRows,
         scope : M.block_jmail.app.dataTable,
@@ -577,6 +684,8 @@ M.block_jmail.checkMail = function(label, searchtext) {
 M.block_jmail.loadContacts = function() {
     var cfg = M.block_jmail.cfg;
     var Y = M.block_jmail.Y;
+    
+    Y.one("#selectall").set('checked', false);
     
     var params = '';
     params += '&fi='+M.block_jmail.filterUser.firstname;
@@ -604,7 +713,7 @@ M.block_jmail.loadContacts = function() {
                         cssclass = (cssclass == 'jmail-even') ? 'jmail-odd': 'jmail-even';
                         var imageHtml = contacts[el].profileimage;
                         contactsHtml += '<div id="user'+contacts[el].id+'" class="'+cssclass+' contact">';
-                        contactsHtml += ' <div class="profileimage">'+imageHtml+'</div>';
+                        contactsHtml += ' <div class="profileimage"><input type="checkbox">'+imageHtml+'</div>';
                         contactsHtml += ' <div class="fullname">'+contacts[el].fullname+actionButtons+'</div>';                        
                         contactsHtml += '</div>';;
                     }
@@ -613,8 +722,8 @@ M.block_jmail.loadContacts = function() {
                     cList.set('text','');
                     cList.append(contactsHtml);
                     
-                    Y.all('#contact_list_users input').on('click', function(e){
-                        var userid = e.target.ancestor('div').ancestor('div').get('id').replace('user');
+                    Y.all('#contact_list_users input[type=button]').on('click', function(e){
+                        var userid = e.target.ancestor('div').ancestor('div').get('id').replace('user', '');
                         // Detect to, cc or bcc - e.target.hasClass();
                         M.block_jmail.composeMessage('new');
                         M.block_jmail.addContact(userid, e.target.ancestor('div').get('text'),e.target.get('className').replace('b',''));
@@ -625,11 +734,11 @@ M.block_jmail.loadContacts = function() {
     Y.io(url, cfg);
 }
 
-M.block_jmail.loadMessage = function(messageId) {
+M.block_jmail.loadMessage = function(messageId, courseId) {
     var cfg = M.block_jmail.cfg;
     var Y = M.block_jmail.Y;
     
-    var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=get_message&sesskey='+cfg.sesskey+'&messageid='+messageId;
+    var url = 'block_jmail_ajax.php?id='+courseId+'&action=get_message&sesskey='+cfg.sesskey+'&messageid='+messageId;
     var cfg = {
         on: {
             complete: function(id, o, args) {
@@ -648,7 +757,7 @@ M.block_jmail.loadMessage = function(messageId) {
                     // Destinataries
                     var lang = {to : M.str.block_jmail.to, cc: M.str.block_jmail.cc, bcc: M.str.block_jmail.bcc};
 
-                    if (message.destinataries.length > 0) {
+                    if (message.destinataries['to'].length > 0) {
                         for (var el in message.destinataries) {
                             var dest = message.destinataries[el];
                             messageHtml += '<div class="mail_destinatary"><div class="mail_el">'+lang[el]+': </div>';
@@ -665,7 +774,7 @@ M.block_jmail.loadMessage = function(messageId) {
                         for (var el in message.labels) {
                             var label = message.labels[el];
                             if (typeof label.id != 'undefined') {
-                                messageHtml += '<span class="labelactions">'+label.name+'<img id="unlabel_'+label.id+'_'+messageId+'" src="pix/delete.gif" alt="'+M.str.block_jmail.delete+'"></span>';
+                                messageHtml += '<span class="labelactions">'+label.name+'<img id="unlabel_'+label.id+'_'+messageId+'" src="pix/delete.gif" alt="'+M.str.block_jmail.deletem+'"></span>';
                             } else {
                                 // Fixed labels, inbox, send, trash, etc...
                                 messageHtml += '<span class="labelactions">'+label+'</span>';
@@ -674,12 +783,16 @@ M.block_jmail.loadMessage = function(messageId) {
                         messageHtml += '</span></div>';
                     }
                     
+                    if (message.approved+'' == '0') {
+                        messageHtml += '<div class="approvalpending">'+M.str.block_jmail.approvalpending+'</div>';
+                    }
+                    
                     var attachmentsHtml = '';
                     if (message.attachments.length > 0) {
                         attachmentsHtml = '<div class="attachments"><p><strong>'+M.str.block_jmail.attachments+'</strong></p>';
                         for (var el in message.attachments) {
                             var attach = message.attachments[el];
-                            attachmentsHtml += '<p><a href="'+attach.path+'">'+attach.iconimage+attach.filename+'</a></p>';
+                            attachmentsHtml += '<p>'+attach.iconimage+' '+attach.filename+'  <a class="downloadattachment" href="'+attach.path+'">'+M.str.block_jmail.download+'</a> | <a href="" class="savetoprivate">'+M.str.block_jmail.savetomyprivatefiles+'</a></p>';
                         }
                         attachmentsHtml += '</div>';
                     }
@@ -699,6 +812,16 @@ M.block_jmail.loadMessage = function(messageId) {
                         var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=unlabel_message&sesskey='+cfg.sesskey+'&messageids='+data[1]+'&labelid='+data[0];
                         Y.io(url);
                         e.target.ancestor('span').remove();
+                    });
+                    
+                    Y.all('.attachments .savetoprivate').on('click', function(e){
+                        e.preventDefault();                        
+                        var myfile = e.target.ancestor('p').one('.downloadattachment').get('href');
+                        myfile = myfile.replace(cfg.wwwroot+'/pluginfile.php','');
+                        
+                        var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=save_private&sesskey='+cfg.sesskey+'&file='+myfile;
+                        Y.io(url, {sync: true});
+                        M.block_jmail.showMessage(M.str.block_jmail.filesaved);
                     });
                     
                 }
@@ -789,7 +912,7 @@ M.block_jmail.loadLabels = function() {
                     });
                     
                     Y.all('#user_labels a').on('click', function(e){        
-                        M.block_jmail.checkMail(e.target.get('id').replace("label",""), '');
+                        M.block_jmail.checkMail(e.target.get('id').replace("label",""));
                         e.preventDefault();
                     });
                                        
@@ -812,8 +935,32 @@ M.block_jmail.deleteMessage = function() {
     M.block_jmail.confirmDialog(M.str.block_jmail.confirmdelete, M.block_jmail.deleteMessageConfirm);
 }
 
+M.block_jmail.approveMessage = function() {
+    var Y = M.block_jmail.Y;
+    var cfg = M.block_jmail.cfg;
+
+    var messages = M.block_jmail.app.dataTable.getSelectedRows();
+    for (var el in messages) {
+        var messageId = M.block_jmail.app.dataTable.getRecordSet().getRecord(messages[el])._oData.id;
+        var courseid = M.block_jmail.app.dataTable.getRecordSet().getRecord(messages[el])._oData.courseid;
+        var url = 'block_jmail_ajax.php?id='+courseid+'&action=approve_message&sesskey='+cfg.sesskey+'&messageid='+messageId;
+        var cfgIO = {
+            on: {
+                complete: function(id, o, args) {                  
+                    M.block_jmail.checkMail('toapprove');
+                }
+            }
+        };
+        Y.io(url, cfgIO);
+    }
+}
+
 M.block_jmail.replyMessage = function() {
     M.block_jmail.composeMessage('reply', M.block_jmail.currentMessage);
+}
+
+M.block_jmail.replyAllMessage = function() {
+    M.block_jmail.composeMessage('replytoall', M.block_jmail.currentMessage);
 }
 
 M.block_jmail.forwardMessage = function() {
@@ -867,7 +1014,7 @@ M.block_jmail.printMessage = function() {
     // open the print the message window
     var cfg = M.block_jmail.cfg;
     
-    var newWindow = window.open('print.php?id='+cfg.courseid+'&messageid='+M.block_jmail.currentMessage.id, '_blank');
+    var newWindow = window.open('print.php?id='+M.block_jmail.currentMessage.courseid+'&messageid='+M.block_jmail.currentMessage.id, '_blank');
     newWindow.focus();    
 }
 
@@ -895,6 +1042,21 @@ M.block_jmail.deleteMessageConfirm = function() {
     
 }
 
+// Every time we render a panel, we should perform this function, it seems a yui bug?
+M.block_jmail.processMenuButtons = function() {
+    
+    // TODO, imrpove to a loop
+    var buttons = ['rolesselectorB','moreButton','moveButton','groupselectorB','mailboxesB'];
+    
+    for (var el in buttons) {
+        el = buttons[el];
+        if (M.block_jmail.app[el]) {
+            M.block_jmail.app[el].getMenu().show();
+            M.block_jmail.app[el].getMenu().hide();
+        }
+    }    
+}
+
 M.block_jmail.composeMessage = function(mode, message) {
     
     var cfg = M.block_jmail.cfg;
@@ -905,6 +1067,11 @@ M.block_jmail.composeMessage = function(mode, message) {
         return false;
     }    
     M.block_jmail.newemailOpen = true;
+    
+    M.block_jmail.processMenuButtons();
+    
+    M.block_jmail.app.composePanel.cfg.setProperty("visible",true);
+    M.block_jmail.app.composePanel.show();
     
     Y.one('#hiddento').set('value', '');
     Y.one('#hiddencc').set('value', '');
@@ -933,6 +1100,9 @@ M.block_jmail.composeMessage = function(mode, message) {
             for (var el in message.destinataries) {
                 var dest = message.destinataries[el];            
                 for (var el2 in dest) {
+                    if (dest[el2].userid == cfg.userid) {
+                        continue;
+                    }
                     M.block_jmail.addContact(dest[el2].userid, dest[el2].fullname, el);
                 }
             }
@@ -950,10 +1120,24 @@ M.block_jmail.composeMessage = function(mode, message) {
         Y.one('#subject').set('value', message.subject);       
     }
     
+    // Preserve the M.str object (Firefox bug)
+    
+    var Mstr = M.str;
+    
     var iocfg = {
          sync: true
      };
-    var uri = 'message.php?id='+cfg.courseid+'&messageid='+messageId+'&mode='+mode;
+
+    if (messageId) {
+        courseid = message.courseid;
+        M.block_jmail.currentComposeCourse.shortname = message.courseshortname;
+    } else {
+        courseid = cfg.courseid;
+    }
+    
+    M.block_jmail.currentComposeCourse.id = courseid;
+    
+    var uri = 'message.php?id='+courseid+'&messageid='+messageId+'&mode='+mode;
     var request = Y.io(uri, iocfg);
     
     var formHtml = request.responseText;            
@@ -961,21 +1145,24 @@ M.block_jmail.composeMessage = function(mode, message) {
     M.block_jmail.Y = Y;
 
     // So so uggly hack
-    var elementsToEval = ["Y.use('editor_tinymce'","Y.use('editor_tinymce'","Y.use('form_filemanager'"];
-    for (var el in elementsToEval) {
-        var startIndex = formHtml.indexOf(elementsToEval[el]);
-        formHtml = formHtml.substr(startIndex);        
-        var stopIndex = formHtml.indexOf("});") + 7;
-        
-        var js = formHtml.substring(0, stopIndex);
-        js = js.replace('<!--','');
-        js = js.replace('-->','');
-        
-        eval('try {'+js+'} catch(e) {}');
-        formHtml = formHtml.substr(stopIndex);
+    // Firefox excluded    
+    if (Y.UA.gecko <= 0) {
+        var elementsToEval = ["Y.use('editor_tinymce'","Y.use('editor_tinymce'","Y.use('form_filemanager'"];
+        for (var el in elementsToEval) {
+            var startIndex = formHtml.indexOf(elementsToEval[el]);
+            formHtml = formHtml.substr(startIndex);        
+            var stopIndex = formHtml.indexOf("});") + 7;
+            
+            var js = formHtml.substring(0, stopIndex);
+            js = js.replace('<!--','');
+            js = js.replace('-->','');
+            
+            eval('try {'+js+'} catch(e) {}');
+            formHtml = formHtml.substr(stopIndex);
+        }
     }
 
-    M.block_jmail.app.composePanel.cfg.setProperty("visible",true);
+    M.str = Mstr;    
 }
 
 M.block_jmail.saveMessage = function(action) {
@@ -1013,7 +1200,7 @@ M.block_jmail.saveMessage = function(action) {
     var attachments = form.get("attachments").get("value");
     var editoritemid = form.get("body[itemid]").get("value");
     
-    var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action='+action+'&sesskey='+cfg.sesskey;
+    var url = 'block_jmail_ajax.php?id='+M.block_jmail.currentComposeCourse.id+'&action='+action+'&sesskey='+cfg.sesskey;
     url += '&to='+to;
     url += '&cc='+cc;
     url += '&bcc='+bcc;
@@ -1025,11 +1212,36 @@ M.block_jmail.saveMessage = function(action) {
     
     var cfg = {
         on: {
-            complete: function(id, o, args) {                  
+            complete: function(id, o, args) {
+                var cfg = M.block_jmail.cfg;
                 window.tinyMCE.get('id_body').setProgressState(0);
                 M.block_jmail.app.composePanel.hide();
+                // Remove all the form elements
+                // We do a cascade remove for some firefox issues
                 var messageAlert = (action == 'send_message')? M.str.block_jmail.messagesent : M.str.block_jmail.messagesaved;
-                M.block_jmail.showMessage(messageAlert);
+                var messageTime = 2000;
+                
+                if (action == 'send_message' && cfg.approvemode && !cfg.canapprovemessages) {
+                    messageAlert += '<br/>'+M.str.block_jmail.messagehastobeapproved;
+                    messageTime = 4000;
+                }
+                
+                if (action == 'send_message' && M.block_jmail.cfg.globalinbox) {
+                    if (M.block_jmail.currentComposeCourse.id != M.block_jmail.cfg.courseid) {
+                        var addiotonalInfo =  M.str.block_jmail.delivertodifferentcourse +' '+M.block_jmail.currentComposeCourse.shortname;
+                    } else {
+                        var addiotonalInfo =  M.str.block_jmail.delivertoglobalinbox;
+                    }
+                    messageAlert += '<br/>'+addiotonalInfo;
+                    messageTime = 6000;
+                }
+                
+                M.block_jmail.showMessage(messageAlert, messageTime);
+                window.tinyMCE.remove(window.tinyMCE.get('id_body'));
+                window.tinyMCE.execCommand('mceRemoveControl',true,'id_body');                
+                Y.one("#id_body_ifr").remove();
+                Y.one("#mform1").remove();
+                Y.one('#newemailformremote').setContent('');
             }
         }
     };
@@ -1045,7 +1257,7 @@ M.block_jmail.markRead = function (row, status) {
         row.read = status;
         M.block_jmail.app.dataTable.render();
         
-        var url = 'block_jmail_ajax.php?id='+this.cfg.courseid+'&action=mark_read&status='+status+'&sesskey='+this.cfg.sesskey+'&messageid='+row.id;
+        var url = 'block_jmail_ajax.php?id='+row.courseid+'&action=mark_read&status='+status+'&sesskey='+this.cfg.sesskey+'&messageid='+row.id;
         this.Y.io(url);
     }
 }
@@ -1065,23 +1277,30 @@ M.block_jmail.showToolbar = function(message) {
             this.Y.one("#"+toHide[el]).setStyle('display', 'none');
         }
         
-        var replytoall = false;
-        replytoall = message.destinataries.length > 1 ||  (message.destinataries.length > 1 && message.destinataries['to'].length > 1);
         
-        if (this.Y.Array.indexOf(labels, 'draft') >= 0) {
+        var totaldestinataries = 0;        
+        for (var type in message.destinataries) {
+            for (var el in message.destinataries[type]) {
+                totaldestinataries++;
+            }
+        }
+        
+        var replytoall = totaldestinataries > 1;
+        
+        if (this.Y.Array.indexOf(labels, 'trash') >= 0) {
+            toShow = ['deleteb', 'replyb', 'forwardb', 'moveb', 'moreb', 'printb'];
+            if (replytoall) {
+                toShow.push('replytoallb');
+            }
+        } else if (this.Y.Array.indexOf(labels, 'draft') >= 0) {
             toShow = ['deleteb', 'editb', 'printb'];
         } else if (this.Y.Array.indexOf(labels, 'sent') >= 0) {
             toShow = ['deleteb', 'replyb', 'forwardb', 'printb'];
             if (replytoall) {
                 toShow.push('replytoallb');
             }
-        } else if (this.Y.Array.indexOf(labels, 'trash') >= 0) {
-            toShow = ['deleteb', 'replyb', 'forwardb', 'moreb', 'printb'];
-            if (replytoall) {
-                toShow.push('replytoallb');
-            }
         } else if (this.Y.Array.indexOf(labels, 'toapprove') >= 0) {
-            toShow = [];
+            toShow = ['approveb'];
         } else {
             toShow = ['deleteb', 'replyb', 'forwardb', 'moveb', 'moreb', 'printb'];
             if (replytoall) {
@@ -1090,7 +1309,10 @@ M.block_jmail.showToolbar = function(message) {
         }
         
         for (var el in toShow) {
-            this.Y.one("#"+toShow[el]).setStyle('display', 'inline');
+            var button = this.Y.one("#"+toShow[el]);
+            if (button) {
+                button.setStyle('display', 'inline');
+            }
         }
     }
     this.Y.one('#jmailtoolbar').setStyle('visibility','visible');

@@ -140,6 +140,10 @@
     background-image: url(pix/print.png);
 }
 
+#approveb .icon {
+    background-image: url(pix/email.png);
+}
+
 #contact_list {
     padding: 5px;
 }
@@ -224,4 +228,9 @@
     width: 50px;
     border: 1px solid black;
     text-align: center;
+}
+
+.approvalpending {
+    color: red;
+    font-weight: strong;
 }

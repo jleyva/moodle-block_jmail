@@ -36,15 +36,12 @@ $PAGE->set_url(new moodle_url('/blocks/jmail/block_jmail_ajax.php', array('id'=>
 
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 $context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
-
-if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
-    $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id);
-}
-
 $PAGE->set_context($context);
 
 require_login($course);
-require_capability('block/jmail:viewmailbox', $blockcontext);
+
+$mailbox = new block_jmail_mailbox($course, $context);
+
 require_sesskey();
 
 // TODO, check block disabled or instance not visible?
@@ -56,7 +53,6 @@ if (isguestuser()) {
 }
 
 $data = null;
-$mailbox = new block_jmail_mailbox($course, $context, $blockcontext);
 
 echo $OUTPUT->header(); // send headers
 
@@ -180,6 +176,10 @@ switch ($action) {
     case 'save_preferences':
         $preferences = required_param('preferences', PARAM_RAW);
         $data = $mailbox->save_preferences($preferences);
+        break;
+    case 'save_private':
+        $file = required_param('file', PARAM_RAW);
+        $data = $mailbox->save_to_private_files($file);
         break;
 }
 
