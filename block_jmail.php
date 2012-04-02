@@ -30,6 +30,10 @@ class block_jmail extends block_list {
         // Default case: the block can be used in courses and site index, but not in activities
         return array('all' => true, 'mod' => false, 'tag' => false);
     }
+    
+    public function has_config() {
+        return true;
+    }
 
     public function instance_allow_config() {
         return true;
@@ -61,11 +65,6 @@ class block_jmail extends block_list {
             return '';
         }
         
-        // Special capability check inside the block pages
-        if (!has_capability('block/jmail:viewmailbox', $this->context)) {
-            return '';
-        }
-        
         require_once(dirname(__FILE__).'/block_jmail_mailbox.class.php');
 
         $this->content = new stdClass();
@@ -81,25 +80,38 @@ class block_jmail extends block_list {
 
         $mycourses = array();
         if ($this->page->course->id == SITEID) {
-            $this->content->footer = $renderer->global_inbox();
-            $mycourses = enrol_get_my_courses(null, 'visible DESC, fullname ASC');
-        } else {
-            $this->content->footer = $renderer->course_inbox($this->page->course);
-            // Get all the user courses, this not means that there is a mailbox in every course
-            $mycourses[] = $DB->get_record('course', array('id' => $this->page->course->id));
-        }
-
-        if ($mycourses) {
-            foreach ($mycourses as $course) {
-                if ($mailbox = new block_jmail_mailbox($course)) {
-                    if ($unreadmails = $mailbox->count_unread_messages()) {
-                        $this->content->items[] = $renderer->unread_messages($mailbox);
-                        $this->content->icon[] = $newmailicon;
+            if (!empty($CFG->block_jmail_enable_globalinbox)) {
+                $this->content->footer = $renderer->global_inbox();
+            }
+            if ($mycourses = block_jmail_mailbox::get_my_mailboxes()) {
+                foreach ($mycourses as $course) {
+                    if ($mailbox = new block_jmail_mailbox($course)) {
+                        if ($unreadmails = $mailbox->count_unread_messages()) {
+                            $this->content->items[] = $renderer->unread_messages($mailbox);
+                            $this->content->icons[] = $newmailicon;
+                        }
                     }
                 }
             }
-        }
-        
+        } else {
+            $this->content->footer = $renderer->course_inbox($this->page->course);         
+            if ($mailbox = new block_jmail_mailbox($this->page->course)) {
+                if ($unreadmails = $mailbox->count_unread_messages()) {
+                    $mailbox->pagesize = 5;
+                    if ($messages = $mailbox->get_message_headers('unread', 0, 'date', 'desc', '')) {                        
+                        foreach ($messages[1] as $m) {
+                            $strfrom = get_string('from', 'block_jmail');
+                            $messagetext = shorten_text($m->subject,25)." (<i>$strfrom: ".shorten_text($m->from,15).")</i>";
+                            $this->content->items[] = $messagetext;
+                            $this->content->icons[] = '';
+                        }
+                    }
+                    $this->content->items[] = get_string('unreadmessages', 'block_jmail', $unreadmails);
+                    $this->content->icons[] = $newmailicon;
+                }
+            }
+        }        
+
         if (!count($this->content->items)) {
 			$this->content->items[] = get_string('nonewmessages', 'block_jmail');
 		}

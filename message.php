@@ -44,18 +44,12 @@ if (! ($block = $DB->get_record('block', array('name'=>'jmail', 'visible'=>1))))
 
 require_login($course->id);
 $context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
-if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
-    $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id);
-} else {
-    throw new moodle_exception('invalidcourseid', 'error');
-}
+$PAGE->set_context($context);
 
-require_capability('block/jmail:viewmailbox', $blockcontext);
-//require_sesskey();
+$mailbox = new block_jmail_mailbox($course, $context);
+$blockcontext = $mailbox->blockcontext;
 
 // TODO, check block disabled or instance not visible?
-
-$mailbox = new block_jmail_mailbox($course, $context, $blockcontext);
 
 $message = block_jmail_message::get_from_id($messageid);
 
@@ -69,8 +63,6 @@ if ($messageid and $message->courseid != $course->id) {
 
 if ($mailbox->cansend) {
 
-    $PAGE->set_context($context);
-    
     $mform = new block_jmail_message_form(null, array('course'=>$course, 'context'=>$blockcontext));
     
     if ($messageid) {
@@ -97,5 +89,10 @@ if ($mailbox->cansend) {
 
     //echo $OUTPUT->standard_head_html();
     echo $mform->get_html();
-    echo $PAGE->requires->get_end_code();
+    $endcode = $PAGE->requires->get_end_code();
+    
+    // Delete js or css that may break the page
+    $endcode = preg_replace('/<link rel.*\.css[^>]*>/i', '', $endcode);
+    $endcode = preg_replace('/<script.*\.js[^>]*><\/script>/i', '', $endcode);
+    echo $endcode;
 }
