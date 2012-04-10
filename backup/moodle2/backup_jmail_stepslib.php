@@ -78,18 +78,18 @@ class backup_jmail_block_structure_step extends backup_block_structure_step {
             $label->set_source_table('block_jmail_label', array('courseid' => backup::VAR_COURSEID));
             $mlabel->set_source_table('block_jmail_m_label', array('labelid' => backup::VAR_PARENTID));
 
+            // Define id annotations
+            $jmail->annotate_ids('course', 'courseid');
+            $jmail->annotate_ids('user', 'sender');
+            $sent->annotate_ids('user', 'userid');
+    
+            // Define file annotations
+    
+            $jmail->annotate_files('block_jmail', 'attachment', 'id');
+            $jmail->annotate_files('block_jmail', 'body', 'id');
+        } else {
+            return null;
         }
-
-        // Define id annotations
-        $jmail->annotate_ids('course', 'courseid');
-        $jmail->annotate_ids('user', 'sender');
-        $sent->annotate_ids('user', 'userid');
-
-        // Define file annotations
-
-        $jmail->annotate_files('block_jmail', 'attachment', 'id');
-        $jmail->annotate_files('block_jmail', 'body', 'id');
-
 
         // Return the root element (jmail), wrapped into standard block structure
         return $this->prepare_block_structure($jmail);

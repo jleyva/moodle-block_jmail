@@ -138,10 +138,9 @@ class restore_jmail_block_structure_step extends restore_structure_step {
         // This is a little bit hacky
         // The file areas are created but the itemid has not been updated to the backup block limitations
         
-        $contextid = $this->task->get_contextid();
-        $fs = get_file_storage();
-        
         if (!empty($this->jmailfileitems)) {
+            $contextid = $this->task->get_contextid();
+            $fs = get_file_storage();
             foreach ($this->jmailfileitems as $olditem => $newitem) {
                 if ($files = $DB->get_records('files', array('itemid' => $olditem,'contextid' => $contextid, 'component' => 'block_jmail'))) {
                     foreach ($files as $f) {

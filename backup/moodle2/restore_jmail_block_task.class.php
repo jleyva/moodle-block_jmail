@@ -36,8 +36,12 @@ class restore_jmail_block_task extends restore_block_task {
     }
 
     protected function define_my_steps() {
-        // jmail has one structure step
-        $this->add_step(new restore_jmail_block_structure_step('jmail_structure', 'jmail.xml'));
+        $userinfo = $this->get_setting_value('users');        
+        
+        if ($userinfo) {
+            // jmail has one structure step
+            $this->add_step(new restore_jmail_block_structure_step('jmail_structure', 'jmail.xml'));
+        }
     }
 
     public function get_fileareas() {

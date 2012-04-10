@@ -34,7 +34,11 @@ class backup_jmail_block_task extends backup_block_task {
     }
 
     protected function define_my_steps() {
-        $this->add_step(new backup_jmail_block_structure_step('jmail_structure', 'jmail.xml'));
+        $userinfo = $this->get_setting_value('users');        
+        
+        if ($userinfo) {
+            $this->add_step(new backup_jmail_block_structure_step('jmail_structure', 'jmail.xml'));
+        }
     }
 
     public function get_fileareas() {
