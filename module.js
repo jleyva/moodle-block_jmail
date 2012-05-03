@@ -1157,7 +1157,7 @@ M.block_jmail.composeMessage = function(mode, message) {
 
     // So so uggly hack
     // Firefox excluded    
-    if (Y.UA.gecko <= 0) {
+    // if (Y.UA.gecko <= 0) {
         var elementsToEval = ["Y.use('editor_tinymce'","Y.use('editor_tinymce'","Y.use('form_filemanager'"];
         for (var el in elementsToEval) {
             var startIndex = formHtml.indexOf(elementsToEval[el]);
@@ -1171,7 +1171,7 @@ M.block_jmail.composeMessage = function(mode, message) {
             eval('try {'+js+'} catch(e) {}');
             formHtml = formHtml.substr(stopIndex);
         }
-    }
+    // }
 
     M.str = Mstr;    
 }
