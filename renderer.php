@@ -272,7 +272,7 @@ class block_jmail_renderer extends plugin_renderer_base {
     
     <script type="text/javascript">
 //<![CDATA[
-M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"http:\/\/localhost\/moodle21\/lib\/editor\/tinymce\/module.js","requires":[]},"form_filemanager":{"name":"form_filemanager","fullpath":"http:\/\/localhost\/moodle21\/lib\/form\/filemanager.js","requires":["core_filepicker","base","io","node","json","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview"]}});
+M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"'.$CFG->wwwroot.'/lib\/editor\/tinymce\/module.js","requires":[]},"form_filemanager":{"name":"form_filemanager","fullpath":"'.$CFG->wwwroot.'/lib\/form\/filemanager.js","requires":["core_filepicker","base","io","node","json","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview"]}});
 
 //]]>
 </script>
