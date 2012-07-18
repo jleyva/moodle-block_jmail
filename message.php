@@ -76,6 +76,11 @@ if ($mailbox->cansend) {
         if ($mode != 'edit') {
             $messageid = 0;
         }
+        
+        if ($mode == 'reply' or $mode == 'replytoall') {
+            // TODO - Move the style to another better place
+            $message->body = '<br/><br/><blockquote style="border-left: 1px #CCC solid">' . $message->body . '</blockquote>';
+        }
 
         $mform->set_data(array('attachments' => $draftitemid,
                                'messageid' => $messageid,

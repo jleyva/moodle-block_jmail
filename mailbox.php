@@ -73,6 +73,7 @@ $module = array(
                                      array('first','block_jmail'),array('last','block_jmail'),array('next','block_jmail'),array('previous','block_jmail'),
                                      array('delete','block_jmail'), array('save','block_jmail'),array('download','block_jmail'),array('savetomyprivatefiles','block_jmail'),array('filesaved','block_jmail'),
                                      array('mailbox','block_jmail'),array('delivertodifferentcourse','block_jmail'),array('delivertoglobalinbox','block_jmail'),
+                                     array('inbox','block_jmail'),
                                      array('add','moodle'),array('deletem','block_jmail'),array('rename','moodle'),array('edit','moodle'), array('ok','moodle'),
                                      array('cancel','moodle'))
             );

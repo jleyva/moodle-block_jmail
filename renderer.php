@@ -186,8 +186,7 @@ class block_jmail_renderer extends plugin_renderer_base {
         
         $toolbar .= '<button type="button" id="moveb" name="moveb" value="'.$strmove.'">'.$strmove.'</button>';
         $toolbar .= '    <select id="labelsmenu" name="labelsmenu"> 
-                                <option value="inbox">'.$strinbox.'</option>
-                                '.$optionslabels.'
+                                <option value="inbox">'.$strinbox.'</option>                                
                             </select> ';
         $toolbar .= '<button type="button" id="moreb" name="moreb" value="'.$strmore.'">'.$strmore.'</button>';
         $toolbar .= '    <select id="moremenu" name="moremenu"> 
@@ -254,13 +253,20 @@ class block_jmail_renderer extends plugin_renderer_base {
         if ($mailboxes = $mailbox::get_my_mailboxes()) {
             $mymailboxes .= '<button type="button" id="mailboxesb" name="mailboxesb" value="'.$strmymailboxes.'">'.$strmymailboxes.'</button>';
             $mymailboxes .= '<select id="mailboxesmenu" name="mailboxesmenu">';
+            $counter = 0;
             foreach ($mailboxes as $box) {
                 if ($box->id == $mailbox->course->id) {
                     continue;
                 }
-                $mymailboxes .= '<option value="'.$box->id.'">'.format_string($box->shortname).'</option>';
+                $counter++;
+                // Apply some pad to the menu elements, we fill with white spaces.
+                $boxname = str_replace(' ', "&nbsp;", str_pad(format_string($box->shortname), strlen($strmymailboxes) * 2));
+                $mymailboxes .= '<option value="'.$box->id.'">'.$boxname.'</option>';
             }
             $mymailboxes .= '</select> ';
+            if (!$counter) {
+                $mymailboxes = '';
+            }
         }
         
         
@@ -396,7 +402,7 @@ M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"'.$CFG->
                         <fieldset>
                             <p>
                                 <label for="id">'.$strname.'</label><br/>
-                                <input type="text" name="newlabelname" id="newlabelname" placeholder="">
+                                <input type="text" name="newlabelname" id="newlabelname" placeholder="" maxlength="16">
                             </p>
                         </fieldset>
                     </form>

@@ -308,8 +308,7 @@ M.block_jmail.init = function(Y, cfg) {
                 {key:"courseshortname", 'label' : M.str.block_jmail.mailbox, sortable: false, width: 120, formatter:  unreadFormatter},
                 {key:"subject", 'label' : M.str.block_jmail.subject, sortable:true, width: (w - M.block_jmail.magicNumSubject), formatter:  unreadFormatter },
                 {key:"date", 'label' : M.str.block_jmail.date,sortable:true, width: 160, formatter:  unreadFormatter }
-            ];
-            console.log('abc');
+            ];            
         } else {
             var myColumnDefs = [            
                 {key:"from", 'label' : M.str.block_jmail.from, sortable:true, width: 160, formatter:  unreadFormatter},
@@ -904,10 +903,12 @@ M.block_jmail.loadLabels = function() {
                     
                     M.block_jmail.labels = labels;
                     var labelsHtml = '';
+                    var menuItems = [{text: M.str.block_jmail.inbox, value: 'inbox'}];
                     
                     for(var el in labels) {
                         var l = labels[el];
                         labelsHtml += '<li class="folder"><em></em><a href="#" id="label'+l.id+'">'+l.name+'</a><span class="labelactions" style="visibility: hidden"><img id="labelactions'+l.id+'" src="pix/menu.png"></span></li>';
+                        menuItems.push({text: l.name, value: l.id})
                     }
                     
                     var cList = Y.one('#user_labels');
@@ -935,7 +936,17 @@ M.block_jmail.loadLabels = function() {
                             M.block_jmail.currentLabel = e.target.get('id').replace("labelactions","");
                         });
                     
-                    // TODO Load move button labels
+                    // TODO Load move button labels                    
+                    var oMenu = M.block_jmail.app.moveButton.getMenu();
+                    if (YAHOO.util.Dom.inDocument(oMenu.element)) {                                                 
+                        oMenu.clearContent();
+                        oMenu.addItems(menuItems);
+                        oMenu.render();
+                    } else {                        
+                        // Delete the duplicate inbox, this is due because we render in a special way the initial button                        
+                        menuItems.shift();
+                        oMenu.itemData = menuItems;
+                    }
             }
         }
     };
@@ -1172,6 +1183,7 @@ M.block_jmail.composeMessage = function(mode, message) {
             formHtml = formHtml.substr(stopIndex);
         }
     // }
+    window.tinyMCE.get('id_body').focus();
 
     M.str = Mstr;    
 }

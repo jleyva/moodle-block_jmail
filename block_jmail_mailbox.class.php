@@ -873,7 +873,7 @@ class block_jmail_mailbox {
      * @return array Array of contacts
      */     
     public function get_contacts($group, $fi, $li, $roleid) {
-        global $DB, $OUTPUT, $SESSION;
+        global $DB, $OUTPUT, $SESSION, $USER;
 
         if (!$this->cansend) {
             return array();
@@ -1009,8 +1009,11 @@ class block_jmail_mailbox {
      */    
     private function filter_contacts_initials($contact) {
         $textlib = textlib_get_instance();
-               
-        return ($textlib->strpos($contact->firstname, $this->currentsearch) === 0) or ($textlib->strpos($contact->lastname, $this->currentsearch) === 0);
+        $firstname = $textlib->strtolower($contact->firstname);
+        $lastname = $textlib->strtolower($contact->lastname);
+        $currentsearch = $textlib->strtolower($this->currentsearch);
+        
+        return ($textlib->strpos($firstname, $currentsearch) === 0) or ($textlib->strpos($lastname, $currentsearch) === 0);
         
     }
     
@@ -1022,8 +1025,11 @@ class block_jmail_mailbox {
     
     private function filter_contacts_like($contact) {
         $textlib = textlib_get_instance();
+        $firstname = $textlib->strtolower($contact->firstname);
+        $lastname = $textlib->strtolower($contact->lastname);
+        $currentsearch = $textlib->strtolower($this->currentsearch);
         
-        return ($textlib->strpos($contact->firstname, $this->currentsearch) !== false) or ($textlib->strpos($contact->lastname, $this->currentsearch) !== false);
+        return ($textlib->strpos($firstname, $currentsearch) !== false) or ($textlib->strpos($lastname, $currentsearch) !== false);
         
     }
     
