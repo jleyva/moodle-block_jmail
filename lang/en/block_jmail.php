@@ -51,6 +51,7 @@ $string['emailcopyfooter'] = '';
 $string['errorsubjectrequired'] = 'The subject is required';
 $string['errortorequired'] = 'At least one destinatary in the to field is required';
 $string['filesaved'] = 'File saved';
+$string['filterfield'] = 'Field for filtering users';
 $string['first'] = '<< First';
 $string['forward'] = 'Forward';
 $string['from'] = 'From';

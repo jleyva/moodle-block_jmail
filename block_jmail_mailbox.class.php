@@ -108,6 +108,7 @@ class block_jmail_mailbox {
             throw new moodle_exception('invalidcourseid', 'error');
         }
         
+        // Block settings.
         $this->config = unserialize(base64_decode($this->instance->configdata));
         
         $this->cansendtomanagers = has_capability('block/jmail:sendtomanagers', $this->blockcontext);
@@ -116,14 +117,10 @@ class block_jmail_mailbox {
         $this->canmanagepreferences = has_capability('block/jmail:managepreferences', $this->blockcontext);
         $this->canapprovemessages = has_capability('block/jmail:approvemessages', $this->blockcontext);
         
-        // Special case, see http://tracker.moodle.org/browse/MDL-32173
+        // Special case
         
-        if ($this->globalinbox) {
-            $this->cansendtomanagers = true;
-            $this->cansendtoall = true;
-            $this->canmanagelabels = false;
-            $this->canmanagepreferences = true;
-            $this->canapprovemessages = false;
+        if ($this->globalinbox) {            
+            $this->canmanagelabels = false;            
         }
         
         $this->cansend = $this->cansendtomanagers or $this->cansendtoall;
@@ -432,8 +429,11 @@ class block_jmail_mailbox {
         // Two cases, separate groups or message sending restricted
         
         $this->load_groups();
+        $contacts = array_keys($this->get_contacts(0, '', '', 0));
         
         foreach($destinataries as $key=>$dest) {
+            
+            // Check if we are sending an email to a manager.
             if (!$this->cansendtoall) {
                 if (! has_capability('block/jmail:sendtoall', $this->blockcontext, $dest->userid) ) {
                     unset($destinataries[$key]);
@@ -441,6 +441,7 @@ class block_jmail_mailbox {
                 }
             }
             
+            // Check for a valid user in agroup.
             if ($this->isseparategroups) {                
                 $ismember = false;
                 foreach ($this->groups as $group) {
@@ -453,6 +454,13 @@ class block_jmail_mailbox {
                     continue;
                 }
             }
+            
+            // Finally check for valid user.
+            if (!in_array($dest->userid, $contacts)) {
+                unset($destinataries[$key]);
+                continue;
+            }
+            
         }
         return $destinataries;
     }
@@ -941,6 +949,11 @@ class block_jmail_mailbox {
         if ($li) {
             $wheres[] = $DB->sql_like('lastname', ':search2', false, false);
             $params['search2'] = "$li%";
+        }
+        
+        if ($this->config->filterfield) {
+            $wheres[] = "u.".$this->config->filterfield." = :filterfield";
+            $params['filterfield'] = $USER->{$this->config->filterfield};
         }
    
         $from = implode("\n", $joins);

@@ -34,6 +34,11 @@ class block_jmail_edit_form extends block_edit_form {
         
         $mform->addElement('selectyesno', 'config_approvemode', get_string('approvemode', 'block_jmail'));
         $mform->setDefault('config_approvemode', 0);
+        
+        $options = array('institution', 'department', 'lang', 'city', 'country', 'theme');      
+        $options = array_combine($options, $options);
+        array_unshift($options, get_string('none'));
+        $mform->addElement('select', 'config_filterfield', get_string('filterfield', 'block_jmail'), $options);        
 
     }
 }

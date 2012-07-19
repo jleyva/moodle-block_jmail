@@ -103,9 +103,7 @@ Setup:
 * jmail General Settings
 * Check enable global inbox
 
-Due to a Moodle bug in Block's Role Assigns (2.0, 2.1 and 2.2), there is no possibility for editing the user block roles at frontpage
-This means that there is not possibility of setup a global inbox in restricted communication, approval or read only mode.
-Please, note also that at site levels all the users has the Authenticated User role by default, so if you want create specific managers you will have to create global roles.
+Please, note that at site levels all the users has the Authenticated User role by default, so if you want create specific managers you will have to create global roles.
 
 == Installation ==
 
