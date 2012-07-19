@@ -91,6 +91,16 @@ Setup:
 ** Set block/jmail:sendtomanagers to allow
 ** Set block/jmail:sendtoall to prevent
 
+
+=== Mailbox in filtered users mode ===
+
+The block supports groups for filtering users but additionally in the block settings you can select a profile field of the user for creating groups fitered.
+
+So if you select "Country" and user from Spain will be available to view and send messages only users from Spain
+
+Same for institutions, department, and language
+
+
 === Global inbox ===
 
 Users will be able to send messages to any user in the system
