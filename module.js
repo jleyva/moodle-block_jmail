@@ -476,11 +476,7 @@ M.block_jmail.init = function(Y, cfg) {
     // TODO - Add rename options
     
     var labelsMenu = new YAHOO.widget.Menu("basicmenu");
-    labelsMenu.addItems([
-
-        { text: "&nbsp;&nbsp;"+M.str.block_jmail.delete, onclick: { fn: M.block_jmail.deleteLabel } }
-
-    ]);
+    labelsMenu.addItems([{ text: "&nbsp;&nbsp;"+M.str.block_jmail.deletem, onclick: { fn: M.block_jmail.deleteLabel } }]);
     labelsMenu.render("menulabel");
     M.block_jmail.app.labelsMenu = labelsMenu;
     
@@ -604,9 +600,8 @@ M.block_jmail.init = function(Y, cfg) {
     });
 
     // Toolbar
-    M.block_jmail.hideToolbar();
+    M.block_jmail.hideToolbar();   
     
-
 }
 
 M.block_jmail.addContact = function(userId, fullName, type) {

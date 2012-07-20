@@ -517,7 +517,8 @@ class block_jmail_mailbox {
                 }
             }
         }
-        return $mailresult;
+        // TODO, handle possible errors
+        return true;
     }
     
     /**
