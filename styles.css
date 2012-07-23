@@ -234,3 +234,7 @@
     color: red;
     font-weight: strong;
 }
+
+#newemailpanel .ft {
+    border: none;
+}

@@ -1178,8 +1178,6 @@ M.block_jmail.composeMessage = function(mode, message) {
             formHtml = formHtml.substr(stopIndex);
         }
     // }
-    window.tinyMCE.get('id_body').focus();
-
     M.str = Mstr;    
 }
 
@@ -1229,6 +1227,7 @@ M.block_jmail.saveMessage = function(action) {
     url += '&messageid='+messageid;
     
     var cfg = {
+        method: 'POST',
         on: {
             complete: function(id, o, args) {
                 var cfg = M.block_jmail.cfg;
@@ -1349,7 +1348,7 @@ M.block_jmail.confirmDialog = function(msg, callBack) {
 			   buttons: [ { text:"Yes", handler: function() { this.hide(); callBack();} , isDefault:true },
 						  { text:"No",  handler: function(){ this.hide(); } } ]
 			 } );    
-    dialog.render("maillist");    
+    dialog.render("jmailcenter");    
     dialog.show();
 }
 
