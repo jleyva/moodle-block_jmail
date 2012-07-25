@@ -95,7 +95,6 @@ $jmailcfg = array(
 //$PAGE->requires->js('/lib/editor/tinymce/tiny_mce/3.4.2/tiny_mce.js');
 $PAGE->requires->yui2_lib(array('event', 'dragdrop', 'element', 'animation', 'resize', 'layout', 'widget', 'button', 'editor', 'get', 'connection', 'datasource', 'datatable', 'container', 'utilities', 'menu', 'json', 'paginator'));
 $PAGE->requires->js_init_call('M.block_jmail.init', array($jmailcfg), true, $module);
-$PAGE->requires->css(new moodle_url('styles.css'));
 
 echo $OUTPUT->header();    
 echo $renderer->load_ui($mailbox);

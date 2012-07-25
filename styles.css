@@ -28,23 +28,23 @@
 }
 
 #label_list li.inbox em {
-    background-image: url(pix/inbox.png);
+    background-image: url([[pix:block_jmail|inbox]]);
 }
 
 #label_list li.draft em {
-    background-image: url(pix/draft.png);
+    background-image: url([[pix:block_jmail|draft]]);
 }
 
 #label_list li.sent em {
-    background-image: url(pix/email.png);
+    background-image: url([[pix:block_jmail|email]]);
 }
 
 #label_list li.trash em {
-    background-image: url(pix/trash.png);
+    background-image: url([[pix:block_jmail|trash]]);
 }
 
 #label_list li.folder em {
-    background-image: url(pix/folder.png);
+    background-image: url([[pix:block_jmail|folder]]);
 }
 
 #label_list li a {
@@ -96,52 +96,52 @@
     position: absolute;
     top: 6px;
     left: 4px;
-    background-image: url(pix/trash.png);
+    background-image: url([[pix:block_jmail|trash]]);
     background-repeat: no-repeat;
 }
 
 #checkmail .icon {
-    background-image: url(pix/email.png);
+    background-image: url([[pix:block_jmail|email]]);
 }
 
 #newmail .icon {
-    background-image: url(pix/new.png);
+    background-image: url([[pix:block_jmail|new]]);
 }
 
 #editb .icon {
-    background-image: url(pix/new.png);
+    background-image: url([[pix:block_jmail|new]]);
 }
 
 #deleteb .icon {
-    background-image: url(pix/trash.png);
+    background-image: url([[pix:block_jmail|trash]]);
 }
 
 #replyb .icon {
-    background-image: url(pix/reply.png);
+    background-image: url([[pix:block_jmail|reply]]);
 }
 
 #replytoallb .icon {
-    background-image: url(pix/reply.png);
+    background-image: url([[pix:block_jmail|reply]]);
 }
 
 #moveb .icon {
-    background-image: url(pix/move.png);
+    background-image: url([[pix:block_jmail|move]]);
 }
 
 #moreb .icon {
-    background-image: url(pix/settings.png);
+    background-image: url([[pix:block_jmail|settings]]);
 }
 
 #forwardb .icon {
-    background-image: url(pix/forward.png);
+    background-image: url([[pix:block_jmail|forward]]);
 }
 
 #printb .icon {
-    background-image: url(pix/print.png);
+    background-image: url([[pix:block_jmail|print]]);
 }
 
 #approveb .icon {
-    background-image: url(pix/email.png);
+    background-image: url([[pix:block_jmail|email]]);
 }
 
 #contact_list {
@@ -182,13 +182,13 @@
 
 #search_bar input{
     width: 85%;
-    background-image: url(pix/search.png);
+    background-image: url([[pix:block_jmail|search]]);
     background-repeat: no-repeat;
     padding-left: 20px;
 }
 
 .loading_big {
-    background-image: url(pix/loading_big.gif);
+    background-image: url([[pix:block_jmail|loading_big]]);
     background-repeat: no-repeat;
     width: 66px;
     height: 66px;
