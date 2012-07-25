@@ -322,6 +322,9 @@ M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"'.$CFG->
                         <div id="mymailboxes">
                         '.$mymailboxes.'
                         </div>
+                        
+                        <div id="loginfo" style="overflow: auto; width: 100%; height: 200px; border: solid 1px red; display: none">
+                        </div>
                     </div>
                 </div>
                 <div id="jmailcenter">

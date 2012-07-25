@@ -26,6 +26,12 @@ M.block_jmail.magicNumDataTableWidth = 10;
 M.block_jmail.currentComposeCourse = {id: 0, shortname: ''};
 
 M.block_jmail.init = function(Y, cfg) {
+    M.block_jmail.logdiv = Y.one("#loginfo");
+    if (location.href.indexOf("#debugon") > 0) {
+        M.block_jmail.logdiv.setStyle('display', 'block');
+    }
+    
+    M.block_jmail.logInfo('Starting the app');
     
     M.block_jmail.Y = Y;
     M.block_jmail.cfg = cfg;
@@ -58,10 +64,8 @@ M.block_jmail.init = function(Y, cfg) {
     //M.block_jmail.filemanagertpl =  fptpl.get('innerHTML');
     //fptpl.remove();    
     
-    // First of all, load labels (async request)
-    M.block_jmail.loadLabels();
-    
     // Load all the contacts users
+    M.block_jmail.logInfo('Loading contacts');
     if (cfg.cansend) {
         M.block_jmail.loadContacts();
         Y.one("#selectall").on('click', function(e){
@@ -117,6 +121,8 @@ M.block_jmail.init = function(Y, cfg) {
     
     var layout2 = null;
     var layout3 = null;
+    
+    M.block_jmail.logInfo('Rendering layouts');
     layout.on('render', function() {
         var el = layout.getUnitByPosition('center').get('wrap');
         layout2 = new YAHOO.widget.Layout(el, {
@@ -148,19 +154,24 @@ M.block_jmail.init = function(Y, cfg) {
         }
     });
     
-    layout.render();    
+    layout.render();
+    M.block_jmail.logInfo('Layouts rendered');
     //layout.getUnitByPosition('right').collapse();
-    
-    Y.on('windowresize', function(e) {
-            layout.set('height', Y.one('#jmailui').getStyle('width')); 
-            layout.set('width', Y.one('#jmailui').getStyle('height')); 
-            layout.resize();
-        });
     
     M.block_jmail.app.layout = layout;
     M.block_jmail.app.layout2 = layout2;
     M.block_jmail.app.layout3 = layout3;
     
+    
+    // TODO IE 7
+    if (Y.UA.ie != 7) {
+        Y.on('windowresize', function(e) {
+                M.block_jmail.app.layout.set('height', M.block_jmail.Y.one('#jmailui').getStyle('width')); 
+                M.block_jmail.app.layout.set('width', M.block_jmail.Y.one('#jmailui').getStyle('height')); 
+                M.block_jmail.app.layout.resize();
+            });
+    }    
+
     // New and check mail buttons
     
     if (cfg.cansend) {
@@ -181,7 +192,7 @@ M.block_jmail.init = function(Y, cfg) {
             M.block_jmail.checkMail('inbox');
         });
 
-    
+    M.block_jmail.logInfo('Creating buttons toolbar');
     // INBOX Toolbar    
     var icon = document.createElement('span'); 
     icon.className = 'icon';    
@@ -281,7 +292,13 @@ M.block_jmail.init = function(Y, cfg) {
         M.block_jmail.app.mailboxesB = mailboxesB;
     }
 
+    // Load labels (async request)
+    M.block_jmail.logInfo('Loading labels');
+    M.block_jmail.loadLabels();
+
+
     // Mail list table
+    M.block_jmail.logInfo('Loading mail list table');
     
     var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=get_message_headers&sesskey='+cfg.sesskey;
     
@@ -423,7 +440,7 @@ M.block_jmail.init = function(Y, cfg) {
 
     initDataTable(layout2.getSizes().top.h - M.block_jmail.magicNumTop, layout2.getSizes().top.w - M.block_jmail.magicNumDataTableWidth);
 
-    
+    M.block_jmail.logInfo('Loading user list with filters');
     // Alphabet filter    
     if (cfg.cansend) {
         
@@ -600,9 +617,11 @@ M.block_jmail.init = function(Y, cfg) {
     });
 
     // Toolbar
-    M.block_jmail.hideToolbar();   
-    
-}
+    M.block_jmail.hideToolbar();
+    M.block_jmail.logInfo('Application loaded');
+
+
+};
 
 M.block_jmail.addContact = function(userId, fullName, type) {
     var cfg = M.block_jmail.cfg;
@@ -1376,4 +1395,12 @@ M.block_jmail.showMessage = function(msg, timeHide) {
         timeHide = 2000;
     }
     setTimeout(function(){ messagePanel.hide(); messagePanel.destroy();}, timeHide);
+}
+
+M.block_jmail.logInfo = function(msg) {
+    
+    if (typeof console != "undefined") {
+        console.log(msg);
+    }    
+    M.block_jmail.logdiv.set('innerHTML', msg + "<br/>" + M.block_jmail.logdiv.get('innerHTML'));
 }
