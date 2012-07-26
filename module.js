@@ -1240,13 +1240,13 @@ M.block_jmail.saveMessage = function(action) {
     url += '&cc='+cc;
     url += '&bcc='+bcc;
     url += '&subject='+subject;
-    url += '&body='+body;
     url += '&attachments='+attachments;
     url += '&editoritemid='+editoritemid;
     url += '&messageid='+messageid;
     
     var cfg = {
         method: 'POST',
+        data: 'body='+body, 
         on: {
             complete: function(id, o, args) {
                 var cfg = M.block_jmail.cfg;
