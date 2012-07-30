@@ -1,0 +1,337 @@
+<HTML class=yui3-js-enabled lang=es id=yui_3_4_1_1_1343058618741_953 dir=ltr xmlns="http://www.w3.org/1999/xhtml" xml:lang="es"><HEAD><TITLE>jmail</TITLE>
+<META content="width=device-width, initial-scale=1.0" name=viewport><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=favicon%2Ffavicon&amp;rev=295&amp;component=theme" type=image/png rel="shortcut icon"><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=favicon%2Fh%2Fapple-touch-icon-precomposed&amp;rev=295&amp;component=theme" rel=apple-touch-icon-precomposed sizes="114x114"><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=favicon%2Fm%2Fapple-touch-icon-precomposed&amp;rev=295&amp;component=theme" rel=apple-touch-icon-precomposed sizes="72x72"><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=favicon%2Fl%2Fapple-touch-icon-precomposed&amp;rev=295&amp;component=theme" rel=apple-touch-icon-precomposed>
+<META http-equiv=Content-Type content="text/html; charset=utf-8">
+<META content="moodle, jmail" name=keywords><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?3.4.1/build/cssreset/reset.css&amp;3.4.1/build/cssfonts/fonts.css&amp;3.4.1/build/cssgrids/grids.css&amp;3.4.1/build/cssbase/base.css" type=text/css rel=stylesheet>
+<SCRIPT src="http://bbvaconsultoria.e-cadmo.net/lib/yui/3.4.1/build/yui/yui.js" type=text/javascript></SCRIPT>
+
+<SCRIPT src="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?2.9.0/build/utilities/utilities.js&amp;2.9.0/build/resize/resize.js&amp;2.9.0/build/layout/layout.js&amp;2.9.0/build/button/button.js&amp;2.9.0/build/container/container.js&amp;2.9.0/build/menu/menu.js&amp;2.9.0/build/editor/editor.js&amp;2.9.0/build/datasource/datasource.js&amp;2.9.0/build/datatable/datatable.js&amp;2.9.0/build/json/json.js&amp;2.9.0/build/paginator/paginator.js&amp;2.9.0/build/logger/logger.js" type=text/javascript></SCRIPT>
+<!-- The following modules were requested but are not defined: widget --><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?2.9.0/build/assets/skins/sam/skin.css" type=text/css rel=stylesheet>
+<SCRIPT id=yui_3_4_1_1_1343058618741_2 src="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?3.4.1/build/oop/oop.js&amp;3.4.1/build/event-custom-base/event-custom-base.js&amp;3.4.1/build/dom-core/dom-core.js&amp;3.4.1/build/dom-base/dom-base.js&amp;3.4.1/build/selector-native/selector-native.js&amp;3.4.1/build/selector/selector.js&amp;3.4.1/build/selector-css2/selector-css2.js&amp;3.4.1/build/node-core/node-core.js&amp;3.4.1/build/node-base/node-base.js&amp;3.4.1/build/event-base/event-base.js&amp;3.4.1/build/event-base-ie/event-base-ie.js&amp;3.4.1/build/event-delegate/event-delegate.js&amp;3.4.1/build/node-event-delegate/node-event-delegate.js&amp;3.4.1/build/pluginhost-base/pluginhost-base.js&amp;3.4.1/build/pluginhost-config/pluginhost-config.js&amp;3.4.1/build/node-pluginhost/node-pluginhost.js&amp;3.4.1/build/dom-style/dom-style.js&amp;3.4.1/build/dom-style-ie/dom-style-ie.js&amp;3.4.1/build/dom-screen/dom-screen.js&amp;3.4.1/build/node-screen/node-screen.js&amp;3.4.1/build/node-style/node-style.js&amp;3.4.1/build/event-custom-complex/event-custom-complex.js&amp;3.4.1/build/intl/intl.js" type=text/javascript charset=utf-8></SCRIPT>
+<LINK id=yui_3_4_1_1_1343058618741_8 href="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?3.4.1/build/node-menunav/assets/skins/sam/node-menunav.css" type=text/css charset=utf-8 rel=stylesheet>
+<SCRIPT id=yui_3_4_1_1_1343058618741_10 src="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?3.4.1/build/classnamemanager/classnamemanager.js&amp;3.4.1/build/attribute-base/attribute-base.js&amp;3.4.1/build/attribute-complex/attribute-complex.js&amp;3.4.1/build/base-base/base-base.js&amp;3.4.1/build/plugin/plugin.js&amp;3.4.1/build/event-simulate/event-simulate.js&amp;3.4.1/build/node-event-simulate/node-event-simulate.js&amp;3.4.1/build/event-synthetic/event-synthetic.js&amp;3.4.1/build/event-key/event-key.js&amp;3.4.1/build/event-focus/event-focus.js&amp;3.4.1/build/node-focusmanager/node-focusmanager.js&amp;3.4.1/build/node-menunav/node-menunav.js" type=text/javascript charset=utf-8></SCRIPT>
+<LINK id=yui_3_4_1_1_1343058618741_80 href="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?3.4.1/build/widget-base/assets/skins/sam/widget-base.css&amp;3.4.1/build/tabview/assets/skins/sam/tabview.css&amp;3.4.1/build/datatable-base/assets/skins/sam/datatable-base.css&amp;3.4.1/build/widget-stack/assets/skins/sam/widget-stack.css&amp;3.4.1/build/widget-buttons/assets/skins/sam/widget-buttons.css&amp;3.4.1/build/panel/assets/skins/sam/panel.css&amp;3.4.1/build/autocomplete-list/assets/skins/sam/autocomplete-list.css" type=text/css charset=utf-8 rel=stylesheet>
+<SCRIPT id=yui_3_4_1_1_1343058618741_81 src="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?3.4.1/build/querystring-stringify-simple/querystring-stringify-simple.js&amp;3.4.1/build/io-base/io-base.js&amp;3.4.1/build/datatype-xml-parse/datatype-xml-parse.js&amp;3.4.1/build/io-xdr/io-xdr.js&amp;3.4.1/build/io-form/io-form.js&amp;3.4.1/build/io-upload-iframe/io-upload-iframe.js&amp;3.4.1/build/queue-promote/queue-promote.js&amp;3.4.1/build/io-queue/io-queue.js&amp;3.4.1/build/json-parse/json-parse.js&amp;3.4.1/build/base-pluginhost/base-pluginhost.js&amp;3.4.1/build/base-build/base-build.js&amp;3.4.1/build/widget-base/widget-base.js&amp;3.4.1/build/widget-base-ie/widget-base-ie.js&amp;3.4.1/build/widget-htmlparser/widget-htmlparser.js&amp;3.4.1/build/widget-uievents/widget-uievents.js&amp;3.4.1/build/widget-skin/widget-skin.js&amp;3.4.1/build/arraylist/arraylist.js&amp;3.4.1/build/widget-parent/widget-parent.js&amp;3.4.1/build/widget-child/widget-child.js&amp;3.4.1/build/tabview-base/tabview-base.js&amp;3.4.1/build/tabview/tabview.js&amp;3.4.1/build/datasource-local/datasource-local.js&amp;3.4.1/build/datasource-get/datasource-get.js&amp;3.4.1/build/dataschema-base/dataschema-base.js&amp;3.4.1/build/json-stringify/json-stringify.js&amp;3.4.1/build/dataschema-json/dataschema-json.js&amp;3.4.1/build/datasource-jsonschema/datasource-jsonschema.js&amp;3.4.1/build/recordset-base/recordset-base.js&amp;3.4.1/build/substitute/substitute.js&amp;3.4.1/build/event-mouseenter/event-mouseenter.js&amp;3.4.1/build/datatable-base/datatable-base.js&amp;3.4.1/build/datatable-datasource/datatable-datasource.js&amp;3.4.1/build/datatable-sort/lang/datatable-sort_en.js&amp;3.4.1/build/arraysort/arraysort.js&amp;3.4.1/build/recordset-sort/recordset-sort.js&amp;3.4.1/build/datatable-sort/datatable-sort.js&amp;3.4.1/build/widget-stdmod/widget-stdmod.js&amp;3.4.1/build/widget-position/widget-position.js&amp;3.4.1/build/widget-position-align/widget-position-align.js&amp;3.4.1/build/widget-stack/widget-stack.js&amp;3.4.1/build/widget-position-constrain/widget-position-constrain.js&amp;3.4.1/build/event-outside/event-outside.js&amp;3.4.1/build/widget-modality/widget-modality.js&amp;3.4.1/build/widget-autohide/widget-autohide.js" type=text/javascript charset=utf-8></SCRIPT>
+
+<SCRIPT id=yui_3_4_1_1_1343058618741_82 src="http://bbvaconsultoria.e-cadmo.net/theme/yui_combo.php?3.4.1/build/widget-buttons/widget-buttons.js&amp;3.4.1/build/panel/panel.js&amp;3.4.1/build/array-extras/array-extras.js&amp;3.4.1/build/escape/escape.js&amp;3.4.1/build/event-valuechange/event-valuechange.js&amp;3.4.1/build/autocomplete-base/autocomplete-base.js&amp;3.4.1/build/autocomplete-sources/autocomplete-sources.js&amp;3.4.1/build/autocomplete-list/lang/autocomplete-list_en.js&amp;3.4.1/build/event-resize/event-resize.js&amp;3.4.1/build/selector-css3/selector-css3.js&amp;3.4.1/build/shim-plugin/shim-plugin.js&amp;3.4.1/build/autocomplete-list/autocomplete-list.js&amp;3.4.1/build/autocomplete-list-keys/autocomplete-list-keys.js&amp;3.4.1/build/autocomplete-plugin/autocomplete-plugin.js&amp;3.4.1/build/text-data-wordbreak/text-data-wordbreak.js&amp;3.4.1/build/text-wordbreak/text-wordbreak.js&amp;3.4.1/build/highlight-base/highlight-base.js&amp;3.4.1/build/autocomplete-highlighters/autocomplete-highlighters.js" type=text/javascript charset=utf-8></SCRIPT>
+
+<SCRIPT id=yui_3_4_1_1_1343058618741_83 src="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/module.js" type=text/javascript charset=utf-8></SCRIPT>
+
+<SCRIPT id=yui_3_4_1_1_1343058618741_777 src="http://bbvaconsultoria.e-cadmo.net/lib/editor/tinymce/module.js" type=text/javascript charset=utf-8></SCRIPT>
+
+<SCRIPT id=firstthemesheet type=text/css>/** Required in order to fix style inclusion problems in IE with YUI **/</SCRIPT>
+<LINK href="http://bbvaconsultoria.e-cadmo.net/theme/styles.php?theme=cadmo&amp;rev=295&amp;type=plugins" type=text/css rel=stylesheet><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/styles.php?theme=cadmo&amp;rev=295&amp;type=parents" type=text/css rel=stylesheet><LINK href="http://bbvaconsultoria.e-cadmo.net/theme/styles.php?theme=cadmo&amp;rev=295&amp;type=theme" type=text/css rel=stylesheet><LINK href="styles.css" type=text/css rel=stylesheet>
+<SCRIPT type=text/javascript>
+//<![CDATA[
+var M = {}; M.yui = {}; var moodleConfigFn = function(me) {var p = me.path, b = me.name.replace(/^moodle-/,'').split('-', 3), n = b.pop();if (/(skin|core)/.test(n)) {n = b.pop();me.type = 'css';};me.path = b.join('-')+'/'+n+'/'+n+'.'+me.type;}; var galleryConfigFn = function(me) {var p = me.path,v=M.yui.galleryversion,f;if(/-(skin|core)/.test(me.name)) {me.type = 'css';p = p.replace(/-(skin|core)/, '').replace(/\.js/, '.css').split('/'), f = p.pop().replace(/(\-(min|debug))/, '');if (/-skin/.test(me.name)) {p.splice(p.length,0,v,'assets','skins','sam', f);} else {p.splice(p.length,0,v,'assets', f);};} else {p = p.split('/'), f = p.pop();p.splice(p.length,0,v, f);};me.path = p.join('/');};
+M.yui.loader = {"base":"http:\/\/bbvaconsultoria.e-cadmo.net\/lib\/yui\/3.4.1\/build\/","comboBase":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?","combine":true,"filter":"RAW","insertBefore":"firstthemesheet","modules":{"yui2-event":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/event\/event-min.js"},"yui2-animation":{"type":"js","requires":["yui2-dom","yui2-event"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/animation\/animation-min.js"},"yui2-swfstore":{"type":"js","requires":["yui2-element","yui2-cookie","yui2-swf"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/swfstore\/swfstore-min.js"},"yui2-datatable":{"requires":["yui2-element","yui2-datasource"],"type":"js","optional":["yui2-calendar","yui2-dragdrop","yui2-paginator"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/datatable\/datatable-min.js"},"yui2-swfdetect":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/swfdetect\/swfdetect-min.js"},"yui2-menu":{"requires":["yui2-containercore"],"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/menu\/menu-min.js"},"yui2-treeview":{"requires":["yui2-event","yui2-dom"],"type":"js","optional":["yui2-json","yui2-animation","yui2-calendar"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/treeview\/treeview-min.js"},"yui2-get":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/get\/get-min.js"},"yui2-progressbar":{"requires":["yui2-element"],"type":"js","optional":["yui2-animation"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/progressbar\/progressbar-min.js"},"yui2-uploader":{"type":"js","requires":["yui2-element"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/uploader\/uploader-min.js"},"yui2-datasource":{"requires":["yui2-event"],"type":"js","optional":["yui2-connection"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/datasource\/datasource-min.js"},"yui2-profiler":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/profiler\/profiler-min.js"},"yui2-connection":{"supersedes":["yui2-connectioncore"],"requires":["yui2-event"],"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/connection\/connection-min.js"},"yui2-json":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/json\/json-min.js"},"yui2-datemath":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/datemath\/datemath-min.js"},"yui2-calendar":{"supersedes":["yui2-datemath"],"requires":["yui2-event","yui2-dom"],"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/calendar\/calendar-min.js"},"yui2-simpleeditor":{"requires":["yui2-element"],"type":"js","optional":["yui2-containercore","yui2-menu","yui2-button","yui2-animation","yui2-dragdrop"],"pkg":"editor","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/editor\/simpleeditor-min.js"},"yui2-swf":{"supersedes":["yui2-swfdetect"],"requires":["yui2-element"],"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/swf\/swf-min.js"},"yui2-event-simulate":{"type":"js","requires":["yui2-event"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/event-simulate\/event-simulate-min.js"},"yui2-yuiloader-dom-event":{"supersedes":["yui2-yahoo","yui2-dom","yui2-event","yui2-get","yui2-yuiloader","yui2-yahoo-dom-event"],"rollup":5,"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/yuiloader-dom-event\/yuiloader-dom-event.js"},"yui2-storage":{"requires":["yui2-yahoo","yui2-event","yui2-cookie"],"type":"js","optional":["yui2-swfstore"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/storage\/storage-min.js"},"yui2-container":{"supersedes":["yui2-containercore"],"requires":["yui2-dom","yui2-event"],"type":"js","optional":["yui2-dragdrop","yui2-animation","yui2-connection"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/container\/container-min.js"},"yui2-profilerviewer":{"requires":["yui2-profiler","yui2-yuiloader","yui2-element"],"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/profilerviewer\/profilerviewer-min.js"},"yui2-imagecropper":{"requires":["yui2-dragdrop","yui2-element","yui2-resize"],"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/imagecropper\/imagecropper-min.js"},"yui2-paginator":{"requires":["yui2-element"],"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/paginator\/paginator-min.js"},"yui2-tabview":{"requires":["yui2-element"],"type":"js","optional":["yui2-connection"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/tabview\/tabview-min.js"},"yui2-layout":{"requires":["yui2-element"],"type":"js","optional":["yui2-animation","yui2-dragdrop","yui2-resize","yui2-selector"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/layout\/layout-min.js"},"yui2-imageloader":{"type":"js","requires":["yui2-event","yui2-dom"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/imageloader\/imageloader-min.js"},"yui2-containercore":{"requires":["yui2-dom","yui2-event"],"type":"js","pkg":"container","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/container\/container_core-min.js"},"yui2-event-mouseenter":{"type":"js","requires":["yui2-dom","yui2-event"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/event-mouseenter\/event-mouseenter-min.js"},"yui2-logger":{"requires":["yui2-event","yui2-dom"],"type":"js","optional":["yui2-dragdrop"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/logger\/logger-min.js"},"yui2-cookie":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/cookie\/cookie-min.js"},"yui2-stylesheet":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/stylesheet\/stylesheet-min.js"},"yui2-connectioncore":{"requires":["yui2-event"],"type":"js","pkg":"connection","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/connection\/connection_core-min.js"},"yui2-utilities":{"supersedes":["yui2-yahoo","yui2-event","yui2-dragdrop","yui2-animation","yui2-dom","yui2-connection","yui2-element","yui2-yahoo-dom-event","yui2-get","yui2-yuiloader","yui2-yuiloader-dom-event"],"rollup":8,"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/utilities\/utilities.js"},"yui2-dragdrop":{"type":"js","requires":["yui2-dom","yui2-event"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/dragdrop\/dragdrop-min.js"},"yui2-colorpicker":{"requires":["yui2-slider","yui2-element"],"type":"js","optional":["yui2-animation"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/colorpicker\/colorpicker-min.js"},"yui2-event-delegate":{"requires":["yui2-event"],"type":"js","optional":["yui2-selector"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/event-delegate\/event-delegate-min.js"},"yui2-yuiloader":{"type":"js","supersedes":["yui2-yahoo","yui2-get"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/yuiloader\/yuiloader-min.js"},"yui2-button":{"requires":["yui2-element"],"type":"js","optional":["yui2-menu"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/button\/button-min.js"},"yui2-resize":{"requires":["yui2-dragdrop","yui2-element"],"type":"js","optional":["yui2-animation"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/resize\/resize-min.js"},"yui2-element":{"requires":["yui2-dom","yui2-event"],"type":"js","optional":["yui2-event-mouseenter","yui2-event-delegate"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/element\/element-min.js"},"yui2-history":{"type":"js","requires":["yui2-event"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/history\/history-min.js"},"yui2-yahoo":{"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/yahoo\/yahoo-min.js"},"yui2-element-delegate":{"type":"js","requires":["yui2-element"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/element-delegate\/element-delegate-min.js"},"yui2-charts":{"type":"js","requires":["yui2-element","yui2-json","yui2-datasource","yui2-swf"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/charts\/charts-min.js"},"yui2-slider":{"requires":["yui2-dragdrop"],"type":"js","optional":["yui2-animation"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/slider\/slider-min.js"},"yui2-selector":{"type":"js","requires":["yui2-yahoo","yui2-dom"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/selector\/selector-min.js"},"yui2-yuitest":{"requires":["yui2-logger"],"type":"js","optional":["yui2-event-simulate"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/yuitest\/yuitest-min.js"},"yui2-carousel":{"requires":["yui2-element"],"type":"js","optional":["yui2-animation"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/carousel\/carousel-min.js"},"yui2-autocomplete":{"requires":["yui2-dom","yui2-event","yui2-datasource"],"type":"js","optional":["yui2-connection","yui2-animation"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/autocomplete\/autocomplete-min.js"},"yui2-yahoo-dom-event":{"supersedes":["yui2-yahoo","yui2-event","yui2-dom"],"rollup":3,"type":"js","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/yahoo-dom-event\/yahoo-dom-event.js"},"yui2-dom":{"type":"js","requires":["yui2-yahoo"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/dom\/dom-min.js"},"yui2-editor":{"supersedes":["yui2-simpleeditor"],"requires":["yui2-menu","yui2-element","yui2-button"],"type":"js","optional":["yui2-animation","yui2-dragdrop"],"fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?2.9.0\/build\/editor\/editor-min.js"},"core_filepicker":{"name":"core_filepicker","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/repository\/filepicker.js","requires":["base","node","node-event-simulate","json","async-queue","io-base","io-upload-iframe","io-form","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview","yui2-dragdrop","yui2-cookie"]},"core_dock":{"name":"core_dock","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/blocks\/dock.js","requires":["base","node","event-custom","event-mouseenter","event-resize"]},"block_jmail":{"name":"block_jmail","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/blocks\/jmail\/module.js","requires":["io","event-custom","json-parse","base","node","tabview","datasource-get","datasource-jsonschema","datatable-base","datatable-datasource","datatable-sort","panel","autocomplete","autocomplete-highlighters"]}},"groups":{"moodle":{"name":"moodle","base":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?moodle\/-1\/","comboBase":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?","combine":true,"filter":"","ext":false,"root":"moodle\/-1\/","patterns":{"moodle-":{"group":"moodle","configFn":moodleConfigFn},"root":"moodle"}},"local":{"name":"gallery","base":"http:\/\/bbvaconsultoria.e-cadmo.net\/lib\/yui\/gallery\/","comboBase":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/yui_combo.php?","combine":true,"filter":"RAW","ext":false,"root":"gallery\/","patterns":{"gallery-":{"group":"gallery","configFn":galleryConfigFn},"root":"gallery"}}}};
+M.cfg = {"wwwroot":"http:\/\/bbvaconsultoria.e-cadmo.net","sesskey":"yC6DyMRT7H","loadingicon":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/image.php?theme=cadmo&image=i%2Floading_small&rev=295","themerev":"295","theme":"cadmo","jsrev":-1,"developerdebug":true};
+//]]>
+</SCRIPT>
+
+<SCRIPT src="http://bbvaconsultoria.e-cadmo.net/lib/javascript-static.js" type=text/javascript></SCRIPT>
+
+<SCRIPT src="http://bbvaconsultoria.e-cadmo.net/theme/javascript.php?theme=cadmo&amp;rev=295&amp;type=head" type=text/javascript></SCRIPT>
+</HEAD>
+<BODY class=" path-blocks path-blocks-jmail ie ie7 dir-ltr lang-es yui-skin-sam yui3-skin-sam bbvaconsultoria-e-cadmo-net pagelayout-base course-2 context-18 category-2 content-only has_custom_menu jsenabled" id=page-blocks-jmail-mailbox><SPAN class=yui-resize-status></SPAN><SPAN class=yui-resize-status style="DISPLAY: none"></SPAN><SPAN class=yui-resize-status></SPAN><IFRAME id=_yuiResizeMonitor title="Text Resize Monitor" style="BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; LEFT: 0px; VISIBILITY: visible; BORDER-BOTTOM-WIDTH: 0px; WIDTH: 2em; POSITION: absolute; TOP: -34px; HEIGHT: 2em; BACKGROUND-COLOR: transparent; BORDER-RIGHT-WIDTH: 0px" tabIndex=-1 role="presentation"></IFRAME>
+<DIV class="yui-panel-container shadow yui-overlay-hidden" id=newemailpanel_c style="Z-INDEX: 4; LEFT: 309px; VISIBILITY: hidden; TOP: 164px">
+<DIV class="yui-module yui-overlay yui-panel" id=newemailpanel style="DISPLAY: block; VISIBILITY: inherit; WIDTH: 800px; HEIGHT: 600px"><A class=container-close href="#">Close</A>
+<DIV class=hd id=newemailpanel_h style="CURSOR: move">New mail</DIV>
+<DIV class="bd mform" id=newemailform style="HEIGHT: 540px">
+<DIV class=fitem>
+<DIV class=fitemtitle><LABEL for=composetoac>To</LABEL> </DIV>
+<DIV class="felement ftext"><INPUT class=yui3-aclist-input id=composetoac size=50 name=composetoac aria-autocomplete="list" aria-expanded="false" aria-owns="ms__id391" autocomplete="off"> 
+<DIV id=composetolist></DIV>
+<DIV class="yui3-widget yui3-aclist yui3-widget-positioned yui3-aclist-hidden" id=yui_3_4_1_1_1343058618741_400 style="LEFT: 144px; WIDTH: 441px; POSITION: absolute; TOP: 64px" aria-hidden="true">
+<DIV class=yui3-aclist-content id=yui_3_4_1_1_1343058618741_401>
+<UL class=yui3-aclist-list id=ms__id391 role="listbox"></UL></DIV></DIV>
+<DIV class=yui3-aclist-aria role="status" aria-live="polite"></DIV></DIV></DIV>
+<DIV class=fitem>
+<DIV class=fitemtitle><LABEL for=composeccac>CC</LABEL> </DIV>
+<DIV class="felement ftext"><INPUT class=yui3-aclist-input id=composeccac size=50 name=composeccac aria-autocomplete="list" aria-expanded="false" aria-owns="ms__id406" autocomplete="off"> 
+<DIV id=composecclist></DIV>
+<DIV class="yui3-widget yui3-aclist yui3-widget-positioned yui3-aclist-hidden" id=yui_3_4_1_1_1343058618741_530 style="LEFT: 144px; WIDTH: 441px; POSITION: absolute; TOP: 94px" aria-hidden="true">
+<DIV class=yui3-aclist-content id=yui_3_4_1_1_1343058618741_531>
+<UL class=yui3-aclist-list id=ms__id406 role="listbox"></UL></DIV></DIV>
+<DIV class=yui3-aclist-aria role="status" aria-live="polite"></DIV></DIV></DIV>
+<DIV class=fitem>
+<DIV class=fitemtitle><LABEL for=composebccac>BCC</LABEL><BR></DIV>
+<DIV class="felement ftext"><INPUT class=yui3-aclist-input id=composebccac size=50 name=composebccac aria-autocomplete="list" aria-expanded="false" aria-owns="ms__id421" autocomplete="off"> 
+<DIV id=composebcclist></DIV>
+<DIV class="yui3-widget yui3-aclist yui3-widget-positioned yui3-aclist-hidden" id=yui_3_4_1_1_1343058618741_655 style="LEFT: 144px; WIDTH: 441px; POSITION: absolute; TOP: 124px" aria-hidden="true">
+<DIV class=yui3-aclist-content id=yui_3_4_1_1_1343058618741_656>
+<UL class=yui3-aclist-list id=ms__id421 role="listbox"></UL></DIV></DIV>
+<DIV class=yui3-aclist-aria role="status" aria-live="polite"></DIV></DIV></DIV>
+<DIV class=fitem>
+<DIV class=fitemtitle><LABEL for=subject>Subject</LABEL><BR></DIV>
+<DIV class="felement ftext"><INPUT id=subject size=50 name=subject> </DIV></DIV>
+<DIV id=newemailformremote></DIV>
+<DIV class=fitem>
+<DIV class=fitemtitle></DIV>
+<DIV class="felement ftext"><SPAN class="yui-button yui-push-button" id=sendbutton><SPAN class=first-child><BUTTON id=sendbutton-button title="" tabIndex=0>Send</BUTTON></SPAN></SPAN> <SPAN class="yui-button yui-push-button" id=savebutton><SPAN class=first-child><BUTTON id=savebutton-button title="" tabIndex=0>Save</BUTTON></SPAN></SPAN> </DIV></DIV><INPUT id=hiddento type=hidden name=to> <INPUT id=hiddencc type=hidden name=cc> <INPUT id=hiddenbcc type=hidden name=bcc> </DIV>
+<DIV class=ft></DIV></DIV></DIV>
+<DIV class=skiplinks><A class=skip href="#maincontent">Saltar a contenido principal</A></DIV>
+<SCRIPT type=text/javascript>
+//<![CDATA[
+document.body.className += ' jsenabled';
+//]]>
+</SCRIPT>
+
+<DIV id=page>
+<DIV id=page-inner-wrapper>
+<DIV id=page-header-wrapper>
+<DIV class=clearfix id=page-header>
+<H1 class="headermain ir">Espacio de coordinación : jmail</H1>
+<DIV id=profileblock>
+<DIV id=user-pic><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=3&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Juan Leyva" height=30 alt="Imagen de Juan Leyva" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=30></A></DIV>
+<DIV class=logininfo>Usted se ha identificado como <A href="http://bbvaconsultoria.e-cadmo.net/user/profile.php?id=3">Juan Leyva</A> (<A href="http://bbvaconsultoria.e-cadmo.net/login/logout.php?sesskey=yC6DyMRT7H">Salir</A>)</DIV></DIV><!-- FIN #profileblock --></DIV><!-- FIN #page-header --></DIV><!-- FIN #page-header-wrapper -->
+<DIV id=custommenu-wrapper>
+<DIV class=clearfix id=custommenu><A class=home href="http://bbvaconsultoria.e-cadmo.net/index.php">
+<DIV>&nbsp;</DIV></A>
+<DIV class="yui3-menu yui3-menu-horizontal" id=custom_menu_1 role="menu">
+<DIV class=yui3-menu-content id=yui_3_4_1_1_1343058618741_952 role="presentation">
+<UL class=first-of-type id=yui_3_4_1_1_1343058618741_951 role="presentation">
+<LI class=yui3-menuitem id=yui_3_4_1_1_1343058618741_954 role="presentation"><A class=yui3-menuitem-content id=yui_3_4_1_1_1343058618741_46 title=Conócenos tabIndex=0 href="http://moodle.org" role="menuitem">Conócenos</A></LI>
+<LI class=yui3-menuitem id=yui_3_4_1_1_1343058618741_955 role="presentation"><A class=yui3-menuitem-content id=yui_3_4_1_1_1343058618741_47 title=Cursos tabIndex=-1 href="http://moodle.org/development" role="menuitem">Cursos</A></LI>
+<LI class=yui3-menuitem id=yui_3_4_1_1_1343058618741_950 role="presentation"><A class=yui3-menuitem-content id=yui_3_4_1_1_1343058618741_48 title="Requisitos técnicos" tabIndex=-1 href="http://moodle.com/hosting" role="menuitem">Requisitos técnicos</A></LI>
+<LI class=yui3-menuitem role="presentation"><A class=yui3-menuitem-content id=yui_3_4_1_1_1343058618741_49 title=Contacto tabIndex=-1 href="http://moodle.com/support" role="menuitem">Contacto</A></LI></UL></DIV></DIV><A class=calendar href="http://bbvaconsultoria.e-cadmo.net/calendar/view.php">July 23, 2012</A> </DIV></DIV><!-- FIN #custommenu-wrapper -->
+<DIV class=clearfix id=navbar-wrapper>
+<DIV class=navbar>
+<DIV class=breadcrumb><SPAN class=accesshide>Ruta a la página</SPAN>
+<UL>
+<LI><A title="Página Principal" href="http://bbvaconsultoria.e-cadmo.net/">Página Principal</A>
+<LI><SPAN class="accesshide "><SPAN class=arrow_text>/</SPAN>&nbsp;</SPAN><SPAN class="arrow sep">►</SPAN> <SPAN tabIndex=0>Mis cursos</SPAN>
+<LI><SPAN class="accesshide "><SPAN class=arrow_text>/</SPAN>&nbsp;</SPAN><SPAN class="arrow sep">►</SPAN> <A title="Espacio de coordinación " href="http://bbvaconsultoria.e-cadmo.net/course/view.php?id=2">Espacio de coordinación </A>
+<LI><SPAN class="accesshide "><SPAN class=arrow_text>/</SPAN>&nbsp;</SPAN><SPAN class="arrow sep">►</SPAN> <SPAN tabIndex=0>jmail</SPAN></LI></UL></DIV>
+<DIV class=navbutton></DIV>
+<DIV class=langmenu>
+<FORM id=single_select_f500d727e906aa1 action=http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php method=get>
+<DIV><INPUT type=hidden value=2 name=id><LABEL for=single_select500d727e906aa2><SPAN class="accesshide ">Idioma</SPAN></LABEL><SELECT class="select menulang" id=single_select500d727e906aa2 name=lang><OPTION value=en>English (en)</OPTION><OPTION value=es selected>Español - Internacional (es)</OPTION></SELECT><NOSCRIPT></NOSCRIPT></DIV></FORM></DIV></DIV></DIV><!-- FIN #navbar-wrapper -->
+<DIV class=clearfix id=page-content-wrapper>
+<DIV id=page-content>
+<DIV id=region-main-box>
+<DIV id=region-post-box>
+<DIV id=region-main-wrap>
+<DIV id=region-main>
+<DIV class=region-content>
+<DIV class=yui3-widget-mask style="DISPLAY: none; Z-INDEX: 5; LEFT: 0px; WIDTH: 100%; POSITION: fixed; TOP: 0px; HEIGHT: 100%"></DIV><SPAN id=maincontent></SPAN>
+<SCRIPT type=text/javascript>
+//<![CDATA[
+M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"http://bbvaconsultoria.e-cadmo.net/lib\/editor\/tinymce\/module.js","requires":[]},"form_filemanager":{"name":"form_filemanager","fullpath":"http://bbvaconsultoria.e-cadmo.net/lib\/form\/filemanager.js","requires":["core_filepicker","base","io","node","json","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview"]}});
+
+//]]>
+</SCRIPT>
+
+<DIV class=yui-layout id=jmailui style="HEIGHT: 871px">
+<DIV class=yui-layout-doc style="WIDTH: 1671px; HEIGHT: 871px">
+<DIV class="yui-layout-unit yui-layout-unit-right yui-layout-scroll yui-resize" id=yui-gen0 style="LEFT: 1371px; WIDTH: 300px; POSITION: absolute; TOP: 0px; HEIGHT: 871px">
+<DIV class="yui-layout-wrap yui-layout" id=yui-gen1 style="LEFT: 2px; WIDTH: 296px; TOP: 2px; HEIGHT: 867px">
+<DIV class=yui-layout-hd style="WIDTH: 294px">
+<H2>&nbsp;</H2>
+<DIV class=collapse title="Click to collapse this pane."></DIV></DIV>
+<DIV class="yui-layout-bd yui-layout-bd-noft" style="WIDTH: 294px; TOP: 27px; HEIGHT: 839px">
+<DIV id=jmailright></DIV></DIV>
+<DIV class=yui-layout-doc style="WIDTH: 296px; HEIGHT: 867px">
+<DIV class="yui-resize yui-layout-unit yui-layout-unit-top yui-layout-noscroll" id=yui-gen12 style="WIDTH: 296px; POSITION: absolute; HEIGHT: 200px">
+<DIV class=yui-layout-wrap id=yui-gen13 style="LEFT: 2px; WIDTH: 292px; TOP: 2px; HEIGHT: 196px">
+<DIV class="yui-layout-bd yui-layout-bd-nohd yui-layout-bd-noft" style="WIDTH: 290px; TOP: 0px; HEIGHT: 194px">
+<DIV id=contact_list_filter>
+<DIV></DIV>
+<DIV><SPAN class="yui-button yui-menu-button" id=rolesselectorb><SPAN class=first-child><BUTTON id=rolesselectorb-button title="" tabIndex=0>Roles</BUTTON></SPAN></SPAN></DIV><B>Nombre</B> 
+<DIV id=firstnamefilter><A class=alphabetreset href="#">Todos</A> <A class=alphabet href="#">A</A> <A class=alphabet href="#">B</A> <A class=alphabet href="#">C</A> <A class=alphabet href="#">D</A> <A class=alphabet href="#">E</A> <A class=alphabet href="#">F</A> <A class=alphabet href="#">G</A> <A class=alphabet href="#">H</A> <A class=alphabet href="#">I</A> <A class=alphabet href="#">J</A> <A class=alphabet href="#">K</A> <A class=alphabet href="#">L</A> <A class=alphabet href="#">M</A> <A class=alphabet href="#">N</A> <A class=alphabet href="#">Ñ</A> <A class=alphabet href="#">O</A> <A class=alphabet href="#">P</A> <A class=alphabet href="#">Q</A> <A class=alphabet href="#">R</A> <A class=alphabet href="#">S</A> <A class=alphabet href="#">T</A> <A class=alphabet href="#">U</A> <A class=alphabet href="#">V</A> <A class=alphabet href="#">W</A> <A class=alphabet href="#">X</A> <A class=alphabet href="#">Y</A> <A class=alphabet href="#">Z</A> </DIV><B>Apellido</B> 
+<DIV id=lastnamefilter><A class=alphabetreset href="#">Todos</A> <A class=alphabet href="#">A</A> <A class=alphabet href="#">B</A> <A class=alphabet href="#">C</A> <A class=alphabet href="#">D</A> <A class=alphabet href="#">E</A> <A class=alphabet href="#">F</A> <A class=alphabet href="#">G</A> <A class=alphabet href="#">H</A> <A class=alphabet href="#">I</A> <A class=alphabet href="#">J</A> <A class=alphabet href="#">K</A> <A class=alphabet href="#">L</A> <A class=alphabet href="#">M</A> <A class=alphabet href="#">N</A> <A class=alphabet href="#">Ñ</A> <A class=alphabet href="#">O</A> <A class=alphabet href="#">P</A> <A class=alphabet href="#">Q</A> <A class=alphabet href="#">R</A> <A class=alphabet href="#">S</A> <A class=alphabet href="#">T</A> <A class=alphabet href="#">U</A> <A class=alphabet href="#">V</A> <A class=alphabet href="#">W</A> <A class=alphabet href="#">X</A> <A class=alphabet href="#">Y</A> <A class=alphabet href="#">Z</A> </DIV></DIV></DIV></DIV>
+<DIV class="yui-resize-handle yui-resize-handle-b" id=yui-gen14>
+<DIV class=yui-layout-resize-knob></DIV></DIV></DIV>
+<DIV class=yui-resize-proxy style="WIDTH: 0px; HEIGHT: 200px">
+<DIV class=yui-layout-handle-b></DIV></DIV>
+<DIV class="yui-layout-unit yui-layout-unit-center yui-layout-scroll" id=yui-gen15 style="LEFT: 0px; WIDTH: 296px; POSITION: absolute; TOP: 200px; HEIGHT: 667px">
+<DIV class=yui-layout-wrap id=yui-gen16 style="LEFT: 2px; WIDTH: 292px; TOP: 2px; HEIGHT: 663px">
+<DIV class="yui-layout-bd yui-layout-bd-nohd yui-layout-bd-noft" style="WIDTH: 290px; TOP: 0px; HEIGHT: 661px">
+<DIV id=contact_list>
+<DIV id=contact_list_users>
+<DIV class="jmail-even contact" id=user2>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=2&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Avelino Palma Martín-Grande" height=35 alt="Imagen de Avelino Palma Martín-Grande" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Avelino Palma Martín-Grande<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-odd contact" id=user3>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=3&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Juan Leyva" height=35 alt="Imagen de Juan Leyva" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Juan Leyva<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-even contact" id=user4>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=4&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Roger Dominguez" height=35 alt="Imagen de Roger Dominguez" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Roger Dominguez<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-odd contact" id=user5>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=5&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Carlos Martinez" height=35 alt="Imagen de Carlos Martinez" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Carlos Martinez<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-even contact" id=user6>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=6&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Lorena Solana" height=35 alt="Imagen de Lorena Solana" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Lorena Solana<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-odd contact" id=user7>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=7&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Francisco Requena" height=35 alt="Imagen de Francisco Requena" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Francisco Requena<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-even contact" id=user8>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=8&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Antonio Roncero" height=35 alt="Imagen de Antonio Roncero" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Antonio Roncero<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-odd contact" id=user9>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=9&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Fernando Vaquero" height=35 alt="Imagen de Fernando Vaquero" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Fernando Vaquero<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-even contact" id=user10>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=10&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Antonio Rodriguez" height=35 alt="Imagen de Antonio Rodriguez" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Antonio Rodriguez<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV>
+<DIV class="jmail-odd contact" id=user11>
+<DIV class=profileimage><INPUT type=checkbox><A href="http://bbvaconsultoria.e-cadmo.net/user/view.php?id=11&amp;course=2"><IMG class="userpicture defaultuserpic" title="Imagen de Jesús Ángel Sanchez Mouro" height=35 alt="Imagen de Jesús Ángel Sanchez Mouro" src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=u%2Ff2&amp;rev=295" width=35></A></DIV>
+<DIV class=fullname>Jesús Ángel Sanchez Mouro<BR><INPUT class=bto type=button value=To>&nbsp;<INPUT class=bcc type=button value=CC>&nbsp;<INPUT class=bbcc type=button value=BCC>&nbsp;</DIV></DIV></DIV>
+<DIV id=selbuttons style="CLEAR: both"><INPUT id=selectall type=checkbox>Selected <INPUT class=selto type=button value=" To ">&nbsp; <INPUT class=selcc type=button value=" CC ">&nbsp; <INPUT class=selbcc type=button value=" BCC "> </DIV></DIV></DIV></DIV></DIV></DIV></DIV>
+<DIV class="yui-resize-handle yui-resize-handle-l" id=yui-gen2>
+<DIV class=yui-layout-resize-knob></DIV></DIV></DIV>
+<DIV class=yui-resize-proxy style="WIDTH: 300px; HEIGHT: 0px">
+<DIV class=yui-layout-handle-l></DIV></DIV>
+<DIV class="yui-layout-unit yui-layout-unit-left yui-layout-scroll" id=yui-gen3 style="LEFT: 0px; WIDTH: 180px; POSITION: absolute; TOP: 0px; HEIGHT: 871px">
+<DIV class=yui-layout-wrap id=yui-gen4 style="LEFT: 2px; WIDTH: 176px; TOP: 2px; HEIGHT: 867px">
+<DIV class="yui-layout-bd yui-layout-bd-nohd yui-layout-bd-noft" style="WIDTH: 174px; TOP: 0px; HEIGHT: 865px">
+<DIV id=jmailleft>
+<DIV id=action_buttons><SPAN class="yui-button yui-push-button" id=checkmail><SPAN class=first-child><BUTTON id=checkmail-button title="" tabIndex=0>Check</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN><SPAN class="yui-button yui-push-button" id=newmail><SPAN class=first-child><BUTTON id=newmail-button title="" tabIndex=0>New mail</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN> </DIV>
+<DIV id=search_bar><INPUT id=input_search name=search><SPAN id=search_button></SPAN> </DIV>
+<DIV id=label_list>
+<UL id=yui_3_4_1_1_1343058618741_237>
+<LI class=inbox><EM></EM><A id=inbox href="#">Inbox</A> 
+<LI class=draft><EM></EM><A id=draft href="#">Draft</A> 
+<LI class=sent><EM></EM><A id=sent href="#">Sent</A> 
+<LI class=trash><EM></EM><A id=trash href="#">Bin</A> </LI></UL>
+<DIV id=user_labels>
+<UL>
+<LI class=folder><EM></EM><A id=label24 href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php?id=2#">mañana</A><SPAN class=labelactions style="VISIBILITY: hidden"><IMG id=labelactions24 src="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/pix/menu.png"></SPAN></LI>
+<LI class=folder><EM></EM><A id=label25 href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php?id=2#">otra</A><SPAN class=labelactions style="VISIBILITY: hidden"><IMG id=labelactions25 src="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/pix/menu.png"></SPAN></LI></UL></DIV>
+<DIV id=menulabel>
+<DIV class="yui-module yui-overlay yuimenu yui-overlay-hidden" id=basicmenu style="Z-INDEX: 2; VISIBILITY: hidden; POSITION: absolute">
+<DIV class=bd>
+<UL class=first-of-type>
+<LI class="yuimenuitem first-of-type" id=yui-gen27 groupindex="0" index="0"><A class=yuimenuitemlabel href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php?id=2#">&nbsp;&nbsp;Delete</A></LI></UL></DIV></DIV></DIV>
+<P><IMG src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=add&amp;rev=295&amp;component=block_jmail"><A id=addlabel href="#">&nbsp;&nbsp;Add a new label</A></P>
+<P><IMG src="http://bbvaconsultoria.e-cadmo.net/theme/image.php?theme=cadmo&amp;image=settings&amp;rev=295&amp;component=block_jmail"><A id=preferences href="#">&nbsp;&nbsp;Preferences</A></P>
+<DIV id=mymailboxes><SPAN class="yui-button yui-menu-button" id=mailboxesb><SPAN class=first-child><BUTTON id=mailboxesb-button title="" tabIndex=0>My mailboxes</BUTTON></SPAN></SPAN> 
+<DIV class="yui-module yui-overlay yuimenu yui-button-menu yui-menu-button-menu yui-overlay-hidden" id=yui-gen20 style="Z-INDEX: 1; VISIBILITY: hidden; POSITION: absolute">
+<DIV class=bd>
+<UL class=first-of-type>
+<LI class="yuimenuitem first-of-type yui-button-selectedmenuitem" id=yui-gen50 groupindex="0" index="0"><A class=yuimenuitemlabel href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php?id=2#">BBVA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</A></LI></UL></DIV>
+<DIV class=yui-menu-shadow style="WIDTH: 138px; HEIGHT: 37px"></DIV></DIV></DIV>
+<DIV id=loginfo style="BORDER-RIGHT: red 1px solid; BORDER-TOP: red 1px solid; DISPLAY: block; OVERFLOW: auto; BORDER-LEFT: red 1px solid; WIDTH: 100%; BORDER-BOTTOM: red 1px solid; HEIGHT: 200px">Application loaded<BR>Loading user list with filters<BR>Loading mail list table<BR>Creating buttons toolbar<BR>Layouts rendered<BR>Rendering layouts<BR>Loading contacts<BR>Loading labels<BR>Starting the app<BR></DIV></DIV></DIV></DIV></DIV></DIV>
+<DIV class="yui-layout-unit yui-layout-unit-center yui-layout-noscroll" id=yui-gen5 style="LEFT: 180px; WIDTH: 1191px; POSITION: absolute; TOP: 0px; HEIGHT: 871px">
+<DIV class="yui-layout-wrap yui-layout" id=yui-gen6 style="LEFT: 0px; WIDTH: 1191px; TOP: 0px; HEIGHT: 871px">
+<DIV class="yui-layout-bd yui-layout-bd-nohd yui-layout-bd-noft" style="WIDTH: 1189px; TOP: 0px; HEIGHT: 869px">
+<DIV id=jmailcenter></DIV></DIV>
+<DIV class=yui-layout-doc style="WIDTH: 1191px; HEIGHT: 871px">
+<DIV class="yui-layout-unit yui-layout-unit-top yui-layout-noscroll yui-resize" id=yui-gen7 style="LEFT: 0px; WIDTH: 1191px; POSITION: absolute; TOP: 0px; HEIGHT: 334px">
+<DIV class=yui-layout-wrap id=yui-gen8 style="LEFT: 2px; WIDTH: 1187px; TOP: 2px; HEIGHT: 330px">
+<DIV class="yui-layout-bd yui-layout-bd-nohd yui-layout-bd-noft" style="WIDTH: 1185px; TOP: 0px; HEIGHT: 328px">
+<DIV id=mailarea>
+<DIV id=jmailtoolbar style="VISIBILITY: hidden"><SPAN class="yui-button yui-push-button" id=deleteb><SPAN class=first-child><BUTTON id=deleteb-button title="" tabIndex=0>Delete</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN><SPAN class="yui-button yui-push-button" id=editb><SPAN class=first-child><BUTTON id=editb-button title="" tabIndex=0>Editar</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN><SPAN class="yui-button yui-push-button" id=replyb><SPAN class=first-child><BUTTON id=replyb-button title="" tabIndex=0>Reply</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN><SPAN class="yui-button yui-push-button" id=replytoallb><SPAN class=first-child><BUTTON id=replytoallb-button title="" tabIndex=0>Reply all</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN><SPAN class="yui-button yui-push-button" id=forwardb><SPAN class=first-child><BUTTON id=forwardb-button title="" tabIndex=0>Forward</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN><SPAN class="yui-button yui-menu-button" id=moveb><SPAN class=first-child><BUTTON id=moveb-button title="" tabIndex=0>Move</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN> <SPAN class="yui-button yui-menu-button" id=moreb><SPAN class=first-child><BUTTON id=moreb-button title="" tabIndex=0>More</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN> <SPAN class="yui-button yui-push-button" id=printb><SPAN class=first-child><BUTTON id=printb-button title="" tabIndex=0>Print</BUTTON></SPAN><SPAN class=icon></SPAN></SPAN> </DIV>
+<DIV class="yui-dt yui-dt-scrollable" id=maillist>
+<DIV class="yui-dt-paginator yui-pg-container" id=yui-dt21-paginator0><SPAN class=yui-pg-first id=yui-pg0-0-first-span31>&lt;&lt; First</SPAN><SPAN class=yui-pg-previous id=yui-pg0-0-prev-span33>&lt;&lt; Previous</SPAN><SPAN class=yui-pg-pages id=yui-pg0-0-pages34><SPAN class="yui-pg-current-page yui-pg-page">1</SPAN></SPAN><SPAN class=yui-pg-next id=yui-pg0-0-next-span36>Next &gt;&gt;</SPAN><SPAN class=yui-pg-last id=yui-pg0-0-last-span38>Last &gt;&gt;</SPAN></DIV>
+<DIV class=yui-dt-mask style="DISPLAY: none"></DIV>
+<DIV class=yui-dt-hd style="WIDTH: 1181px; BACKGROUND-COLOR: #f2f2f2">
+<TABLE id=yuievtautoid-1>
+<COLGROUP>
+<COL>
+<COL>
+<COL></COLGROUP>
+<THEAD>
+<TR class="yui-dt-first yui-dt-last">
+<TH class="yui-dt21-col-from yui-dt-col-from yui-dt-sortable" id=yui-dt21-fixedth-from>
+<DIV class=yui-dt-liner id=yui-dt21-th-from-liner style="OVERFLOW: hidden; WIDTH: 160px"><SPAN class=yui-dt-label><A class=yui-dt-sortable title="Click to sort ascending" href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/yui-dt21-href-from">From</A></SPAN></DIV></TH>
+<TH class="yui-dt21-col-subject yui-dt-col-subject yui-dt-sortable" id=yui-dt21-fixedth-subject>
+<DIV class=yui-dt-liner id=yui-dt21-th-subject-liner style="OVERFLOW: hidden; WIDTH: 781px"><SPAN class=yui-dt-label><A class=yui-dt-sortable title="Click to sort ascending" href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/yui-dt21-href-subject">Subject</A></SPAN></DIV></TH>
+<TH class="yui-dt21-col-date yui-dt-col-date yui-dt-sortable" id=yui-dt21-fixedth-date style="BORDER-RIGHT: #f2f2f2 1px solid">
+<DIV class=yui-dt-liner id=yui-dt21-th-date-liner style="OVERFLOW: hidden; WIDTH: 160px"><SPAN class=yui-dt-label><A class=yui-dt-sortable title="Click to sort ascending" href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/yui-dt21-href-date">Date</A></SPAN></DIV></TH></TR></THEAD></TABLE></DIV>
+<DIV class=yui-dt-bd style="WIDTH: 1181px; HEIGHT: 209px">
+<TABLE id=yuievtautoid-0 style="MARGIN-TOP: 0px" summary="">
+<THEAD>
+<TR>
+<TH class=yui-dt-first id=yui-dt21-th-from>From</TH>
+<TH id=yui-dt21-th-subject>Subject</TH>
+<TH class=yui-dt-last id=yui-dt21-th-date>Date</TH></TR></THEAD>
+<TBODY class=yui-dt-message style="DISPLAY: none">
+<TR class="yui-dt-first yui-dt-last">
+<TD class="yui-dt-first yui-dt-last" colSpan=3>
+<DIV class="yui-dt-liner yui-dt-loading">Loading...</DIV></TD></TR></TBODY>
+<TBODY class=yui-dt-data hideFocus tabIndex=0>
+<TR class="yui-dt-rec yui-dt-first yui-dt-even" id=yui-rec28>
+<TD class="yui-dt21-col-from yui-dt-col-from yui-dt-sortable yui-dt-first" headers="yui-dt21-th-from ">
+<DIV class=yui-dt-liner style="OVERFLOW: hidden; WIDTH: 160px">Lorena Solana</DIV></TD>
+<TD class="yui-dt21-col-subject yui-dt-col-subject yui-dt-sortable" id=yui-gen53 headers="yui-dt21-th-subject ">
+<DIV class=yui-dt-liner id=yui-gen54 style="OVERFLOW: hidden; WIDTH: 781px">ddefg</DIV></TD>
+<TD class="yui-dt21-col-date yui-dt-col-date yui-dt-sortable yui-dt-last" headers="yui-dt21-th-date ">
+<DIV class=yui-dt-liner style="OVERFLOW: hidden; WIDTH: 160px">19/07/2012 16:55</DIV></TD></TR>
+<TR class="yui-dt-rec yui-dt-last yui-dt-odd" id=yui-rec29>
+<TD class="yui-dt21-col-from yui-dt-col-from yui-dt-sortable yui-dt-first" id=yui-gen56 headers="yui-dt21-th-from ">
+<DIV class=yui-dt-liner id=yui-gen55 style="OVERFLOW: hidden; WIDTH: 160px">Lorena Solana</DIV></TD>
+<TD class="yui-dt21-col-subject yui-dt-col-subject yui-dt-sortable" id=yui-gen52 headers="yui-dt21-th-subject ">
+<DIV class=yui-dt-liner id=yui-gen51 style="OVERFLOW: hidden; WIDTH: 781px">prueba</DIV></TD>
+<TD class="yui-dt21-col-date yui-dt-col-date yui-dt-sortable yui-dt-last" headers="yui-dt21-th-date ">
+<DIV class=yui-dt-liner style="OVERFLOW: hidden; WIDTH: 160px">18/07/2012 16:35</DIV></TD></TR></TBODY></TABLE></DIV>
+<DIV class="yui-dt-paginator yui-pg-container" id=yui-dt21-paginator1><SPAN class=yui-pg-first id=yui-pg0-1-first-span41>&lt;&lt; First</SPAN><SPAN class=yui-pg-previous id=yui-pg0-1-prev-span43>&lt;&lt; Previous</SPAN><SPAN class=yui-pg-pages id=yui-pg0-1-pages44><SPAN class="yui-pg-current-page yui-pg-page">1</SPAN></SPAN><SPAN class=yui-pg-next id=yui-pg0-1-next-span46>Next &gt;&gt;</SPAN><SPAN class=yui-pg-last id=yui-pg0-1-last-span48>Last &gt;&gt;</SPAN></DIV></DIV></DIV></DIV></DIV>
+<DIV class="yui-resize-handle yui-resize-handle-b" id=yui-gen9>
+<DIV class=yui-layout-resize-knob></DIV></DIV></DIV>
+<DIV class=yui-resize-proxy style="Z-INDEX: -1; LEFT: 0px; VISIBILITY: hidden; WIDTH: 1191px; TOP: 0px; HEIGHT: 334px">
+<DIV class=yui-layout-handle-b></DIV></DIV>
+<DIV class="yui-layout-unit yui-layout-unit-center yui-layout-scroll" id=yui-gen10 style="LEFT: 0px; WIDTH: 1191px; POSITION: absolute; TOP: 334px; HEIGHT: 537px">
+<DIV class=yui-layout-wrap id=yui-gen11 style="LEFT: 2px; WIDTH: 1187px; TOP: 2px; HEIGHT: 533px">
+<DIV class="yui-layout-bd yui-layout-bd-nohd yui-layout-bd-noft" style="WIDTH: 1185px; TOP: 0px; HEIGHT: 531px">
+<DIV id=mailcontents></DIV></DIV></DIV></DIV></DIV></DIV></DIV></DIV></DIV>
+<DIV id=messagepanel></DIV>
+<DIV id=newlabelpanel style="DISPLAY: none">
+<DIV class=yui3-widget-bd>
+<FORM>
+<FIELDSET>
+<P><LABEL for=id>Nombre</LABEL><BR><INPUT id=newlabelname maxLength=16 name=newlabelname placeholder=""> </P></FIELDSET> </FORM></DIV></DIV>
+<DIV class="yui3-widget yui3-panel yui3-widget-positioned yui3-widget-stacked yui3-widget-modal yui3-widget-buttons yui3-panel-hidden" id=yui_3_4_1_1_1343058618741_252 style="Z-INDEX: 5; LEFT: 642px; WIDTH: 400px; TOP: 278px">
+<DIV class="yui3-panel-content yui3-widget-stdmod" id=preferencespanel style="DISPLAY: none">
+<DIV class=yui3-widget-hd>Preferences<SPAN class=yui3-widget-button-wrapper><A class="yui3-button yui3-button-close" href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php?id=2#"><SPAN class=yui3-button-content><SPAN class=yui3-button-icon></SPAN></A></SPAN></SPAN></DIV>
+<DIV id=panelContent>
+<DIV class=yui3-widget-bd>
+<FORM>
+<FIELDSET>
+<P><LABEL for=subscription>Subscription</LABEL><BR><SELECT id=subscription name=subscription> <OPTION value="" selected>None</OPTION> <OPTION value=receivecopies>Recieve copies of the messages in my email</OPTION></SELECT> </P></FIELDSET> </FORM></DIV></DIV>
+<DIV class=yui3-widget-ft><SPAN class=yui3-widget-button-wrapper><A class=yui3-button href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php?id=2#"><SPAN class=yui3-button-content>OK</SPAN></A><A class=yui3-button href="http://bbvaconsultoria.e-cadmo.net/blocks/jmail/mailbox.php?id=2#"><SPAN class=yui3-button-content>Cancelar</SPAN></A></SPAN></DIV></DIV></DIV>
+<DIV id=rendertarget></DIV></DIV></DIV></DIV><!-- FIN #region-main-wrap --></DIV><!-- FIN #region-post-box --></DIV><!-- FIN #region-main-box --></DIV><!-- FIN #page-content --></DIV><!-- FIN #page-content-wrapper -->
+<DIV id=page-footer-wrapper>
+<DIV id=page-footer>
+<DIV class=credit>
+<P class=copy>©BBVA Consultoría, S.A. - 2011 <SMALL><A href="">Aviso legal</A></SMALL> </P></DIV>
+<DIV class="footer-menu clearfix">
+<UL>
+<LI><A href="">Inicio</A> </LI>
+<LI>Ayuda 
+<UL>
+<LI><A href="">Contacto</A> 
+<LI><A href="">Preguntas frecuentes</A> </LI></UL></LI></UL></DIV></DIV><!-- FIN #page-footer --></DIV><!-- FIN #page-footer-wrapper --></DIV><!-- FIN #page-inner-wrapper --></DIV><!-- FIN #page -->
+<SCRIPT type=text/javascript>
+//<![CDATA[
+M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"http:\/\/bbvaconsultoria.e-cadmo.net\/lib\/editor\/tinymce\/module.js","requires":[]}});
+
+//]]>
+</SCRIPT>
+<!-- The following modules were requested but are not defined: widget -->
+<SCRIPT src="http://bbvaconsultoria.e-cadmo.net/theme/javascript.php?theme=cadmo&amp;rev=295&amp;type=footer" type=text/javascript></SCRIPT>
+
+<SCRIPT src="http://bbvaconsultoria.e-cadmo.net/lib/editor/tinymce/tiny_mce/3.4.9/tiny_mce_src.js" type=text/javascript></SCRIPT>
+
+<SCRIPT type=text/javascript>
+//<![CDATA[
+M.str = {"repository":{"add":"Agregar","back":"&laquo; Atr\u00e1s","close":"Cerrar","cleancache":"Limpiar mis archivos en cach\u00e9","copying":"Copiando","date":"Fecha","downloadsucc":"Este archivo se ha descargado con \u00e9xito","emptylist":"Lista vac\u00eda","error":"Ha ocurrido un error desconocido.","federatedsearch":"B\u00fasqueda fedeerada","filenotnull":"Debe seleccionar un archivo para subir","getfile":"Seleccionar este archivo","iconview":"Ver como iconos","invalidjson":"Cadena JSON no v\u00e1lida","linkexternal":"Enlace externo","listview":"Ver como lista","loading":"Cargando...","login":"Entrar","logout":"Salir","noenter":"No se ha escrito nada","noresult":"No hay resultados de la b\u00fasqueda","manageurl":"Gestionar","popup":"Hagla clic sobre el bot\u00f3n \"Login\" para conectarse","preview":"Vista previa","refresh":"Refrescar","save":"Guardar","saveas":"Guardar como","saved":"Guardado","saving":"Guardando","search":"Buscar","searching":"Buscar en","size":"Tama\u00f1o","submit":"Enviar","sync":"Sync","title":"Seleccione un archivo...","upload":"Subir este archivo","uploading":"Subiendo...","xhtmlerror":"Usted probablemente est\u00e1 utilizando encabezado XHTML estricto, algunos componentes YUI no funciona en este modo, por favor deshabilite la opci\u00f3n en moodle","chooselicense":"Seleccionar licencia","author":"Autor","norepositoriesavailable":"Lo sentimos, ninguno de sus repositorios actuales puede devolver archivos en el formato solicitado.","norepositoriesexternalavailable":"Lo sentimos, ninguno de sus repositorios actuales puede devolver archivos externos.","nofilesattached":"No se han adjuntado archivos","filepicker":"Selector de archivos","nofilesavailable":"No hay archivos disponibles","overwrite":"Sobreescribir","renameto":"Cambiar el nombre a","fileexists":"Nombre de archivo ya usado. Por favor, use otro nombre","fileexistsdialogheader":"El fichero existe","fileexistsdialog_editor":"Un archivo con el mismo nombre ya se ha adjuntado al texto que est\u00e1 editando.","fileexistsdialog_filemanager":"Un archivo con ese nombre ya ha sido adjuntado"},"moodle":{"cancel":"Cancelar","help":"Ayuda","next":"Siguiente","ok":"OK","error":"Error","info":"Informaci\u00f3n","add":"Agregar","rename":"Renombrar","edit":"Editar","yes":"S\u00ed"},"block":{"addtodock":"Minimizar en la barra lateral","undockitem":"Desacoplar este \u00edtem","undockall":"Desacoplar todo"},"langconfig":{"thisdirectionvertical":"btt"},"block_jmail":{"from":"From","subject":"Subject","date":"Date","messagesent":"Message sent","reply":"Reply","forward":"Forward","print":"Print","messagesaved":"Message saved","addlabel":"Add a new label","cc":"CC","bcc":"BCC","messagedeleted":"Message deleted","messagesdeleted":"Messages deleted","errortorequired":"At least one destinatary in the to field is required","errorsubjectrequired":"The subject is required","to":"To","confirmdelete":"Are you sure you want to delete the selected messages?","label":"Label","labels":"Labels","nomessagesfound":"No messages found","re":"Re:","fw":"Fw:","attachments":"Attachments","preferences":"Preferences","approvalpending":"Approval pending","messagehastobeapproved":"Your message will not be delivery to the destinataries until a moderator has approved it","first":"<< First","last":"Last >>","next":"Next >>","previous":"<< Previous","delete":"Delete","save":"Save","download":"Download","savetomyprivatefiles":"Save to my private files","filesaved":"File saved","mailbox":"Mailbox","delivertodifferentcourse":"Your message has been delivery to the referenced message user's inbox:","delivertoglobalinbox":"Your message has been delivery to the user's global inbox","inbox":"Inbox","deletem":"Delete"},"admin":{"confirmation":"Confirmaci\u00f3n"}};
+//]]>
+</SCRIPT>
+
+<SCRIPT type=text/javascript>
+//<![CDATA[
+YUI(M.yui.loader).use('node', function(Y) {
+M.util.load_flowplayer();
+setTimeout("fix_column_widths()", 20);
+Y.on('domready', function() { Y.use('block_jmail', function(Y) { M.block_jmail.init(Y, {"wwwroot":"http:\/\/bbvaconsultoria.e-cadmo.net","courseid":"2","sesskey":"yC6DyMRT7H","pagesize":15,"cansend":true,"canapprovemessages":true,"canmanagelabels":true,"canmanagepreferences":true,"userid":"3","globalinbox":false,"approvemode":false}); }); });
+M.yui.galleryversion="2010.04.08-12-35";Y.use("node-menunav",function() {(function(){M.core_custom_menu.init(Y, "custom_menu_1");
+})();
+});
+M.util.init_select_autosubmit(Y, "single_select_f500d727e906aa1", "single_select500d727e906aa2", false);
+Y.on('domready', function() { Y.use('editor_tinymce', function(Y) { M.editor_tinymce.init_editor(Y, "body", {"mode":"exact","elements":"body","relative_urls":false,"document_base_url":"http:\/\/bbvaconsultoria.e-cadmo.net","content_css":"http:\/\/bbvaconsultoria.e-cadmo.net\/theme\/styles.php?theme=cadmo&rev=295&type=editor","language":"es","directionality":"ltr","plugin_insertdate_dateFormat ":"%A, %d de %B de %Y","plugin_insertdate_timeFormat ":"%H:%M","theme":"advanced","skin":"o2k7","skin_variant":"silver","apply_source_formatting":true,"remove_script_host":false,"entity_encoding":"raw","plugins":"moodlemedia,advimage,safari,table,style,layer,advhr,advlink,emotions,inlinepopups,searchreplace,paste,directionality,fullscreen,moodlenolink,nonbreaking,contextmenu,insertdatetime,save,iespell,preview,print,noneditable,visualchars,xhtmlxtras,template,pagebreak,spellchecker","theme_advanced_font_sizes":"1,2,3,4,5,6,7","theme_advanced_layout_manager":"SimpleLayout","theme_advanced_toolbar_align":"left","theme_advanced_buttons1":"fontselect,fontsizeselect,formatselect","theme_advanced_buttons1_add":"|,undo,redo,|,search,replace,|,fullscreen","theme_advanced_buttons2":"bold,italic,underline,strikethrough,sub,sup,|,justifyleft,justifycenter,justifyright","theme_advanced_buttons2_add":"|,cleanup,removeformat,pastetext,pasteword,|,forecolor,backcolor,|,ltr,rtl","theme_advanced_buttons3":"bullist,numlist,outdent,indent,|,link,unlink,moodlenolink,|,image,moodlemedia,nonbreaking,charmap","theme_advanced_buttons3_add":"table,|,code,spellchecker","theme_advanced_fonts":"Trebuchet=Trebuchet MS,Verdana,Arial,Helvetica,sans-serif;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;Georgia=georgia,times new roman,times,serif;Tahoma=tahoma,arial,helvetica,sans-serif;Times New Roman=times new roman,times,serif;Verdana=verdana,arial,helvetica,sans-serif;Impact=impact;Wingdings=wingdings","theme_advanced_resize_horizontal":true,"theme_advanced_resizing":true,"theme_advanced_resizing_min_height":30,"theme_advanced_toolbar_location":"top","theme_advanced_statusbar_location":"bottom","spellchecker_rpc_url":"http:\/\/bbvaconsultoria.e-cadmo.net\/lib\/editor\/tinymce\/tiny_mce\/3.4.9\/plugins\/spellchecker\/rpc.php","spellchecker_languages":"+English=en,Danish=da,Dutch=nl,Finnish=fi,French=fr,German=de,Italian=it,Polish=pl,Portuguese=pt,Spanish=es,Swedish=sv"}); }); });
+
+});
+//]]>
+</SCRIPT>
+</BODY></HTML>
