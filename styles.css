@@ -1,9 +1,12 @@
-#jmailtoolbar .yui-button {
-    
+#jmailtoolbar .yui-button {    
     float: left;
-
     position: relative;
     color: black;
+}
+
+#jmailtoolbar .fixedbsize {
+    width: 80px;
+    height: 25px;
 }
 
 #jmailtoolbar .yui-button .first-child a {
