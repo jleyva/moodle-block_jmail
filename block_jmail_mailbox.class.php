@@ -1170,7 +1170,7 @@ class block_jmail_mailbox {
     }
     
     public static function get_my_mailboxes() {
-        global $DB, $USER;
+        global $DB, $USER, $CFG;
         
         $mailboxes = array();
         
@@ -1186,12 +1186,23 @@ class block_jmail_mailbox {
         
         if ($mycourses) {
             foreach ($mycourses as $c) {
+                
                 context_instance_preload($c);
                 if (!$context = get_context_instance(CONTEXT_COURSE, $c->id)) {
                     continue;
                 }
                 
                 if (!$instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
+                    continue;
+                }
+                
+                if ($c->id != SITEID) {
+                    $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
+
+                    if (!has_capability('block/jmail:viewmailbox', $blockcontext)) {
+                        continue;
+                    }
+                } else if (empty($CFG->block_jmail_enable_globalinbox)) {
                     continue;
                 }
                 
