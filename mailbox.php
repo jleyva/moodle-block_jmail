@@ -27,6 +27,7 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/jmail/block_jmail_mailbox.class.php');
 
 $id = optional_param('id', SITEID, PARAM_INT);
+$to = optional_param('to', 0, PARAM_INT);
 
 $PAGE->set_url('/blocks/jmail/mailbox.php', array('id'=>$id));
 
@@ -78,6 +79,20 @@ $module = array(
                                      array('cancel','moodle'))
             );
 
+$usertoid = 0;
+$usertoname = '';
+
+if ($userto = $DB->get_record('user', array('id' => $to, 'deleted' => 0))) {
+    $d = new stdClass;
+    $d->type = 'to';
+    $d->userid = $userto->id;
+    $destinataries[] = $d;
+    if ($mailbox->check_destinataries($destinataries)) {
+        $usertoid = $userto->id;
+        $usertoname = fullname($userto);
+    }
+}
+
 $jmailcfg = array(
         'wwwroot' => $CFG->wwwroot,
         'courseid' => $course->id,
@@ -89,7 +104,9 @@ $jmailcfg = array(
         'canmanagepreferences' => $mailbox->canmanagepreferences,
         'userid' => $USER->id,
         'globalinbox' => $mailbox->globalinbox,
-        'approvemode' => (! empty($mailbox->config->approvemode))? $mailbox->config->approvemode : false
+        'approvemode' => (! empty($mailbox->config->approvemode))? $mailbox->config->approvemode : false,
+        'usertoid' => $usertoid,
+        'usertoname' => $usertoname
         );
 
 //$PAGE->requires->js('/lib/editor/tinymce/tiny_mce/3.4.2/tiny_mce.js');

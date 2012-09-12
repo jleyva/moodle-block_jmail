@@ -115,6 +115,15 @@ Setup:
 
 Please, note that at site levels all the users has the Authenticated User role by default, so if you want create specific managers you will have to create global roles.
 
+== Other settings ==
+
+You can add a html link to the mailbox indicating an user id for automatically open a New message window with the To field filled with the user indicated
+
+http://yourmoodle.com/blocks/jmail/mailbox.php?id=X&to=Y
+
+X - Course where the mailbox is
+Y - User id you want to send a message
+
 == Installation ==
 
 Follow [[Installing_plugins]] instructions

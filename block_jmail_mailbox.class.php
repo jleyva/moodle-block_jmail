@@ -425,7 +425,7 @@ class block_jmail_mailbox {
      * @param array $destinataries A destinataries array
      * @return array A filtered destinataries array
      */ 
-    private function check_destinataries($destinataries) {
+    public function check_destinataries($destinataries) {
         // Two cases, separate groups or message sending restricted
         
         $this->load_groups();

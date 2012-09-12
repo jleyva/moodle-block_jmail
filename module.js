@@ -615,7 +615,12 @@ M.block_jmail.init = function(Y, cfg) {
     Y.one('#sendbutton').on('click', function(e){
         M.block_jmail.saveMessage('send_message');
     });
-
+    
+    if (M.block_jmail.cfg.usertoid) {
+        M.block_jmail.composeMessage('new');
+        M.block_jmail.addContact(M.block_jmail.cfg.usertoid, M.block_jmail.cfg.usertoname, 'to');
+    }
+    
     // Toolbar
     M.block_jmail.hideToolbar();
     M.block_jmail.logInfo('Application loaded');
@@ -626,6 +631,8 @@ M.block_jmail.init = function(Y, cfg) {
 M.block_jmail.addContact = function(userId, fullName, type) {
     var cfg = M.block_jmail.cfg;
     var Y = M.block_jmail.Y;
+    
+    M.block_jmail.logInfo('Adding contact: ' + userId + ' ' + fullName);
     
     var hidden = Y.one('#hidden'+type);    
 
