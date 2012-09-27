@@ -121,6 +121,8 @@ class block_jmail_message {
         $header->approved = $this->approved;
         $header->courseid = $course->id;
         $header->courseshortname = $course->shortname;
+        $header->userid = $this->userid;
+        $header->userto = fullname($DB->get_record('user', array('id' => $this->userid, 'deleted' => 0)));
                
         return $header;
     }

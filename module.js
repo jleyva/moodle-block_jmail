@@ -16,7 +16,7 @@ M.block_jmail.messageCache = {};
 M.block_jmail.filterUser = {firstname: '', lastname: '', group: 0, role: 0}
 // keeps message filter current state
 M.block_jmail.filterMessage = {label: 'inbox', start: 0, sort: 'date', direction: 'DESC', searchtext: ''};
-M.block_jmail.currentLabel = 0;
+M.block_jmail.currentLabel = '';
 M.block_jmail.currentMessage = {};
 M.block_jmail.searchTimeout = null;
 M.block_jmail.searchText = '';
@@ -310,6 +310,7 @@ M.block_jmail.init = function(Y, cfg) {
     var initDataTable = function(h, w) {
         
         var unreadFormatter = function(elCell, oRecord, oColumn, oData){
+                    
             if (oRecord.getData('read')+'' == '0') {
                 oData = '<strong>'+oData+'</strong>';
             }
@@ -318,6 +319,11 @@ M.block_jmail.init = function(Y, cfg) {
                     oData += ' (<span class="approvalpending">'+M.str.block_jmail.approvalpending+'</span>)';
                 }
             }
+
+            if (M.block_jmail.currentLabel == 'sent' && oColumn.field == 'from') {
+                oData = oRecord.getData('userto');
+            }
+
             elCell.innerHTML = oData;
         }
         
@@ -343,7 +349,7 @@ M.block_jmail.init = function(Y, cfg) {
         myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
         myDataSource.responseSchema = {
             resultsList: "messages",
-            fields: ["id","from","subject","date","read","approved","courseid","courseshortname"],
+            fields: ["id","from","subject","date","read","approved","courseid","courseshortname","userto"],
             // Access to values in the server response
             metaFields: {
                 totalRecords: "total",
@@ -503,8 +509,16 @@ M.block_jmail.init = function(Y, cfg) {
     
     // Actions for fixed labels inbox, draft, bin
     
-    Y.one('#label_list ul').all('a').on('click', function(e){        
-        M.block_jmail.checkMail(e.target.get('id'));
+    Y.one('#label_list ul').all('a').on('click', function(e){
+        M.block_jmail.currentLabel = e.target.get('id');
+
+        if (M.block_jmail.currentLabel == 'sent') {
+            Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
+        } else {
+            Y.one('#maillist table a').setHTML(M.str.block_jmail.from);
+        }
+
+        M.block_jmail.checkMail(M.block_jmail.currentLabel);
         e.preventDefault();
     });
     
@@ -947,8 +961,16 @@ M.block_jmail.loadLabels = function() {
                         e.target.ancestor('li', true).one('.labelactions').setStyle('visibility', 'hidden');
                     });
                     
-                    Y.all('#user_labels a').on('click', function(e){        
-                        M.block_jmail.checkMail(e.target.get('id').replace("label",""));
+                    Y.all('#user_labels a').on('click', function(e){
+                        M.block_jmail.currentLabel = e.target.get('id').replace("label","");
+                        
+                        if (M.block_jmail.currentLabel == 'sent') {
+                            Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
+                        } else {
+                            Y.one('#maillist table a').setHTML(M.str.block_jmail.from);
+                        }
+                        
+                        M.block_jmail.checkMail(M.block_jmail.currentLabel);                        
                         e.preventDefault();
                     });
                                        

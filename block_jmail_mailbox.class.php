@@ -258,6 +258,7 @@ class block_jmail_mailbox {
                             ORDER BY $sort $direction";
                         break;
             case 'sent' :
+                        $select .= ', s.userid';
                         $params = array('sender' => $USER->id, 'course' => $this->course->id, 'timesent' => 0, 'userdeleted' => 0);
                         if ($this->globalinbox) {
                             unset($params['course']);
@@ -267,6 +268,7 @@ class block_jmail_mailbox {
                         $sql = "
                             FROM {block_jmail} m
                             JOIN {user} u ON u.id = m.sender
+                            JOIN {block_jmail_sent} s ON m.id = s.messageid
                             WHERE
                             sender = :sender AND courseid $coursein AND timesent > :timesent
                             AND u.deleted = :userdeleted
