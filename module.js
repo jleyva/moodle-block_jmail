@@ -41,12 +41,15 @@ M.block_jmail.init = function(Y, cfg) {
     // Panel for composing messages, this is the first we have to do for avoid problems with the tinymce editor
     // We must render first the panel
     
+    // Moodle 2.3 requires a bigger height panel
+    var panelHeight = (M.block_jmail.cfg.version >= 2012062500)? "700px": "600px";
+    
     Y.one('#newemailpanel').setStyle('display', 'block');
     var panel = new YAHOO.widget.Panel("newemailpanel", {
         draggable: true,
         modal: false,
         width: "800px",
-        height: "600px",
+        height: panelHeight,
         autofillheight: "body",
         visible: false,
         zindex:4,
@@ -1183,7 +1186,8 @@ M.block_jmail.composeMessage = function(mode, message) {
     var uri = 'message.php?id='+courseid+'&messageid='+messageId+'&mode='+mode;
     var request = Y.io(uri, iocfg);
     
-    var formHtml = request.responseText;            
+    var formHtml = request.responseText;
+
     Y.one('#newemailformremote').insert(formHtml);
     M.block_jmail.Y = Y;
 
@@ -1191,7 +1195,14 @@ M.block_jmail.composeMessage = function(mode, message) {
     // Firefox excluded    
     // if (Y.UA.gecko <= 0) {
         var elementsToEval = ["Y.use('editor_tinymce'","Y.use('editor_tinymce'","Y.use('form_filemanager'"];
+        
+        // Moodle 2.3 and onwards
+        if (cfg.version >= 2012062500) {
+            var elementsToEval = ["Y.use(\"moodle-core-formchangechecker\"","Y.use('core_filepicker'","Y.use('editor_tinymce'","Y.use('editor_tinymce'","Y.use('form_filemanager'","Y.use('form_filemanager'"];
+        }
+        
         for (var el in elementsToEval) {
+            console.log("Evaluating " + elementsToEval[el]);
             var startIndex = formHtml.indexOf(elementsToEval[el]);
             formHtml = formHtml.substr(startIndex);        
             var stopIndex = formHtml.indexOf("});") + 7;
@@ -1200,7 +1211,9 @@ M.block_jmail.composeMessage = function(mode, message) {
             js = js.replace('<!--','');
             js = js.replace('-->','');
             
-            eval('try {'+js+'} catch(e) {}');
+            eval('try {'+js+'} catch(e) { console.log(e) }');
+            console.log(startIndex + " --  " + stopIndex)
+            console.log(js);
             formHtml = formHtml.substr(stopIndex);
         }
     // }

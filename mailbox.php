@@ -106,7 +106,8 @@ $jmailcfg = array(
         'globalinbox' => $mailbox->globalinbox,
         'approvemode' => (! empty($mailbox->config->approvemode))? $mailbox->config->approvemode : false,
         'usertoid' => $usertoid,
-        'usertoname' => $usertoname
+        'usertoname' => $usertoname,
+        'version' => $CFG->version,
         );
 
 //$PAGE->requires->js('/lib/editor/tinymce/tiny_mce/3.4.2/tiny_mce.js');

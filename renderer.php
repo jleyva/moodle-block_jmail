@@ -273,15 +273,26 @@ class block_jmail_renderer extends plugin_renderer_base {
         // Tinymce editor
         $editor = editors_get_preferred_editor(FORMAT_HTML);
         $editor->use_editor('body');
+        
+        // Moodle 2.3 and onwards
+        if ($CFG->version >= 2012062500) {
+            $script = '//<![CDATA[
+                M.yui.add_module({"core_dndupload":{"name":"core_dndupload","fullpath":"'.$CFG->wwwroot.'/lib\/form\/dndupload.js","requires":["node","event","json","core_filepicker"]},"form_filemanager":{"name":"form_filemanager","fullpath":"'.$CFG->wwwroot.'/lib\/form\/filemanager.js","requires":["core_filepicker","base","io-base","node","json","core_dndupload","panel","resize-plugin","dd-plugin"]}});
+                
+                //]]>';
+        }
+        else {
+            $script = '//<![CDATA[
+                M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"'.$CFG->wwwroot.'/lib\/editor\/tinymce\/module.js","requires":[]},"form_filemanager":{"name":"form_filemanager","fullpath":"'.$CFG->wwwroot.'/lib\/form\/filemanager.js","requires":["core_filepicker","base","io","node","json","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview"]}});
+                
+                //]]>';
+        }
 
         return '
     
     <script type="text/javascript">
-//<![CDATA[
-M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"'.$CFG->wwwroot.'/lib\/editor\/tinymce\/module.js","requires":[]},"form_filemanager":{"name":"form_filemanager","fullpath":"'.$CFG->wwwroot.'/lib\/form\/filemanager.js","requires":["core_filepicker","base","io","node","json","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview"]}});
-
-//]]>
-</script>
+    ' . $script . '
+    </script>
     
             <div id="jmailui">
                 <div id="jmailleft">
