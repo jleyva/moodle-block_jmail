@@ -21,6 +21,7 @@
 
 #label_list ul li {
     list-style: none;
+    clear: both;
 }
 
 #label_list ul li em {    
