@@ -1212,8 +1212,6 @@ M.block_jmail.composeMessage = function(mode, message) {
             js = js.replace('-->','');
             
             eval('try {'+js+'} catch(e) { console.log(e) }');
-            console.log(startIndex + " --  " + stopIndex)
-            console.log(js);
             formHtml = formHtml.substr(stopIndex);
         }
     // }
