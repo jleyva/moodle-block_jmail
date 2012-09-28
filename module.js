@@ -322,6 +322,7 @@ M.block_jmail.init = function(Y, cfg) {
 
             if (M.block_jmail.currentLabel == 'sent' && oColumn.field == 'from') {
                 oData = oRecord.getData('userto');
+                Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
             }
 
             elCell.innerHTML = oData;
@@ -421,6 +422,13 @@ M.block_jmail.init = function(Y, cfg) {
             Y.all("#maillist .yui-pg-last").set('text', M.str.block_jmail.last);
             Y.all("#maillist .yui-pg-next").set('text', M.str.block_jmail.next);
             Y.all("#maillist .yui-pg-previous").set('text', M.str.block_jmail.previous);
+            
+            if (M.block_jmail.currentLabel == 'sent') {
+                Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
+            } else {
+                 Y.one('#maillist table a').setHTML(M.str.block_jmail.from);	
+            }            
+                
         }, M.block_jmail.app.dataTable, true);
         
         M.block_jmail.app.dataTable.subscribe("tbodyKeyEvent", function(event, target){

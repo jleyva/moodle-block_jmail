@@ -45,50 +45,50 @@ class block_jmail_mailbox {
 
     /** @var object Full course */
     public $course = null;
-    
+
     /** @var object Full course */
     public $context = null;
     public $blockcontext = null;
-    
+
     public $cansend = false;
     public $cansendtoall = false;
     public $cansendtomanagers = false;
-    
+
     public $canmanagelabels = false;
-    
+
     /** @var integer Current user unreaded messages in this mailbox */
     public $unreadcount = 0;
-    
+
     /** @var integer Number of emails per page */
     public $pagesize = 15;
-    
+
     public $config;
-    
+
     public $instance;
-    
+
     private $isseparategroups = false;
-    
+
     private $groups = array();
-    
+
     /**
      * Class constructor
      * @param object $course Full course object
-     */    
+     */
     function __construct($course, $context = null, $blockcontext = null) {
         global $SESSION, $DB, $CFG;
-        
+
         // TODO - Do no instanciate mailboxes for courses without the block installed
         $this->course = $course;
-        
+
         if (!$context) {
             $this->context = get_context_instance(CONTEXT_COURSE, $this->course->id);
         } else {
             $this->context = $context;
         }
-        
+
         $this->instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$this->context->id), '*', MUST_EXIST);
-        
-        if (!$blockcontext) {            
+
+        if (!$blockcontext) {
             $this->blockcontext = get_context_instance(CONTEXT_BLOCK, $this->instance->id, MUST_EXIST);
         } else {
             $this->blockcontext = $blockcontext;
@@ -96,35 +96,35 @@ class block_jmail_mailbox {
 
         if ($invisible = $DB->get_records('block_positions', array('blockinstanceid'=>$this->instance->id, 'visible'=>0))) {
             throw new moodle_exception('invalidcourseid', 'error');
-        }       
-        
+        }
+
         if ($this->course->id != SITEID and !has_capability('block/jmail:viewmailbox', $this->blockcontext)) {
             throw new moodle_exception('invalidcourseid', 'error');
         }
-        
+
         $this->globalinbox = ($this->course->id == SITEID)? true : false;
-        
+
         if ($this->globalinbox and empty($CFG->block_jmail_enable_globalinbox)) {
             throw new moodle_exception('invalidcourseid', 'error');
         }
-        
+
         // Block settings.
         $this->config = unserialize(base64_decode($this->instance->configdata));
-        
+
         $this->cansendtomanagers = has_capability('block/jmail:sendtomanagers', $this->blockcontext);
         $this->cansendtoall = has_capability('block/jmail:sendtoall', $this->blockcontext);
         $this->canmanagelabels = has_capability('block/jmail:managelabels', $this->blockcontext);
         $this->canmanagepreferences = has_capability('block/jmail:managepreferences', $this->blockcontext);
         $this->canapprovemessages = has_capability('block/jmail:approvemessages', $this->blockcontext);
-        
+
         // Special case
-        
-        if ($this->globalinbox) {            
-            $this->canmanagelabels = false;            
+
+        if ($this->globalinbox) {
+            $this->canmanagelabels = false;
         }
-        
+
         $this->cansend = $this->cansendtomanagers or $this->cansendtoall;
-        
+
         if (! isset($SESSION->jmailcache)) {
             $SESSION->jmailcache = new stdClass;
             $SESSION->jmailcache->contacts = array();
@@ -133,40 +133,40 @@ class block_jmail_mailbox {
             $SESSION->jmailcache->courses = array();
         }
     }
-    
+
     /**
      * Count unread messages for the current user
      * @return integer Number of unread messages for the current user
-     */  
+     */
     public function count_unread_messages() {
         global $DB, $USER;
 
-        $sql = "SELECT COUNT('x') FROM {block_jmail} j, {block_jmail_sent} s WHERE j.id = s.messageid AND j.timesent > 0 AND s.userid = :userid AND j.courseid = :course AND s.mread = 0 AND j.approved = 1 AND s.deleted = 0";        
+        $sql = "SELECT COUNT('x') FROM {block_jmail} j, {block_jmail_sent} s WHERE j.id = s.messageid AND j.timesent > 0 AND s.userid = :userid AND j.courseid = :course AND s.mread = 0 AND j.approved = 1 AND s.deleted = 0";
         $this->unreadcount = (int) $DB->count_records_sql($sql, array('userid' =>$USER->id ,'course' => $this->course->id));
-        
+
         return $this->unreadcount;
-        
+
     }
-    
+
     /**
      * Get current user messages headers (subject, remitent, date)
      * @param string $filter Messages filter, page, label, dates...
      * @return array Array in the first element the total messages numbert, second element an array of messages objects
-     */  
+     */
     public function get_message_headers($label, $start, $sort, $direction, $searchtext) {
         global $CFG, $DB, $USER, $SESSION;
 
         $messagesdata = array(0, array());
         $dbmessages = array();
-        
+
         if (!$label) {
             $label = 'inbox';
         }
-        
+
         if ($label == 'search' and !$searchtext) {
             $label = 'inbox';
         }
-        
+
         switch($sort) {
             case 'subject': $sort = 'subject';
                             break;
@@ -174,16 +174,16 @@ class block_jmail_mailbox {
                             $sort = 'firstname';
                             if (!empty($SESSION->fullnamedisplay)) {
                                 $CFG->fullnamedisplay = $SESSION->fullnamedisplay;
-                            }                        
+                            }
                             if (!isset($CFG->fullnamedisplay) or $CFG->fullnamedisplay === 'firstname lastname') {
                                 $sort = 'firstname';
-                        
+
                             } else if ($CFG->fullnamedisplay == 'lastname firstname') {
                                 $sort = 'lastname';
-                        
+
                             } else if ($CFG->fullnamedisplay == 'firstname') {
                                 $sort = 'firstname';
-                            }                
+                            }
                             break;
             case 'date':    if ($label == 'draft') {
                                 $sort = 'm.timecreated';
@@ -194,10 +194,10 @@ class block_jmail_mailbox {
             default:        $sort = 'timesent';
         }
 
-        
+
         $select = "SELECT DISTINCT(m.id), m.courseid, m.subject, m.timesent, m.timecreated, m.sender, m.approved";
-        $params = array('userid'=>$USER->id, 'sent'=>0, 'deleted' => 0, 'approved' => 1, 'userdeleted' => 0);        
-        
+        $params = array('userid'=>$USER->id, 'sent'=>0, 'deleted' => 0, 'approved' => 1, 'userdeleted' => 0);
+
         if ($this->globalinbox) {
             $mailboxes = $this->get_my_mailboxes();
             $mailboxes[SITEID] = get_site();
@@ -207,7 +207,7 @@ class block_jmail_mailbox {
             $coursein = ' = :course';
             $params['course'] = $this->course->id;
         }
-        
+
         switch ($label) {
             case 'search':
                         $select .= ', s.mread';
@@ -216,7 +216,7 @@ class block_jmail_mailbox {
                         $params['searchtext1'] = "%$searchtext%";
                         $params['searchtext2'] = "%$searchtext%";
                         $params['searchtext3'] = "%$searchtext%";
-                        
+
                         $fullname = $DB->sql_fullname('u.firstname','u.lastname');
                         $sql = "
                             FROM {block_jmail} m
@@ -224,18 +224,18 @@ class block_jmail_mailbox {
                             JOIN {user} u ON u.id = m.sender
                             WHERE
                             ((m.timesent > :sent AND s.userid = :userid AND m.approved = :approved) OR (m.sender = :sender))
-                            AND m.courseid $coursein                            
+                            AND m.courseid $coursein
                             AND u.deleted = :userdeleted
                             AND (". $DB->sql_like('subject', ':searchtext1', false, false)."
-                            OR ". $DB->sql_like('body', ':searchtext2', false, false)."                            
+                            OR ". $DB->sql_like('body', ':searchtext2', false, false)."
                             OR ". $DB->sql_like($fullname, ':searchtext3', false, false)."
                             )
-                            ORDER BY $sort $direction";                            
+                            ORDER BY $sort $direction";
                         break;
-                        
+
             case 'inbox':
                         $select .= ', s.mread';
-                        $params['labeled'] = 0;                                               
+                        $params['labeled'] = 0;
                         $sql = "
                             FROM {block_jmail} m
                             JOIN {block_jmail_sent} s ON m.id = s.messageid
@@ -245,15 +245,15 @@ class block_jmail_mailbox {
                             AND m.approved = :approved
                             AND s.deleted = :deleted AND s.labeled = :labeled
                             AND u.deleted = :userdeleted
-                            ORDER BY $sort $direction";                            
+                            ORDER BY $sort $direction";
                         break;
             case 'draft' :
-                        $params = array('sender' => $USER->id, 'course' => $this->course->id, 'timesent' => 0, 'userdeleted' => 0);                            
+                        $params = array('sender' => $USER->id, 'course' => $this->course->id, 'timesent' => 0, 'userdeleted' => 0);
                         $sql = "
                             FROM {block_jmail} m
                             JOIN {user} u ON u.id = m.sender
                             WHERE
-                            timesent = :timesent AND sender = :sender AND courseid = :course 
+                            timesent = :timesent AND sender = :sender AND courseid = :course
                             AND u.deleted = :userdeleted
                             ORDER BY $sort $direction";
                         break;
@@ -264,15 +264,15 @@ class block_jmail_mailbox {
                             unset($params['course']);
                             $params = array_merge($params, $uparams);
                         }
-                        
+
                         $sql = "
                             FROM {block_jmail} m
-                            JOIN {user} u ON u.id = m.sender
                             JOIN {block_jmail_sent} s ON m.id = s.messageid
+                            JOIN {user} u ON u.id = s.userid
                             WHERE
                             sender = :sender AND courseid $coursein AND timesent > :timesent
                             AND u.deleted = :userdeleted
-                            ORDER BY $sort $direction";                          
+                            ORDER BY $sort $direction";
                         break;
             case 'trash' :
                         $select .= ', s.mread';
@@ -286,9 +286,9 @@ class block_jmail_mailbox {
                             AND m.approved = :approved
                             AND u.deleted = :userdeleted
                             ORDER BY $sort $direction";
-                        
+
                         break;
-            case 'unread' :                        
+            case 'unread' :
                         $params['mread'] = 0;
                         $sql = "
                             FROM {block_jmail} m
@@ -303,8 +303,8 @@ class block_jmail_mailbox {
                             AND s.mread = :mread
                             AND u.deleted = :userdeleted
                             ORDER BY $sort $direction";
-                        
-                        break;                    
+
+                        break;
             case 'toapprove' :
                         if (!$this->canapprovemessages) {
                             return $messagesdata;
@@ -314,7 +314,7 @@ class block_jmail_mailbox {
                             unset($params['course']);
                             $params = array_merge($params, $uparams);
                         }
-                        
+
                         $sql = "
                             FROM {block_jmail} m
                             JOIN {block_jmail_sent} s ON m.id = s.messageid
@@ -324,10 +324,10 @@ class block_jmail_mailbox {
                             AND m.approved = :approved
                             AND u.deleted = :userdeleted
                             ORDER BY $sort $direction";
-                        break;                    
+                        break;
             default:
                         $select .= ', s.mread';
-                        $params['label'] = $label;                            
+                        $params['label'] = $label;
                         $sql = "
                             FROM {block_jmail} m
                             JOIN {block_jmail_sent} s ON m.id = s.messageid
@@ -341,7 +341,7 @@ class block_jmail_mailbox {
                             ORDER BY $sort $direction";
 
         }
-        
+
         $dbmessages = $DB->get_records_sql($select.$sql, $params, $start, $this->pagesize);
         $messagesdata[0] = $DB->count_records_sql("SELECT COUNT('x')".$sql, $params);
 
@@ -355,12 +355,12 @@ class block_jmail_mailbox {
 
         return $messagesdata;
     }
-    
+
     /**
      * Saves a message
-     *     
+     *
      * @return bool True if all ok
-     */  
+     */
     public function save_message($id, $to, $cc, $bcc, $subject, $body, $timesent, $attachments, $editoritemid) {
         global $USER;
 
@@ -385,15 +385,15 @@ class block_jmail_mailbox {
                 }
             }
         }
-        
+
         $destinataries = $this->check_destinataries($destinataries);
 
         if ($id and $message = block_jmail_message::get_from_id($id)) {
             $message->subject = $subject;
             $message->body = $body;
-            $message->timesent = $timesent;            
+            $message->timesent = $timesent;
             $message->update($destinataries, $attachments, $editoritemid);
-            
+
             add_to_log($this->course->id, 'jmail', 'message updated');
             $this->send_copy($message);
         } else {
@@ -414,27 +414,27 @@ class block_jmail_mailbox {
 
             $message = new block_jmail_message($message);
             $message->save($destinataries, $attachments, $editoritemid);
-            
+
             add_to_log($this->course->id, 'jmail', 'message saved');
             $this->send_copy($message);
         }
 
         return true;
     }
-    
+
     /**
      * Checks the current destinataries, (groupmode or capabilities)
      * @param array $destinataries A destinataries array
      * @return array A filtered destinataries array
-     */ 
+     */
     public function check_destinataries($destinataries) {
         // Two cases, separate groups or message sending restricted
-        
+
         $this->load_groups();
         $contacts = array_keys($this->get_contacts(0, '', '', 0));
-        
+
         foreach($destinataries as $key=>$dest) {
-            
+
             // Check if we are sending an email to a manager.
             if (!$this->cansendtoall) {
                 if (! has_capability('block/jmail:sendtoall', $this->blockcontext, $dest->userid) ) {
@@ -442,9 +442,9 @@ class block_jmail_mailbox {
                     continue;
                 }
             }
-            
+
             // Check for a valid user in agroup.
-            if ($this->isseparategroups) {                
+            if ($this->isseparategroups) {
                 $ismember = false;
                 foreach ($this->groups as $group) {
                     if ($ismember = groups_is_member($group, $dest->userid)) {
@@ -456,58 +456,58 @@ class block_jmail_mailbox {
                     continue;
                 }
             }
-            
+
             // Finally check for valid user.
             if (!in_array($dest->userid, $contacts)) {
                 unset($destinataries[$key]);
                 continue;
             }
-            
+
         }
         return $destinataries;
     }
-    
+
     /**
      * Loads the current user groups
      * @return array Array of groups
-    */ 
+    */
     private function load_groups() {
         global $USER;
-        
+
         $this->isseparategroups = ($this->course->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $this->context));
-        
+
         if (! empty($this->groups)) {
             return $this->groups;
         }
-        
+
         $groups = groups_get_user_groups($this->course->id, $USER->id);
         $this->groups = $groups[0];
         return $this->groups;
     }
-    
+
     /**
      * Send a copy to the user email according to the user's preferences
      * @param block_jmail_message $message A full message object
      * @return boolean True if the message have been sent succesfully
-     */ 
+     */
     private function send_copy($message) {
         global $DB, $CFG;
-        
-        $mailresult = true;        
+
+        $mailresult = true;
         $site = get_site();
-        
+
         // We ensure that is a message sent and approved
         if (!$message->timesent or !$message->approved) {
             return false;
         }
-        
+
         add_to_log($this->course->id, 'jmail', 'message sent');
-        
+
         $message = $message->full();
-        
+
         if ($message->destinataries) {
             $url = $CFG->wwwroot.'/blocks/jmail/mailbox.php?id='+$this->course->id;
-            foreach ($message->destinataries as $type => $destinataries) {                
+            foreach ($message->destinataries as $type => $destinataries) {
                 foreach ($destinataries as $dest) {
                     $userprefs = $this->load_user_preferences($dest->userid);
                     if ($userprefs->receivecopies and $userto = $DB->get_record('user', array('id' => $dest->userid))) {
@@ -522,21 +522,21 @@ class block_jmail_mailbox {
         // TODO, handle possible errors
         return true;
     }
-    
+
     /**
      * Gets the current user preferences
       @return object User preferences
      */
     public function get_preferences() {
         global $USER;
-        
+
         if (!$this->canmanagepreferences) {
             return false;
         }
-        
+
         return $this->load_user_preferences($USER->id);
     }
-    
+
     /**
      * Sets the current user preferences
      * @param string $preferences JSON string of the current preferences
@@ -544,14 +544,14 @@ class block_jmail_mailbox {
      */
     public function save_preferences($preferences) {
         global $USER, $DB;
-        
+
         if (!$this->canmanagepreferences) {
             return false;
         }
-        
+
         if ($preferences) {
             $preferences = json_decode($preferences);
-            if (is_object($preferences)) {                
+            if (is_object($preferences)) {
                 foreach ($preferences as $key=>$val) {
                     if ($pref = $DB->get_record('block_jmail_preferences', array('userid' => $USER->id, 'courseid' => $this->course->id, 'name' => $key))) {
                         $pref->value = $val;
@@ -568,55 +568,55 @@ class block_jmail_mailbox {
                 }
             }
         }
-        
+
         return true;
-    }    
-    
+    }
+
     /**
      * Load the preferences for a user in the current mailbox
      * @param int $userid An user id
      * @return object User preferences
-     */ 
+     */
     private function load_user_preferences($userid) {
         global $DB;
-                
+
         $preferences = new stdClass;
         $preferences->receivecopies = false;
-        
+
         if ($prefs = $DB->get_records('block_jmail_preferences', array('userid' => $userid, 'courseid' => $this->course->id))) {
             foreach ($prefs as $pref) {
                 $prefname = $pref->name;
                 $preferences->$prefname = $pref->value;
             }
         }
-        
+
         return $preferences;
     }
-    
+
     /**
      * Get a message for an user
      *
      * @param int $messageid Database message sent id (jmail_sent table)
      * @return object Object containing the full message
-     */  
+     */
     public function get_message($messageid) {
         global $USER;
 
         $message = block_jmail_message::get_from_id($messageid);
         $pendingaprobal = !$message->approved and $this->canapprovemessages;
-        
+
         if ($message->is_mine() or $pendingaprobal) {
-            return $message->full();            
+            return $message->full();
         }
         return false;
     }
-    
+
     /**
      * Get a sent or draft message for an user (jmail table)
      *
      * @param int $messageid Database message id
      * @return object Object containing the full message
-     */  
+     */
     public function get_message_sent($messageid) {
         global $USER;
 
@@ -625,31 +625,31 @@ class block_jmail_mailbox {
             return $message->full();
         }
         return false;
-    } 
-    
+    }
+
     /**
      * Delete a message for an user
      *
      * @param int $messageid Database message id
      * @return array Array of label objects
-     */  
+     */
     public function delete_message($messageid) {
         global $DB, $USER;
 
         $message = block_jmail_message::get_from_id($messageid);
-        
-        if ($message and $message->userid == $USER->id) {            
-            return $message->delete();            
+
+        if ($message and $message->userid == $USER->id) {
+            return $message->delete();
         }
         return false;
     }
-    
+
     /**
      * Approve a message for an user
      *
      * @param int $messageid Database message id
      * @return bool True if all ok
-     */  
+     */
     public function approve_message($messageid) {
         global $DB, $USER;
 
@@ -658,14 +658,14 @@ class block_jmail_mailbox {
             return $message->approve();
         }
         return false;
-    }    
+    }
 
     /**
      * Return the current user labels for this mailbox
      * There are cross-mailboxes labels (the field course it's 0 for this labels)
-     * 
+     *
      * @return array Array of label objects
-     */  
+     */
     public function get_labels() {
         global $DB, $USER;
 
@@ -679,7 +679,7 @@ class block_jmail_mailbox {
      *
      * @param int $labelid Database label id
      * @return array Array of label objects
-     */  
+     */
     public function delete_label($labelid) {
         global $DB, $USER;
 
@@ -693,14 +693,14 @@ class block_jmail_mailbox {
         }
         return false;
     }
-    
+
     /**
      * Rename a label for an user
      *
      * @param int $labelid Database label id
      * @param string $name Labels name
      * @return bool True if all ok
-     */  
+     */
     public function rename_label($labelid, $name) {
         global $DB, $USER;
 
@@ -715,17 +715,17 @@ class block_jmail_mailbox {
         }
         return false;
     }
-    
+
     /**
      * Create a label for an user
      *
      * @param string $name Labels name
      * @param bool $global When the label is global or for a mailbox
      * @return misc False or label database id
-     */  
+     */
     public function create_label($name, $global = false) {
         global $DB, $USER;
-        
+
         if (!$this->canmanagelabels) {
             return false;
         }
@@ -743,51 +743,51 @@ class block_jmail_mailbox {
         }
         return false;
     }
-    
+
     /**
      * Links a message to a label
      *
      * @param int $messageid Message db id
      * @param string $labelid Label db id or name
      * @return bool True if all ok
-     */  
+     */
     public function label_message($messageid, $labelid) {
         global $DB, $USER;
-        
+
         if (!$this->canmanagelabels) {
             return false;
         }
 
-        if ($message = block_jmail_message::get_from_id($messageid)) {                        
-            
-            if (is_numeric($labelid) and $message->is_mine() and $DB->get_record('block_jmail_label', array('id'=>$labelid, 'userid'=>$USER->id))) {                
+        if ($message = block_jmail_message::get_from_id($messageid)) {
+
+            if (is_numeric($labelid) and $message->is_mine() and $DB->get_record('block_jmail_label', array('id'=>$labelid, 'userid'=>$USER->id))) {
                 $labelm = new stdClass;
                 $labelm->labelid = $labelid;
                 $labelm->messagesentid = $message->sentid;
                 $labelm->timecreated = time();
                 if ($DB->insert_record('block_jmail_m_label', $labelm)) {
-                    $message->mark_labeled();                    
+                    $message->mark_labeled();
                     return true;
                 }
             } else {
-                if ($labelid == 'inbox') {                    
-                    $this->unlabel_message_full($messageid);                    
+                if ($labelid == 'inbox') {
+                    $this->unlabel_message_full($messageid);
                     // If it was deleted, undelete it
-                    $message->undelete();                    
+                    $message->undelete();
                     return true;
                 }
-            }            
+            }
         }
         return false;
     }
-    
+
     /**
      * Unlinks a message to a label
      *
      * @param int $messageid Message db id
      * @param int $labelid Label db id
      * @return bool True if all ok
-     */  
+     */
     public function unlabel_message($messageid, $labelid) {
         global $DB, $USER;
 
@@ -796,7 +796,7 @@ class block_jmail_mailbox {
         }
 
         if ($message = block_jmail_message::get_from_id($messageid)) {
-            if (is_numeric($labelid) and $message->is_mine() and $DB->get_record('block_jmail_label', array('id'=>$labelid, 'userid'=>$USER->id))) {                
+            if (is_numeric($labelid) and $message->is_mine() and $DB->get_record('block_jmail_label', array('id'=>$labelid, 'userid'=>$USER->id))) {
                 if ($DB->delete_records('block_jmail_m_label', array('messagesentid'=>$message->sentid, 'labelid'=>$labelid))) {
                     $message->mark_unlabeled();
                     return true;
@@ -805,13 +805,13 @@ class block_jmail_mailbox {
         }
         return false;
     }
-    
+
     /**
      * Unlinks a message to all labels it's linked to
      *
      * @param int $messageid Message db id
      * @return bool True if all ok
-     */  
+     */
     public function unlabel_message_full($messageid) {
         global $DB, $USER;
 
@@ -829,19 +829,19 @@ class block_jmail_mailbox {
         }
         return true;
     }
-    
+
     /**
      * Mark a message as read or unread
      *
      * @param int $messageid Message db id
      * @param int $status Message read or unread
      * @return bool True if all ok
-     */  
+     */
     public function mark_read($messageid, $status) {
         global $DB, $USER;
 
         if ($message = block_jmail_message::get_from_id($messageid)) {
-            if ($message->is_mine()) {                
+            if ($message->is_mine()) {
                 if ($status) {
                     return $message->mark_read();
                 } else {
@@ -850,15 +850,15 @@ class block_jmail_mailbox {
             }
         }
         return false;
-    }    
-    
-    
+    }
+
+
     /**
      * Send a draft message
      *
      * @param int $messageid Database message id
      * @return array Array of label objects
-     */  
+     */
     public function send_draf($messageid) {
         global $DB, $USER;
 
@@ -867,7 +867,7 @@ class block_jmail_mailbox {
         }
 
         $message = block_jmail_message::get_from_id($messageid);
-        if ($message->sender == $USER->id) {            
+        if ($message->sender == $USER->id) {
             $message->mark_sent();
         }
         return false;
@@ -882,7 +882,7 @@ class block_jmail_mailbox {
      * @param string $li Lastname initial to filter
      * @param int $roleid Role id to filter
      * @return array Array of contacts
-     */     
+     */
     public function get_contacts($group, $fi, $li, $roleid) {
         global $DB, $OUTPUT, $SESSION, $USER;
 
@@ -895,7 +895,7 @@ class block_jmail_mailbox {
 
         if (isset($SESSION->jmailcache->contacts[$this->course->id][$hash])) {
             return $SESSION->jmailcache->contacts[$this->course->id][$hash];
-        }        
+        }
 
         if (!$this->globalinbox) {
             if (! has_capability('moodle/course:viewparticipants', $this->context)) {
@@ -905,13 +905,13 @@ class block_jmail_mailbox {
 
         $groupmode    = groups_get_course_groupmode($this->course);   // Groups are being used
         $currentgroup = groups_get_course_group($this->course, true);
-    
+
         if (!$currentgroup) {      // To make some other functions work better later
             $currentgroup  = NULL;
         }
-    
+
         $this->isseparategroups = ($this->course->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $this->context));
-        
+
         if ($this->isseparategroups and (!$currentgroup) ) {
             return array();
         }
@@ -937,39 +937,39 @@ class block_jmail_mailbox {
         list($ccselect, $ccjoin) = context_instance_preload_sql('u.id', CONTEXT_USER, 'ctx');
         $select .= $ccselect;
         $joins[] = $ccjoin;
-        
+
         if ($roleid) {
             $contextlist = get_related_contexts_string($this->context);
             $wheres[] = "u.id IN (SELECT userid FROM {role_assignments} WHERE roleid = :roleid AND contextid $contextlist)";
             $params['roleid'] = $roleid;
         }
-        
+
         if ($fi) {
             $wheres[] = $DB->sql_like('firstname', ':search1', false, false);
             $params['search1'] = "$fi%";
         }
-        
+
         if ($li) {
             $wheres[] = $DB->sql_like('lastname', ':search2', false, false);
             $params['search2'] = "$li%";
         }
-        
+
         if ($this->config->filterfield) {
             $wheres[] = "u.".$this->config->filterfield." = :filterfield";
             $params['filterfield'] = $USER->{$this->config->filterfield};
         }
-   
+
         $from = implode("\n", $joins);
         if ($wheres) {
             $where = "WHERE " . implode(" AND ", $wheres);
         } else {
             $where = "";
         }
-        
+
         $sort = '';
         $start = '';
         $end = '';
-        
+
         $userlist = $DB->get_records_sql("$select $from $where $sort", $params, $start, $end);
 
         if ($userlist) {
@@ -979,18 +979,18 @@ class block_jmail_mailbox {
                 unset($userlist[$key]->email);
             }
         }
-        
+
         $SESSION->jmailcache->contacts[$this->course->id][$hash] = $userlist;
-        
+
         return $userlist;
-        
+
     }
-    
+
     /**
      * Perform a search over the course users
      * @param string $search The text to be searched in firstname or lastname
      * @return array Array of user objects
-     */    
+     */
     public function get_contacts_search($search) {
         // For avoid SQL queries, we use a session cache
         if (!isset($SESSION->jmailcache->contacts_search[$this->course->id])) {
@@ -998,57 +998,57 @@ class block_jmail_mailbox {
         }
         $users = $SESSION->jmailcache->contacts_search[$this->course->id];
 
-    
+
         if (! $search) {
             return array();
         }
-    
+
         $this->currentsearch = $search;
-        
+
         $users1 = array_filter($users, array($this, 'filter_contacts_initials'));
         $users2 = array_filter($users, array($this, 'filter_contacts_like'));
-        
+
         // I can't find a core php function for doing this
         foreach ($users2 as $key=>$u) {
             if (!isset($users1[$key])) {
                 $users1[] = $u;
             }
         }
-        
+
         return $users1;
     }
-    
-    /**
-     * Performs a text search in the user object
-     * @param object $contact A user object
-     * @return object A single user
-     */    
-    private function filter_contacts_initials($contact) {
-        $textlib = textlib_get_instance();
-        $firstname = $textlib->strtolower($contact->firstname);
-        $lastname = $textlib->strtolower($contact->lastname);
-        $currentsearch = $textlib->strtolower($this->currentsearch);
-        
-        return ($textlib->strpos($firstname, $currentsearch) === 0) or ($textlib->strpos($lastname, $currentsearch) === 0);
-        
-    }
-    
+
     /**
      * Performs a text search in the user object
      * @param object $contact A user object
      * @return object A single user
      */
-    
+    private function filter_contacts_initials($contact) {
+        $textlib = textlib_get_instance();
+        $firstname = $textlib->strtolower($contact->firstname);
+        $lastname = $textlib->strtolower($contact->lastname);
+        $currentsearch = $textlib->strtolower($this->currentsearch);
+
+        return ($textlib->strpos($firstname, $currentsearch) === 0) or ($textlib->strpos($lastname, $currentsearch) === 0);
+
+    }
+
+    /**
+     * Performs a text search in the user object
+     * @param object $contact A user object
+     * @return object A single user
+     */
+
     private function filter_contacts_like($contact) {
         $textlib = textlib_get_instance();
         $firstname = $textlib->strtolower($contact->firstname);
         $lastname = $textlib->strtolower($contact->lastname);
         $currentsearch = $textlib->strtolower($this->currentsearch);
-        
+
         return ($textlib->strpos($firstname, $currentsearch) !== false) or ($textlib->strpos($lastname, $currentsearch) !== false);
-        
+
     }
-    
+
     /**
      * Refresh the cached contact list
      * @return bool Allways true
@@ -1062,35 +1062,35 @@ class block_jmail_mailbox {
     /**
      * Return the current user roles and groups in the current course
      * @return array Array in the first element the groups in the second the user roles
-     */     
+     */
 
     public function get_groups_roles() {
         global $USER;
-        
+
         $groups = array();
         $roles = array();
-        
+
         if (! has_capability('moodle/course:viewparticipants', $this->context)) {
             return array($groups, $roles);
         }
-        
+
         if ($groupmode = $this->course->groupmode) {
-                        
+
             $aag = has_capability('moodle/site:accessallgroups', $this->context);
-        
+
             if ($groupmode == VISIBLEGROUPS or $aag) {
                 $allowedgroups = groups_get_all_groups($this->course->id, 0, $this->course->defaultgroupingid);
             } else {
                 $allowedgroups = groups_get_all_groups($this->course->id, $USER->id, $this->course->defaultgroupingid);
             }
-        
+
             $activegroup = groups_get_course_group($this->course, true, $allowedgroups);
-        
+
             $groupsmenu = array();
             if (!$allowedgroups or $groupmode == VISIBLEGROUPS or $aag) {
                 $groupsmenu[0] = get_string('allparticipants');
             }
-        
+
             if ($allowedgroups) {
                 foreach ($allowedgroups as $group) {
                     $groupsmenu[$group->id] = format_string($group->name);
@@ -1103,101 +1103,101 @@ class block_jmail_mailbox {
         $roles = get_profile_roles($this->context);
         $allrolenames = array();
         $rolenames = array(0=>get_string('allparticipants'));
-        
+
         foreach ($allroles as $role) {
             $allrolenames[$role->id] = strip_tags(role_get_name($role, $this->context));
             if (isset($roles[$role->id])) {
                 $rolenames[$role->id] = $allrolenames[$role->id];
             }
-        }   
-        
+        }
+
         $roles = $rolenames;
-        
+
         return array($groups, $roles);
     }
-    
+
     /**
      * Saves an attachment to your private files
      */
-    
+
     public function save_to_private_files($path) {
         global $USER;
-        
+
         $args = explode('/', ltrim($path, '/'));
         $contextid = (int)array_shift($args);
         $component = clean_param(array_shift($args), PARAM_SAFEDIR);
         $filearea  = clean_param(array_shift($args), PARAM_SAFEDIR);
         $messageid = clean_param(array_shift($args), PARAM_INT);
-        
+
         $message = block_jmail_message::get_from_id($messageid);
-        
+
         if ($contextid != $this->blockcontext->id) {
             return false;
         }
-        
+
         if ($filearea !== 'attachment') {
             return false;
         }
-        
+
         if ($component !== 'block_jmail') {
             return false;
-        }        
-        
+        }
+
         if (!$message or !$message->is_mine()) {
             return false;
         }
-        
+
         $fs = get_file_storage();
-        
+
         if (!$file = $fs->get_file_by_hash(sha1($path)) or $file->is_directory()) {
             return false;
         }
-        
+
         $context = get_context_instance(CONTEXT_USER, $USER->id);
-        
+
         $newfile = new stdClass();
         $newfile->contextid = $context->id;
         $newfile->component = 'user';
         $newfile->filearea = 'private';
         $newfile->itemid = 0;
-        $newfile->filepath = '/jmail/'.format_string($this->course->shortname).'/';        
+        $newfile->filepath = '/jmail/'.format_string($this->course->shortname).'/';
         $newfile->filename = array_pop(explode('/',$path));
-        
+
         if (!$fs->create_file_from_storedfile($newfile, $file)) {
             return false;
         }
-        
+
         return true;
-        
+
     }
-    
+
     public static function get_my_mailboxes() {
         global $DB, $USER, $CFG;
-        
+
         $mailboxes = array();
-        
+
         if (!empty($SESSION->jmailcache->mailboxes)) {
             return $SESSION->jmailcache->mailboxes;
         }
-        
+
         if (has_capability('moodle/site:config', get_context_instance(CONTEXT_SYSTEM))) {
             $mycourses = $DB->get_records_sql("SELECT DISTINCT(c.id), c.shortname FROM {course} c LEFT JOIN {block_jmail_sent} s ON s.userid = :userid LEFT JOIN {block_jmail} j ON j.id = s.messageid", array('userid' => $USER->id));
         } else {
             $mycourses = enrol_get_my_courses();
         }
-        
+
         if ($mycourses) {
             foreach ($mycourses as $c) {
-                
+
                 context_instance_preload($c);
                 if (!$context = get_context_instance(CONTEXT_COURSE, $c->id)) {
                     continue;
                 }
-                
+
                 if (!$instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
                     continue;
                 }
-                
+
                 if ($c->id != SITEID) {
                     $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
 
@@ -1207,21 +1207,24 @@ class block_jmail_mailbox {
                 } else if (empty($CFG->block_jmail_enable_globalinbox)) {
                     continue;
                 }
-                
+
                 if ($invisible = $DB->get_records('block_positions', array('blockinstanceid'=>$instance->id, 'visible'=>0))) {
                     continue;
                 }
-                
+
                 $mailbox = new stdClass;
                 $mailbox->id = $c->id;
                 $mailbox->shortname = format_string($c->shortname);
                 $mailboxes[$c->id] = $mailbox;
             }
         }
-        
-        $SESSION->jmailcache->mailboxes = $mailboxes;
-        
-        return $mailboxes;        
+
+
+        if (!empty($mailboxes)) {
+            $SESSION->jmailcache->mailboxes = $mailboxes;
+        }
+
+        return $mailboxes;
     }
 
 }
