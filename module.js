@@ -1232,7 +1232,7 @@ M.block_jmail.composeMessage = function(mode, message) {
         }
         
         for (var el in elementsToEval) {
-            console.log("Evaluating " + elementsToEval[el]);
+
             var startIndex = formHtml.indexOf(elementsToEval[el]);
             formHtml = formHtml.substr(startIndex);        
             var stopIndex = formHtml.indexOf("});") + 7;
