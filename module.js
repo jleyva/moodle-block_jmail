@@ -1355,20 +1355,22 @@ M.block_jmail.showToolbar = function(message) {
     var toShow = [];
     
     if (typeof message != 'undefined') {
-        
+
         var labels = message.labels;        
         for (var el in toHide) {
-            this.Y.one("#"+toHide[el]).setStyle('display', 'none');
-        }
-        
-        
+			var button = this.Y.one("#"+toHide[el]);
+            if (button) {
+				button.setStyle('display', 'none');
+			}
+		}
+
         var totaldestinataries = 0;        
         for (var type in message.destinataries) {
             for (var el in message.destinataries[type]) {
                 totaldestinataries++;
             }
         }
-        
+
         var replytoall = totaldestinataries > 1;
         
         if (this.Y.Array.indexOf(labels, 'trash') >= 0) {
