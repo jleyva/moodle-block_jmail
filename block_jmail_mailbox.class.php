@@ -123,7 +123,7 @@ class block_jmail_mailbox {
             $this->canmanagelabels = false;
         }
 
-        $this->cansend = $this->cansendtomanagers or $this->cansendtoall;
+        $this->cansend = $this->cansendtomanagers || $this->cansendtoall;
 
         if (! isset($SESSION->jmailcache)) {
             $SESSION->jmailcache = new stdClass;
