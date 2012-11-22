@@ -343,6 +343,9 @@ class block_jmail_mailbox {
         }
 
         $dbmessages = $DB->get_records_sql($select.$sql, $params, $start, $this->pagesize);
+        
+        // Patch for Postgres, ORDER BY not valid in SELECT COUNT...
+        list($sql, $order) = explode("ORDER BY", $sql);
         $messagesdata[0] = $DB->count_records_sql("SELECT COUNT('x')".$sql, $params);
 
         if ($dbmessages) {
