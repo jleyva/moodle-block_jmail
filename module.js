@@ -322,7 +322,7 @@ M.block_jmail.init = function(Y, cfg) {
 
             if (M.block_jmail.currentLabel == 'sent' && oColumn.field == 'from') {
                 oData = oRecord.getData('userto');
-                Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
+                Y.one('#maillist table a').setContent(M.str.block_jmail.to);
             }
 
             elCell.innerHTML = oData;
@@ -424,9 +424,9 @@ M.block_jmail.init = function(Y, cfg) {
             Y.all("#maillist .yui-pg-previous").set('text', M.str.block_jmail.previous);
             
             if (M.block_jmail.currentLabel == 'sent') {
-                Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
+                Y.one('#maillist table a').setContent(M.str.block_jmail.to);
             } else {
-                 Y.one('#maillist table a').setHTML(M.str.block_jmail.from);	
+                 Y.one('#maillist table a').setContent(M.str.block_jmail.from);	
             }            
                 
         }, M.block_jmail.app.dataTable, true);
@@ -521,9 +521,9 @@ M.block_jmail.init = function(Y, cfg) {
         M.block_jmail.currentLabel = e.target.get('id');
 
         if (M.block_jmail.currentLabel == 'sent') {
-            Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
+            Y.one('#maillist table a').setContent(M.str.block_jmail.to);
         } else {
-            Y.one('#maillist table a').setHTML(M.str.block_jmail.from);
+            Y.one('#maillist table a').setContent(M.str.block_jmail.from);
         }
 
         M.block_jmail.checkMail(M.block_jmail.currentLabel);
@@ -973,9 +973,9 @@ M.block_jmail.loadLabels = function() {
                         M.block_jmail.currentLabel = e.target.get('id').replace("label","");
                         
                         if (M.block_jmail.currentLabel == 'sent') {
-                            Y.one('#maillist table a').setHTML(M.str.block_jmail.to);
+                            Y.one('#maillist table a').setContent(M.str.block_jmail.to);
                         } else {
-                            Y.one('#maillist table a').setHTML(M.str.block_jmail.from);
+                            Y.one('#maillist table a').setContent(M.str.block_jmail.from);
                         }
                         
                         M.block_jmail.checkMail(M.block_jmail.currentLabel);                        
