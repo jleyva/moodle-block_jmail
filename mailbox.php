@@ -111,8 +111,20 @@ $jmailcfg = array(
         );
 
 //$PAGE->requires->js('/lib/editor/tinymce/tiny_mce/3.4.2/tiny_mce.js');
-$PAGE->requires->yui2_lib(array('event', 'dragdrop', 'element', 'animation', 'resize', 'layout', 'widget', 'button', 'editor', 'get', 'connection', 'datasource', 'datatable', 'container', 'utilities', 'menu', 'json', 'paginator'));
-$PAGE->requires->js_init_call('M.block_jmail.init', array($jmailcfg), true, $module);
+
+//MDL-34741 switch to YUI2 to 2in3 (2.4 and above)
+if ($CFG->version < 2012120300) {
+    $PAGE->requires->yui2_lib(array('event', 'dragdrop', 'element', 'animation', 'resize', 'layout', 'widget', 'button', 'editor', 'get', 'connection', 'datasource', 'datatable', 'container', 'utilities', 'menu', 'json', 'paginator'));
+}
+ 
+//MDL-34741 switch to YUI2 to 2in3 (2.4 and above)
+if ($CFG->version < 2012120300) {
+    // 2.1, 2.2, 2.3
+    $PAGE->requires->js_init_call('M.block_jmail.init', array($jmailcfg), true, $module);
+} else {
+	// 2.4 and onwards..
+	$PAGE->requires->js_init_call('M.block_jmail.initYAHOO', array($jmailcfg), true, $module);
+}
 
 echo $OUTPUT->header();    
 echo $renderer->load_ui($mailbox);
