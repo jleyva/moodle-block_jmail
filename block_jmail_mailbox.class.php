@@ -2,7 +2,7 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
+// it under the terms of the GNU General Public Licesnse as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
@@ -356,6 +356,7 @@ class block_jmail_mailbox {
             $messagesdata[1] = $messages;
         }
 
+        $this->refresh_contacts();
         return $messagesdata;
     }
 
@@ -371,6 +372,7 @@ class block_jmail_mailbox {
             return false;
         }
 
+        $this->refresh_contacts();
         $destinataries = array();
         // We mix all the users
         $users = array('to' => $to, 'cc' => $cc, 'bcc' => $bcc);
@@ -434,6 +436,7 @@ class block_jmail_mailbox {
         // Two cases, separate groups or message sending restricted
 
         $this->load_groups();
+        $this->refresh_contacts();
         $contacts = array_keys($this->get_contacts(0, '', '', 0));
 
         foreach($destinataries as $key=>$dest) {
@@ -897,7 +900,8 @@ class block_jmail_mailbox {
         $hash = "-$group-$fi-$li-$roleid-";
 
         if (isset($SESSION->jmailcache->contacts[$this->course->id][$hash])) {
-            return $SESSION->jmailcache->contacts[$this->course->id][$hash];
+            // Problem when sending messages to new users.
+            //return $SESSION->jmailcache->contacts[$this->course->id][$hash];
         }
 
         if (!$this->globalinbox) {
