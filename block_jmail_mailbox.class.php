@@ -512,14 +512,16 @@ class block_jmail_mailbox {
         $message = $message->full();
 
         if ($message->destinataries) {
-            $url = $CFG->wwwroot.'/blocks/jmail/mailbox.php?id='+$this->course->id;
+            $url = $CFG->wwwroot.'/blocks/jmail/mailbox.php?id=' . $this->course->id;
             foreach ($message->destinataries as $type => $destinataries) {
                 foreach ($destinataries as $dest) {
                     $userprefs = $this->load_user_preferences($dest->userid);
-                    if ($userprefs->receivecopies and $userto = $DB->get_record('user', array('id' => $dest->userid))) {
-                        $bodytext = get_string('emailcopyheader', 'block_jmail', $url);
-                        $bodytext .= format_text_email($message->body, FORMAT_HTML);
+                    if ($userprefs->receivecopies && ($userto = $DB->get_record('user', array('id' => $dest->userid)))) {
+                        $bodytext = get_string('emailcopyheader', 'block_jmail', $url) . "<br /><br />";
+                        $bodytext .= $message->body . "<br /><br />";
                         $bodytext .= get_string('emailcopyfooter', 'block_jmail', $url);
+
+                        $bodytext = format_text_email($bodytext, FORMAT_HTML);
                         $mailresult = email_to_user($userto, $site->shortname, $message->subject, $bodytext, '', '', '', true, '');
                     }
                 }
