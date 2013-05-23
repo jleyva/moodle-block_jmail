@@ -138,6 +138,23 @@ Unzip the zip file into blocks/jmail, the directory should look like:
 ** ...
 ** version.php
 
+== FAQ ==
+
+=== I didn't receive a copy of the messages in my email account (gmail, yahoo, etc..) ===
+
+In your course Inbox you have to go to Settings and Enable "Receive a copy of the messages ..." option
+
+=== I have enabled "Receive a copy of the messages ... " option but still I don't have receive emails ===
+
+Review your SPAM directory
+You have specify in your Moodle profile settings that you email is not visible (that prevents Moodle to send any email to you, including jmail ones)
+
+=== I don't see all the course users in my contact list ===
+
+* If you are using custom roles, this roles should be marked as "profileroles" roles in Moodle settings, Site Policies, profileroles option
+* or Refresh the page
+* or log-out and log-in again to refresh cachees
+
 
 == Credits ==
 
