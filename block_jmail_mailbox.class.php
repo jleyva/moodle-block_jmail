@@ -86,7 +86,9 @@ class block_jmail_mailbox {
             $this->context = $context;
         }
 
-        $this->instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$this->context->id), '*', MUST_EXIST);
+        $instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$this->context->id), '*', MUST_EXIST);
+        // A block can be present at multiple sites for a course.
+        $this->instance = array_shift($instances);
 
         if (!$blockcontext) {
             $this->blockcontext = get_context_instance(CONTEXT_BLOCK, $this->instance->id, MUST_EXIST);
@@ -1203,9 +1205,10 @@ class block_jmail_mailbox {
                     continue;
                 }
 
-                if (!$instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
+                if (!$instances = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
                     continue;
                 }
+                $instance = array_shift($instances);
 
                 if ($c->id != SITEID) {
                     $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
