@@ -1205,7 +1205,7 @@ class block_jmail_mailbox {
                     continue;
                 }
 
-                if (!$instances = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
+                if (!$instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
                     continue;
                 }
                 $instance = array_shift($instances);
