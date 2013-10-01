@@ -131,7 +131,6 @@ class block_jmail_mailbox {
             $SESSION->jmailcache = new stdClass;
             $SESSION->jmailcache->contacts = array();
             $SESSION->jmailcache->contacts_search = array();
-            $SESSION->jmailcache->mailboxes = array();
             $SESSION->jmailcache->courses = array();
         }
     }
@@ -1187,10 +1186,6 @@ class block_jmail_mailbox {
 
         $mailboxes = array();
 
-        if (!empty($SESSION->jmailcache->mailboxes)) {
-            return $SESSION->jmailcache->mailboxes;
-        }
-
         if (has_capability('moodle/site:config', get_context_instance(CONTEXT_SYSTEM))) {
             $mycourses = $DB->get_records_sql("SELECT DISTINCT(c.id), c.shortname FROM {course} c LEFT JOIN {block_jmail_sent} s ON s.userid = :userid LEFT JOIN {block_jmail} j ON j.id = s.messageid", array('userid' => $USER->id));
         } else {
@@ -1231,10 +1226,6 @@ class block_jmail_mailbox {
             }
         }
 
-
-        if (!empty($mailboxes)) {
-            $SESSION->jmailcache->mailboxes = $mailboxes;
-        }
 
         return $mailboxes;
     }
