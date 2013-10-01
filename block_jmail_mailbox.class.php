@@ -964,7 +964,7 @@ class block_jmail_mailbox {
             $params['search2'] = "$li%";
         }
 
-        if ($this->config->filterfield) {
+        if (!empty($this->config->filterfield)) {
             $wheres[] = "u.".$this->config->filterfield." = :filterfield";
             $params['filterfield'] = $USER->{$this->config->filterfield};
         }
