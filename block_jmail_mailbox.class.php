@@ -25,6 +25,7 @@
  */
 
 
+require_once($CFG->dirroot.'/blocks/jmail/locallib.php');
 require_once($CFG->dirroot.'/blocks/jmail/block_jmail_message.class.php');
 
 class block_jmail_exception extends moodle_exception {
@@ -81,7 +82,7 @@ class block_jmail_mailbox {
         $this->course = $course;
 
         if (!$context) {
-            $this->context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+            $this->context = block_jmail_get_context(CONTEXT_COURSE, $this->course->id);
         } else {
             $this->context = $context;
         }
@@ -91,7 +92,7 @@ class block_jmail_mailbox {
         $this->instance = array_shift($instances);
 
         if (!$blockcontext) {
-            $this->blockcontext = get_context_instance(CONTEXT_BLOCK, $this->instance->id, MUST_EXIST);
+            $this->blockcontext = block_jmail_get_context(CONTEXT_BLOCK, $this->instance->id, MUST_EXIST);
         } else {
             $this->blockcontext = $blockcontext;
         }
@@ -344,7 +345,7 @@ class block_jmail_mailbox {
         }
 
         $dbmessages = $DB->get_records_sql($select.$sql, $params, $start, $this->pagesize);
-        
+
         // Patch for Postgres, ORDER BY not valid in SELECT COUNT...
         list($sql, $order) = explode("ORDER BY", $sql);
         $messagesdata[0] = $DB->count_records_sql("SELECT COUNT('x')".$sql, $params);
@@ -1163,7 +1164,7 @@ class block_jmail_mailbox {
             return false;
         }
 
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        $context = block_jmail_get_context(CONTEXT_USER, $USER->id);
 
         $newfile = new stdClass();
         $newfile->contextid = $context->id;
@@ -1186,7 +1187,7 @@ class block_jmail_mailbox {
 
         $mailboxes = array();
 
-        if (has_capability('moodle/site:config', get_context_instance(CONTEXT_SYSTEM))) {
+        if (has_capability('moodle/site:config', block_jmail_get_context(CONTEXT_SYSTEM))) {
             $mycourses = $DB->get_records_sql("SELECT DISTINCT(c.id), c.shortname FROM {course} c LEFT JOIN {block_jmail_sent} s ON s.userid = :userid LEFT JOIN {block_jmail} j ON j.id = s.messageid", array('userid' => $USER->id));
         } else {
             $mycourses = enrol_get_my_courses();
@@ -1195,8 +1196,8 @@ class block_jmail_mailbox {
         if ($mycourses) {
             foreach ($mycourses as $c) {
 
-                context_instance_preload($c);
-                if (!$context = get_context_instance(CONTEXT_COURSE, $c->id)) {
+                context_helper::preload_from_record($c);
+                if (!$context = block_jmail_get_context(CONTEXT_COURSE, $c->id)) {
                     continue;
                 }
 
@@ -1206,7 +1207,7 @@ class block_jmail_mailbox {
                 $instance = array_shift($instances);
 
                 if ($c->id != SITEID) {
-                    $blockcontext = get_context_instance(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
+                    $blockcontext = block_jmail_get_context(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
 
                     if (!has_capability('block/jmail:viewmailbox', $blockcontext)) {
                         continue;

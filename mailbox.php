@@ -24,6 +24,7 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->dirroot.'/blocks/jmail/locallib.php');
 require_once($CFG->dirroot.'/blocks/jmail/block_jmail_mailbox.class.php');
 
 $id = optional_param('id', SITEID, PARAM_INT);
@@ -41,7 +42,7 @@ if (! ($block = $DB->get_record('block', array('name'=>'jmail', 'visible'=>1))))
 
 require_login($course->id);
 
-$context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
+$context = block_jmail_get_context(CONTEXT_COURSE, $course->id, MUST_EXIST);
 $PAGE->set_context($context);
 
 $mailbox = new block_jmail_mailbox($course, $context);
@@ -65,7 +66,7 @@ $module = array(
                 'fullpath'  => '/blocks/jmail/module.js',
                 'requires'  => array('io', 'event-custom', 'json-parse', 'base', 'node', 'tabview', 'datasource-get', 'datasource-jsonschema', 'datatable-base', 'datatable-datasource', 'datatable-sort', 'panel', 'autocomplete', 'autocomplete-highlighters'),
                 'strings'   => array(array('from','block_jmail'),array('subject','block_jmail'),array('date','block_jmail'),array('messagesent','block_jmail'),
-                                     array('reply','block_jmail'),array('forward','block_jmail'),array('print','block_jmail'), array('messagesaved','block_jmail'),    
+                                     array('reply','block_jmail'),array('forward','block_jmail'),array('print','block_jmail'), array('messagesaved','block_jmail'),
                                      array('addlabel','block_jmail'),array('cc','block_jmail'),array('bcc','block_jmail'),array('messagedeleted','block_jmail'),
                                      array('messagesdeleted','block_jmail'),array('errortorequired','block_jmail'),array('errorsubjectrequired','block_jmail'),
                                      array('to','block_jmail'),array('confirmdelete','block_jmail'), array('label','block_jmail'), array('labels','block_jmail'),
@@ -116,7 +117,7 @@ $jmailcfg = array(
 if ($CFG->version < 2012120300) {
     $PAGE->requires->yui2_lib(array('event', 'dragdrop', 'element', 'animation', 'resize', 'layout', 'widget', 'button', 'editor', 'get', 'connection', 'datasource', 'datatable', 'container', 'utilities', 'menu', 'json', 'paginator'));
 }
- 
+
 //MDL-34741 switch to YUI2 to 2in3 (2.4 and above)
 if ($CFG->version < 2012120300) {
     // 2.1, 2.2, 2.3
@@ -126,6 +127,6 @@ if ($CFG->version < 2012120300) {
 	$PAGE->requires->js_init_call('M.block_jmail.initYAHOO', array($jmailcfg), true, $module);
 }
 
-echo $OUTPUT->header();    
+echo $OUTPUT->header();
 echo $renderer->load_ui($mailbox);
 echo $OUTPUT->footer();

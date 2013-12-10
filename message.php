@@ -43,7 +43,7 @@ if (! ($block = $DB->get_record('block', array('name'=>'jmail', 'visible'=>1))))
 
 
 require_login($course->id);
-$context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
+$context = block_jmail_get_context(CONTEXT_COURSE, $course->id, MUST_EXIST);
 $PAGE->set_context($context);
 
 $mailbox = new block_jmail_mailbox($course, $context);
@@ -64,19 +64,19 @@ if ($messageid and $message->courseid != $course->id) {
 if ($mailbox->cansend) {
 
     $mform = new block_jmail_message_form(null, array('course'=>$course, 'context'=>$blockcontext));
-    
+
     if ($messageid) {
-        
+
         $draftitemid = file_get_submitted_draft_itemid('attachments');
         file_prepare_draft_area($draftitemid, $blockcontext->id, 'block_jmail', 'attachment', $messageid);
-            
+
         $draftideditor = file_get_submitted_draft_itemid('body');
         $message->body = file_prepare_draft_area($draftideditor, $blockcontext->id, 'block_jmail', 'body', $messageid, array('subdirs'=>true), $message->body);
-                
+
         if ($mode != 'edit') {
             $messageid = 0;
         }
-        
+
         if ($mode == 'reply' or $mode == 'replytoall') {
             // TODO - Move the style to another better place
             $message->body = '<br/><br/><blockquote style="border-left: 1px #CCC solid">' . $message->body . '</blockquote>';
@@ -95,7 +95,7 @@ if ($mailbox->cansend) {
     //echo $OUTPUT->standard_head_html();
     echo $mform->get_html();
     $endcode = $PAGE->requires->get_end_code();
-    
+
     // Delete js or css that may break the page
     $endcode = preg_replace('/<link rel.*\.css[^>]*>/i', '', $endcode);
     $endcode = preg_replace('/<script.*\.js[^>]*><\/script>/i', '', $endcode);

@@ -27,6 +27,7 @@
 define('AJAX_SCRIPT', true);
 
 require_once('../../config.php');
+require_once($CFG->dirroot.'/blocks/jmail/locallib.php');
 require_once($CFG->dirroot.'/blocks/jmail/block_jmail_mailbox.class.php');
 
 $id      = required_param('id', PARAM_INT); // course id
@@ -35,7 +36,7 @@ $action  = required_param('action', PARAM_ACTION);
 $PAGE->set_url(new moodle_url('/blocks/jmail/block_jmail_ajax.php', array('id'=>$id)));
 
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
-$context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
+$context = block_jmail_get_context(CONTEXT_COURSE, $course->id, MUST_EXIST);
 $PAGE->set_context($context);
 
 require_login($course);
@@ -63,9 +64,9 @@ switch ($action) {
         $sort = optional_param('sort', 'date', PARAM_ALPHA);
         $direction = optional_param('direction', 'DESC', PARAM_ALPHA);
         $searchtext = optional_param('searchtext', '', PARAM_NOTAGS);
-        
+
         list($totalmessages, $messages) = $mailbox->get_message_headers($label, $start, $sort, $direction, $searchtext);
-                
+
         $data = new stdClass;
         $data->pagesize = $mailbox->pagesize;
         $data->total = $totalmessages;
@@ -73,7 +74,7 @@ switch ($action) {
         $data->sort = $sort;
         $data->direction = $direction;
         $data->messages = $messages;
-        
+
         break;
     case 'get_message':
     case 'get_message_sent':
@@ -99,7 +100,7 @@ switch ($action) {
             $timesent = time();
         }
         $data = $mailbox->save_message($messageid, $to, $cc, $bcc, $subject, $body, $timesent, $attachments, $editoritemid);
-        
+
         break;
     case 'send_draft':
         $messageid = required_param('messageid', PARAM_INT);
@@ -121,7 +122,7 @@ switch ($action) {
         $messageid = required_param('messageid', PARAM_INT);
         $status = required_param('status', PARAM_INT);
         $data = $mailbox->mark_read($messageid, $status);
-        break;   
+        break;
     case 'label_message':
     case 'unlabel_message':
         $messageids = required_param('messageids', PARAM_SEQUENCE);
@@ -147,7 +148,7 @@ switch ($action) {
         $labelid = required_param('labelid', PARAM_INT);
         $name = required_param('name', PARAM_TEXT);
         $data = $mailbox->delete_label($labelid, $name);
-        break;    
+        break;
     case 'create_label':
         $name = required_param('name', PARAM_TEXT);
         $global = optional_param('global', false, PARAM_BOOL);
@@ -157,7 +158,7 @@ switch ($action) {
         $data = $mailbox->get_groups_roles();
         break;
     case 'get_contacts':
-        $group = optional_param('group', 0,PARAM_INT);        
+        $group = optional_param('group', 0,PARAM_INT);
         $roleid = optional_param('roleid', 0, PARAM_INT);
         $fi = optional_param('fi', '', PARAM_ALPHA);
         $li = optional_param('li', '', PARAM_ALPHA);

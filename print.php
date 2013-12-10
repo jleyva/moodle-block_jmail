@@ -41,7 +41,7 @@ if (! ($block = $DB->get_record('block', array('name'=>'jmail', 'visible'=>1))))
 }
 
 require_login($course->id);
-$context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
+$context = block_jmail_get_context(CONTEXT_COURSE, $course->id, MUST_EXIST);
 $PAGE->set_context($context);
 
 $mailbox = new block_jmail_mailbox($course, $context);
@@ -50,6 +50,6 @@ $message = block_jmail_message::get_from_id($messageid);
 
 $renderer = $PAGE->get_renderer('block_jmail');
 
-if ($message and $message->is_mine() and $message->courseid == $course->id) {    
+if ($message and $message->is_mine() and $message->courseid == $course->id) {
     print $renderer->message_print($message);
 }
