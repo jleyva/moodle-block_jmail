@@ -29,27 +29,27 @@
 defined('MOODLE_INTERNAL') || die();
 
 class block_jmail_renderer extends plugin_renderer_base {
-    
+
     /**
      * Returns a plugin icon
      * @param string $icon Icon name
      * @return string
      */
     function plugin_icon($icon) {
-        return '<img src="'.$this->output->pix_url($icon, 'block_jmail') . '" class="icon" alt="" />&nbsp;';        
+        return '<img src="'.$this->output->pix_url($icon, 'block_jmail') . '" class="icon" alt="" />&nbsp;';
     }
-    
+
     /**
-     * Link to the global inbox     
+     * Link to the global inbox
      * @return moodle_url
      */
     function global_inbox() {
         $url = new moodle_url('/blocks/jmail/mailbox.php', array('id'=>SITEID));
-        $inboxname = get_string('viewglobalinbox', 'block_jmail');        
+        $inboxname = get_string('viewglobalinbox', 'block_jmail');
         return html_writer::link($url, $inboxname, array('title'=>$inboxname));
         return '';
     }
-    
+
     /**
      * Returns the course inbox
      * @param object $course Course object
@@ -57,10 +57,10 @@ class block_jmail_renderer extends plugin_renderer_base {
      */
     function course_inbox($course) {
         $url = new moodle_url('/blocks/jmail/mailbox.php', array('id'=>$course->id));
-        $str = get_string('viewinbox', 'block_jmail');        
+        $str = get_string('viewinbox', 'block_jmail');
         return html_writer::link($url, $str, array('title'=>$str));
     }
-    
+
     /**
      * Prints the link to the inbox and the unread messages
      * @param block_jmail_mailbox $mailbox Mailbox object
@@ -71,7 +71,7 @@ class block_jmail_renderer extends plugin_renderer_base {
         $coursename = format_string($mailbox->course->shortname);
         return html_writer::link($url, "$coursename (".get_string('unreadmessages', 'block_jmail', $mailbox->unreadcount).")", array('title'=>$coursename));
     }
-    
+
     /**
      * Load the html of the message print window
      * @param block_jmail_message $message A message object
@@ -79,11 +79,11 @@ class block_jmail_renderer extends plugin_renderer_base {
      */
     function message_print($message) {
         $message = $message->full();
-        
+
         $destname = array('to' => get_string('to', 'block_jmail'),
                           'cc' => get_string('cc', 'block_jmail'),
                           'bcc' => get_string('bcc', 'block_jmail'));
-        
+
         $output = html_writer::start_tag('html');
         $output .= html_writer::start_tag('head');
         $output .= html_writer::tag('script', 'function Print(){document.body.offsetHeight;window.print()};');
@@ -92,19 +92,19 @@ class block_jmail_renderer extends plugin_renderer_base {
         $output .= $this->output->heading($message->subject, 2);
         $output .= $this->output->heading(get_string('from', 'block_jmail').': '.$message->from, 3);
         $output .= $this->output->heading($message->date, 4);
-        
+
         if ($message->destinataries) {
-            foreach ($message->destinataries as $type => $destinataries) {                
+            foreach ($message->destinataries as $type => $destinataries) {
                 foreach ($destinataries as $dest) {
                     $output .= $this->output->heading($destname[$type].': '.$dest->fullname, 5);
                 }
             }
         }
-        
+
         $output .= html_writer::tag('p', $message->body);
         $output .= html_writer::end_tag('body');
         $output .= html_writer::end_tag('html');
-        
+
         return $output;
     }
 
@@ -113,20 +113,20 @@ class block_jmail_renderer extends plugin_renderer_base {
      */
     function load_ui($mailbox) {
         global $CFG;
-        
+
         $mystrings = array('subject','check','new'=>'newmail','inbox', 'drafts' => 'draft',
                            'sent'=>'sent', 'bin','toapprove','approve','delete','mymailboxes',
                            'reply','move','forward','print','addlabel','to','cc','bcc',
                            'send','save','more','preferences', 'markread', 'markunread', 'addlabel',
                            'replytoall' => 'replyall', 'receivecopies' , 'subscription', 'none', 'selected'
                            );
-        
+
         foreach ($mystrings as $key=>$value) {
             $varname = 'str';
             $varname .= is_numeric($key)? $value : $key;
             $$varname = get_string($value, 'block_jmail');
         }
-        
+
         $strfirstname = get_string('firstname');
         $strlastname = get_string('lastname');
         $strroles = get_string('roles');
@@ -134,11 +134,11 @@ class block_jmail_renderer extends plugin_renderer_base {
         $strall = get_string('all');
         $strname = get_string('name');
         $stredit = get_string('edit');
-        
+
         $cansend = $mailbox->cansend;
-        
+
         $loadingicon = $this->plugin_icon('loading');
-        
+
         // TODO - Making it works for AJAX added new labels
         $optionslabels = '';
         if ($labels = $mailbox->get_labels()) {
@@ -146,64 +146,64 @@ class block_jmail_renderer extends plugin_renderer_base {
                 $optionslabels .= '<option value="'.$l->id.'">'.$l->name.'</option>';
             }
         }
-        
-        $alphabetfilter = '<a href="#" class="alphabetreset">'.$strall.'</a> ';        
+
+        $alphabetfilter = '<a href="#" class="alphabetreset">'.$strall.'</a> ';
         $alphabet = explode(',', get_string('alphabet', 'langconfig'));
-        
+
         list($groups, $roles) = $mailbox->get_groups_roles();
-        
+
         $groupsselect = '';
         $rolesselect = '';
-        
-        if (count($groups) > 0) {            
+
+        if (count($groups) > 0) {
             $selector = html_writer::select($groups, 'groupselector', '', array(''=>'choosedots'), array('id'=>'groupselector'));
             $groupsselect = '<input type="submit" id="groupselectorb" name="groupselectorb" value="'.$strgroups.'">'.$selector;
         }
-        
+
         if (count($roles) > 1) {
             $selector = html_writer::select($roles, 'rolesselector', '', null, array('id'=>'rolesselector'));
             $rolesselect = '<input type="submit" id="rolesselectorb" name="rolesselectorb" value="'.$strroles.'">'.$selector;
         }
-                
+
         foreach ($alphabet as $letter) {
-            $alphabetfilter .= '<a href="#" class="alphabet">'.$letter.'</a> ';            
+            $alphabetfilter .= '<a href="#" class="alphabet">'.$letter.'</a> ';
         }
-        
+
         // Main toolbar html
         $toolbar = '<button type="button" id="deleteb" name="deleteb" value="'.$strdelete.'">'.$strdelete.'</button>';
-        
+
         $toolbar .= '<button type="button" id="editb" name="editb" value="'.$stredit.'">'.$stredit.'</button>';
-        
+
         if (!empty($mailbox->config->approvemode) and has_capability('block/jmail:approvemessages', $mailbox->blockcontext)) {
             $toolbar .= '<button type="button" id="approveb" name="approveb" value="'.$strapprove.'">'.$strapprove.'</button>';
         }
-        
+
         if ($cansend) {
             $toolbar .= '<button type="button" id="replyb" name="replyb" value="'.$strreply.'">'.$strreply.'</button>';
             $toolbar .= '<button type="button" id="replytoallb" name="replytoallb" value="'.$strreplytoall.'">'.$strreplytoall.'</button>';
             $toolbar .= '<button type="button" id="forwardb" name="forwardb" value="'.$strforward.'">'.$strforward.'</button>';
         }
-        
+
         $toolbar .= '<button type="button" id="moveb" name="moveb" value="'.$strmove.'">'.$strmove.'</button>';
-        $toolbar .= '    <select id="labelsmenu" name="labelsmenu"> 
-                                <option value="inbox">'.$strinbox.'</option>                                
+        $toolbar .= '    <select id="labelsmenu" name="labelsmenu">
+                                <option value="inbox">'.$strinbox.'</option>
                             </select> ';
         $toolbar .= '<button type="button" id="moreb" name="moreb" value="'.$strmore.'">'.$strmore.'</button>';
-        $toolbar .= '    <select id="moremenu" name="moremenu"> 
+        $toolbar .= '    <select id="moremenu" name="moremenu">
                                 <option value="markread">'.$strmarkread.'</option>
-                                <option value="markunread">'.$strmarkunread.'</option>                                
+                                <option value="markunread">'.$strmarkunread.'</option>
                             </select> ';
-        $toolbar .= '<button type="button" id="printb" name="printb" value="'.$strprint.'">'.$strprint.'</button>';                            
+        $toolbar .= '<button type="button" id="printb" name="printb" value="'.$strprint.'">'.$strprint.'</button>';
 
         // Action buttons html
-        $actionbuttons = '<button type="button" id="checkmail" name="checkmail" value="'.$strcheck.'">'.$strcheck.'</button>';        
+        $actionbuttons = '<button type="button" id="checkmail" name="checkmail" value="'.$strcheck.'">'.$strcheck.'</button>';
         if ($cansend) {
             $actionbuttons .= '<button type="button" id="newmail" name="newmail" value="'.$strnew.'">'.$strnew.'</button>';
         }
-        
+
         // Contacts html
         $contacts = '';
-        
+
         if ($cansend) {
             $contacts = '
                     <div id="contact_list_filter">
@@ -212,7 +212,7 @@ class block_jmail_renderer extends plugin_renderer_base {
                         <b>'.$strfirstname.'</b>
                         <div id="firstnamefilter">'.$alphabetfilter.'</div>
                         <b>'.$strlastname.'</b>
-                        <div id="lastnamefilter">'.$alphabetfilter.'</div>                        
+                        <div id="lastnamefilter">'.$alphabetfilter.'</div>
                     </div>
                     <div id="contact_list">
                         <div id="contact_list_users">'.$loadingicon.'</div>
@@ -232,23 +232,23 @@ class block_jmail_renderer extends plugin_renderer_base {
             <li class="inbox">
                 <em></em>
                 <a href="#" id="toapprove">'.$strtoapprove.'</a>
-            </li>';                            
+            </li>';
         }
-        
+
         // Preferences and labels
-        
+
         $preferences = '';
 
         if ($mailbox->canmanagelabels) {
             $preferences .= '<p><img src="'.$this->output->pix_url('add', 'block_jmail').'"><a href="#" id="addlabel">&nbsp;&nbsp;'.$straddlabel.'</a></p>';
         }
-        
+
         if ($mailbox->canmanagepreferences) {
             $preferences .= '<p><img src="'.$this->output->pix_url('settings', 'block_jmail').'"><a href="#" id="preferences">&nbsp;&nbsp;'.$strpreferences.'</a></p>';
         }
-        
+
         // My mailboxes
-        
+
         $mymailboxes = '';
         if ($mailboxes = $mailbox::get_my_mailboxes()) {
             $mymailboxes .= '<button type="button" id="mailboxesb" name="mailboxesb" value="'.$strmymailboxes.'">'.$strmymailboxes.'</button>';
@@ -268,35 +268,40 @@ class block_jmail_renderer extends plugin_renderer_base {
                 $mymailboxes = '';
             }
         }
-        
-        
+
+
         // Tinymce editor
         $editor = editors_get_preferred_editor(FORMAT_HTML);
         $editor->use_editor('body');
-        
+
         // Moodle 2.3 and onwards
         if ($CFG->version >= 2012062500) {
             $script = '//<![CDATA[
                 M.yui.add_module({"core_dndupload":{"name":"core_dndupload","fullpath":"'.$CFG->wwwroot.'/lib\/form\/dndupload.js","requires":["node","event","json","core_filepicker"]},"form_filemanager":{"name":"form_filemanager","fullpath":"'.$CFG->wwwroot.'/lib\/form\/filemanager.js","requires":["core_filepicker","base","io-base","node","json","core_dndupload","panel","resize-plugin","dd-plugin"]}});
-                
+
                 //]]>';
         }
         else {
             $script = '//<![CDATA[
                 M.yui.add_module({"editor_tinymce":{"name":"editor_tinymce","fullpath":"'.$CFG->wwwroot.'/lib\/editor\/tinymce\/module.js","requires":[]},"form_filemanager":{"name":"form_filemanager","fullpath":"'.$CFG->wwwroot.'/lib\/form\/filemanager.js","requires":["core_filepicker","base","io","node","json","yui2-button","yui2-container","yui2-layout","yui2-menu","yui2-treeview"]}});
-                
+
                 //]]>';
         }
 
+        $warnings = '';
+        if (debugging('', DEBUG_NORMAL) and !empty($CFG->debugdisplay)) {
+            $warnings = $this->output->error_text(get_string('errordebugging', 'block_jmail')) . '<br />';
+        }
+
         return '
-    
+
     <script type="text/javascript">
     ' . $script . '
     </script>
-    
+            ' . $warnings . '
             <div id="jmailui">
                 <div id="jmailleft">
-                    <div id="action_buttons">                        
+                    <div id="action_buttons">
                         '.$actionbuttons.'
                     </div>
                     <div id="search_bar">
@@ -327,13 +332,13 @@ class block_jmail_renderer extends plugin_renderer_base {
                         </div>
                         <div id="menulabel">
                         </div>
-                        
+
                         '.$preferences.'
-                        
+
                         <div id="mymailboxes">
                         '.$mymailboxes.'
                         </div>
-                        
+
                         <div id="loginfo" style="overflow: auto; width: 100%; height: 200px; border: solid 1px red; display: none">
                         </div>
                     </div>
@@ -343,11 +348,11 @@ class block_jmail_renderer extends plugin_renderer_base {
                         <div id="jmailtoolbar">
                             '.$toolbar.'
                         </div>
-                        <div id="maillist">                                        
-                        </div>                                    
+                        <div id="maillist">
+                        </div>
                     </div>
-                    <div id="mailcontents">                                
-                    </div>                                                   
+                    <div id="mailcontents">
+                    </div>
                 </div>
                 <div id="jmailright">
                     '.$contacts.'
@@ -356,7 +361,7 @@ class block_jmail_renderer extends plugin_renderer_base {
             <div id="messagepanel"></div>
             <div id="newemailpanel" style="display: none">
                 <div class="hd">'.$strnew.'</div>
-                <div id="newemailform" class="bd mform">                                     
+                <div id="newemailform" class="bd mform">
                     <div class="fitem">
                         <div class="fitemtitle">
                             <label for="composetoac">'.$strto.'</label>
@@ -365,7 +370,7 @@ class block_jmail_renderer extends plugin_renderer_base {
                             <input type="text" name="composetoac" id="composetoac" value=""  size="50">
                             <div id="composetolist"></div>
                         </div>
-                    </div>                            
+                    </div>
                     <div class="fitem">
                         <div class="fitemtitle">
                             <label for="composeccac">'.$strcc.'</label>
@@ -377,7 +382,7 @@ class block_jmail_renderer extends plugin_renderer_base {
                     </div>
                     <div class="fitem">
                         <div class="fitemtitle">
-                            <label for="composebccac">'.$strbcc.'</label><br>                            
+                            <label for="composebccac">'.$strbcc.'</label><br>
                         </div>
                         <div class="felement ftext">
                             <input type="text" name="composebccac" id="composebccac" value=""  size="50">
@@ -386,24 +391,24 @@ class block_jmail_renderer extends plugin_renderer_base {
                     </div>
                     <div class="fitem">
                         <div class="fitemtitle">
-                            <label for="subject">'.$strsubject.'</label><br>                            
+                            <label for="subject">'.$strsubject.'</label><br>
                         </div>
                         <div class="felement ftext">
-                            <input type="text" name="subject" id="subject" value=""  size="50">                                    
+                            <input type="text" name="subject" id="subject" value=""  size="50">
                         </div>
                     </div>
-    
+
                     <div id="newemailformremote"></div>
-                    
+
                     <div class="fitem">
-                        <div class="fitemtitle">                                
+                        <div class="fitemtitle">
                         </div>
                         <div class="felement ftext">
                             <input type="button" name="sendbutton" id="sendbutton" value="'.$strsend.'">
                             <input type="button" name="savebutton" id="savebutton" value="'.$strsave.'">
                         </div>
                     </div>
-                    
+
                     <input type="hidden" name="to" id="hiddento">
                     <input type="hidden" name="cc" id="hiddencc">
                     <input type="hidden" name="bcc" id="hiddenbcc">
@@ -433,7 +438,7 @@ class block_jmail_renderer extends plugin_renderer_base {
                                         <option value="">'.$strnone.'</option>
                                         <option value="receivecopies">'.$strreceivecopies.'</option>
                                     </select>
-                                </p>                               
+                                </p>
                             </fieldset>
                         </form>
                     </div>

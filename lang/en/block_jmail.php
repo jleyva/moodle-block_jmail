@@ -48,6 +48,9 @@ $string['draft'] = 'Draft';
 $string['enableglobalinbox'] = 'Enable global inbox';
 $string['emailcopyheader'] = 'This is a copy of a message you have received in one of your courses mailbox.<br /> You can view the full message here: {$a}';
 $string['emailcopyfooter'] = '';
+$string['errordebugging'] = 'It seems that your installation is running in DEBUG mode with display errors in the HTML page. This may cause some functionallities to don\'t work.
+<br />
+Please, disable "Display debug messages" in Site administration / Development / Debugging';
 $string['errorsubjectrequired'] = 'The subject is required';
 $string['errortorequired'] = 'At least one destinatary in the to field is required';
 $string['filesaved'] = 'File saved';
