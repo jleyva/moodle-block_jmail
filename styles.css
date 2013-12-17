@@ -1,4 +1,4 @@
-#jmailtoolbar .yui-button {    
+#jmailtoolbar .yui-button {
     float: left;
     position: relative;
     color: black;
@@ -24,7 +24,7 @@
     clear: both;
 }
 
-#label_list ul li em {    
+#label_list ul li em {
     background-repeat: no-repeat;
     float: left;
     width: 16px;
@@ -52,19 +52,19 @@
 }
 
 #label_list li a {
-    padding: 3px;   
+    padding: 3px;
 }
 
-.yui-skin-sam .yui-layout .yui-layout-hd { 
-    background: none; 
+.yui-skin-sam .yui-layout .yui-layout-hd {
+    background: none;
     border: 1px solid #808080;
     background-color: #F2F2F2;
 }
 
-.yui-skin-sam .yui-layout .yui-layout-unit div.yui-layout-hd h2 { 
+.yui-skin-sam .yui-layout .yui-layout-unit div.yui-layout-hd h2 {
     font-weight: normal;
     background-color: #F2F2F2;
-    color: black; 
+    color: black;
     padding: 2px;
     font-size: 1em;
 }
@@ -241,4 +241,8 @@
 
 #newemailpanel .ft {
     border: none;
+}
+
+.yui-skin-sam .yui-panel-container {
+    z-index: 2;
 }
