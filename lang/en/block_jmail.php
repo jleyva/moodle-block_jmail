@@ -60,6 +60,7 @@ $string['forward'] = 'Forward';
 $string['from'] = 'From';
 $string['fw'] = 'Fw:';
 $string['inbox']= 'Inbox';
+$string['jmail:addinstance']= 'Add a jmail instance';
 $string['label'] = 'Label';
 $string['labels'] = 'Labels';
 $string['last'] = 'Last >>';

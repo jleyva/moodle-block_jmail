@@ -1244,6 +1244,10 @@ M.block_jmail.composeMessage = function(mode, message) {
             var elementsToEval = ["Y.use(\"moodle-core-formchangechecker\"","Y.use('core_filepicker'","Y.use('editor_tinymce'","Y.use('editor_tinymce'","Y.use('form_filemanager'","Y.use('form_filemanager'"];
         }
 
+        // Clean Javascript.
+        formHtml = formHtml.replace(/\s*M\.util\.js_complete[^;]*;/g, "");
+        formHtml = formHtml.replace(/\s*M\.util\.js_pending[^;]*;/g, "");
+
         for (var el in elementsToEval) {
 
             var startIndex = formHtml.indexOf(elementsToEval[el]);
