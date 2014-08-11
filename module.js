@@ -57,6 +57,11 @@ M.block_jmail.init = function(Y, cfg) {
     // Moodle 2.3 requires a bigger height panel
     var panelHeight = (M.block_jmail.cfg.version >= 2012062500)? "800px": "600px";
 
+    // Moodle 2.7 and onwards
+    if (cfg.version >= 2014051200) {
+        panelHeight = "900px";
+    }
+
     Y.one('#newemailpanel').setStyle('display', 'block');
     var panel = new YAHOO.widget.Panel("newemailpanel", {
         draggable: true,
@@ -1244,6 +1249,11 @@ M.block_jmail.composeMessage = function(mode, message) {
             var elementsToEval = ["Y.use(\"moodle-core-formchangechecker\"","Y.use('core_filepicker'","Y.use('editor_tinymce'","Y.use('editor_tinymce'","Y.use('form_filemanager'","Y.use('form_filemanager'"];
         }
 
+        // Moodle 2.7 and onwards
+        if (cfg.version >= 2014051200) {
+            elementsToEval = ["Y.use(\"moodle-core-formchangechecker\"","Y.use('core_filepicker'", "Y.use(\"moodle-editor_atto-editor\"","Y.use('form_filemanager'","Y.use('form_filemanager'"];
+        }
+
         // Clean Javascript.
         formHtml = formHtml.replace(/\s*M\.util\.js_complete[^;]*;/g, "");
         formHtml = formHtml.replace(/\s*M\.util\.js_pending[^;]*;/g, "");
@@ -1294,8 +1304,11 @@ M.block_jmail.saveMessage = function(action) {
         return false;
     }
 
-    window.tinyMCE.triggerSave();
-    window.tinyMCE.get('id_body').setProgressState(1);
+    if (window.tinyMCE) {
+        window.tinyMCE.triggerSave();
+        window.tinyMCE.get('id_body').setProgressState(1);
+    }
+
     var body = encodeURIComponent(Y.one('#id_body').get("value"));
     var attachments = form.get("attachments").get("value");
     var editoritemid = form.get("body[itemid]").get("value");
@@ -1315,7 +1328,10 @@ M.block_jmail.saveMessage = function(action) {
         on: {
             complete: function(id, o, args) {
                 var cfg = M.block_jmail.cfg;
-                window.tinyMCE.get('id_body').setProgressState(0);
+                if (window.tinyMCE) {
+                    window.tinyMCE.get('id_body').setProgressState(0);
+                }
+
                 M.block_jmail.app.composePanel.hide();
                 // Remove all the form elements
                 // We do a cascade remove for some firefox issues
@@ -1338,8 +1354,12 @@ M.block_jmail.saveMessage = function(action) {
                 }
 
                 M.block_jmail.showMessage(messageAlert, messageTime);
-                window.tinyMCE.remove(window.tinyMCE.get('id_body'));
-                window.tinyMCE.execCommand('mceRemoveControl',true,'id_body');
+
+                if (window.tinyMCE) {
+                    window.tinyMCE.remove(window.tinyMCE.get('id_body'));
+                    window.tinyMCE.execCommand('mceRemoveControl',true,'id_body');
+                }
+
                 Y.one("#id_body_ifr").remove();
                 Y.one("#mform1").remove();
                 Y.one('#newemailformremote').setContent('');
