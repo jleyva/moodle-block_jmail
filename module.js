@@ -1250,7 +1250,7 @@ M.block_jmail.composeMessage = function(mode, message) {
         }
 
         // Moodle 2.7 and onwards
-        if (cfg.version >= 2014051200) {
+        if (cfg.version >= 2014051200 && cfg.editor != 'tinymce') {
             elementsToEval = ["Y.use(\"moodle-core-formchangechecker\"","Y.use('core_filepicker'", "Y.use(\"moodle-editor_atto-editor\"","Y.use('form_filemanager'","Y.use('form_filemanager'"];
         }
 

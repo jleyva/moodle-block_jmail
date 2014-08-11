@@ -94,6 +94,15 @@ if ($userto = $DB->get_record('user', array('id' => $to, 'deleted' => 0))) {
     }
 }
 
+$editor = 'tinymce';
+if ($CFG->version >= 2014051200) {
+    if ($USER->preference) {
+        if (!empty($USER->preference['htmleditor'])) {
+            $editor = $USER->preference['htmleditor'];
+        }
+    }
+}
+
 $jmailcfg = array(
         'wwwroot' => $CFG->wwwroot,
         'courseid' => $course->id,
@@ -109,6 +118,7 @@ $jmailcfg = array(
         'usertoid' => $usertoid,
         'usertoname' => $usertoname,
         'version' => $CFG->version,
+        'editor' => $editor
         );
 
 //$PAGE->requires->js('/lib/editor/tinymce/tiny_mce/3.4.2/tiny_mce.js');
