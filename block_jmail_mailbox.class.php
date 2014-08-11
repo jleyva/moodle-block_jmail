@@ -261,7 +261,8 @@ class block_jmail_mailbox {
                         break;
             case 'sent' :
                         $select .= ', s.userid';
-                        $params = array('sender' => $USER->id, 'course' => $this->course->id, 'timesent' => 0, 'userdeleted' => 0);
+                        $params = array('sender' => $USER->id, 'course' => $this->course->id,
+                                            'timesent' => 0, 'userdeleted' => 0, 'type' => 'to');
                         if ($this->globalinbox) {
                             unset($params['course']);
                             $params = array_merge($params, $uparams);
@@ -269,7 +270,7 @@ class block_jmail_mailbox {
 
                         $sql = "
                             FROM {block_jmail} m
-                            JOIN {block_jmail_sent} s ON m.id = s.messageid
+                            JOIN {block_jmail_sent} s ON m.id = s.messageid AND s.type = :type
                             JOIN {user} u ON u.id = s.userid
                             WHERE
                             sender = :sender AND courseid $coursein AND timesent > :timesent
