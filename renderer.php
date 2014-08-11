@@ -368,7 +368,7 @@ class block_jmail_renderer extends plugin_renderer_base {
                         </div>
                         <div class="felement ftext">
                             <input type="text" name="composetoac" id="composetoac" value=""  size="50">
-                            <div id="composetolist"></div>
+                            <div id="composetolist" class="composelist"></div>
                         </div>
                     </div>
                     <div class="fitem">
@@ -377,7 +377,7 @@ class block_jmail_renderer extends plugin_renderer_base {
                         </div>
                         <div class="felement ftext">
                             <input type="text" name="composeccac" id="composeccac" value=""  size="50">
-                            <div id="composecclist"></div>
+                            <div id="composecclist" class="composelist"></div>
                         </div>
                     </div>
                     <div class="fitem">
@@ -386,7 +386,7 @@ class block_jmail_renderer extends plugin_renderer_base {
                         </div>
                         <div class="felement ftext">
                             <input type="text" name="composebccac" id="composebccac" value=""  size="50">
-                            <div id="composebcclist"></div>
+                            <div id="composebcclist" class="composelist"></div>
                         </div>
                     </div>
                     <div class="fitem">

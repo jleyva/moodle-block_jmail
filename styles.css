@@ -165,9 +165,11 @@
 }
 
 #contact_list_users .fullname input{
-    font-size: 0.7em;
+    font-size: 0.8em;
     width: 50px;
     height: 15px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .jmail-even{
@@ -245,4 +247,8 @@
 
 .yui-skin-sam .yui-panel-container {
     z-index: 2;
+}
+
+.composelist {
+    display: inline;
 }
