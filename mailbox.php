@@ -103,6 +103,9 @@ if ($CFG->version >= 2014051200) {
     }
 }
 
+$usercontext = block_jmail_get_context(CONTEXT_USER, $USER->id);
+$privatefiles = has_capability('moodle/user:manageownfiles', $usercontext);
+
 $jmailcfg = array(
         'wwwroot' => $CFG->wwwroot,
         'courseid' => $course->id,
@@ -118,7 +121,8 @@ $jmailcfg = array(
         'usertoid' => $usertoid,
         'usertoname' => $usertoname,
         'version' => $CFG->version,
-        'editor' => $editor
+        'editor' => $editor,
+        'privatefiles' => $privatefiles
         );
 
 //$PAGE->requires->js('/lib/editor/tinymce/tiny_mce/3.4.2/tiny_mce.js');

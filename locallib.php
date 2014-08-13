@@ -58,5 +58,11 @@ function block_jmail_get_context($context, $id = null, $flags = null) {
         } else {
             return get_context_instance($context, $id, $flags);
         }
+    } else if ($context == CONTEXT_USER) {
+        if (class_exists('context_user')) {
+            return context_user::instance($id, $flags);
+        } else {
+            return get_context_instance($context, $id, $flags);
+        }
     }
 }

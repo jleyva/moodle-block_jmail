@@ -855,7 +855,10 @@ M.block_jmail.loadMessage = function(messageId, courseId) {
                         attachmentsHtml = '<div class="attachments"><p><strong>'+M.str.block_jmail.attachments+'</strong></p>';
                         for (var el in message.attachments) {
                             var attach = message.attachments[el];
-                            attachmentsHtml += '<p>'+attach.iconimage+' '+attach.filename+'  <a class="downloadattachment" href="'+attach.path+'">'+M.str.block_jmail.download+'</a> | <a href="" class="savetoprivate">'+M.str.block_jmail.savetomyprivatefiles+'</a></p>';
+                            attachmentsHtml += '<p>'+attach.iconimage+' '+attach.filename+'  <a class="downloadattachment" href="'+attach.path+'">'+M.str.block_jmail.download+'</a>';
+                            if (M.block_jmail.cfg.privatefiles) {
+                                attachmentsHtml +=' | <a href="" class="savetoprivate">'+M.str.block_jmail.savetomyprivatefiles+'</a></p>';
+                            }
                         }
                         attachmentsHtml += '</div>';
                     }
@@ -877,16 +880,17 @@ M.block_jmail.loadMessage = function(messageId, courseId) {
                         e.target.ancestor('span').remove();
                     });
 
-                    Y.all('.attachments .savetoprivate').on('click', function(e){
-                        e.preventDefault();
-                        var myfile = e.target.ancestor('p').one('.downloadattachment').get('href');
-                        myfile = myfile.replace(cfg.wwwroot+'/pluginfile.php','');
+                    if (M.block_jmail.cfg.privatefiles) {
+                        Y.all('.attachments .savetoprivate').on('click', function(e){
+                            e.preventDefault();
+                            var myfile = e.target.ancestor('p').one('.downloadattachment').get('href');
+                            myfile = myfile.replace(cfg.wwwroot+'/pluginfile.php','');
 
-                        var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=save_private&sesskey='+cfg.sesskey+'&file='+myfile;
-                        Y.io(url, {sync: true});
-                        M.block_jmail.showMessage(M.str.block_jmail.filesaved);
-                    });
-
+                            var url = 'block_jmail_ajax.php?id='+cfg.courseid+'&action=save_private&sesskey='+cfg.sesskey+'&file='+myfile;
+                            Y.io(url, {sync: true});
+                            M.block_jmail.showMessage(M.str.block_jmail.filesaved);
+                        });
+                    }
                 }
             }
         }
