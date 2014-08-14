@@ -88,6 +88,13 @@ class block_jmail_mailbox {
         }
 
         $instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$this->context->id));
+
+        // Try my-index and user-profile.
+        if (!$instances) {
+            $system = block_jmail_get_context(CONTEXT_SYSTEM);
+            $instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid' => $system->id));
+        }
+
         // A block can be present at multiple sites for a course.
         $this->instance = array_shift($instances);
 
