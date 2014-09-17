@@ -94,7 +94,7 @@ if ($userto = $DB->get_record('user', array('id' => $to, 'deleted' => 0))) {
     }
 }
 
-$editor = 'tinymce';
+$editor = '';
 if ($CFG->version >= 2014051200) {
     if ($USER->preference) {
         if (!empty($USER->preference['htmleditor'])) {
