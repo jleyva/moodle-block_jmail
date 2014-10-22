@@ -41,13 +41,19 @@ $PAGE->set_context($context);
 
 require_login($course);
 
-$mailbox = new block_jmail_mailbox($course, $context);
-
 require_sesskey();
+
+$err = new stdClass();
+
+if (!$mailbox = new block_jmail_mailbox($course, $context)) {
+    $err->error = "Invalid mailbox";
+    echo json_encode($err);
+    die;
+}
 
 // TODO, check block disabled or instance not visible?
 
-$err = new stdClass();
+
 if (isguestuser()) {
     $err->error = get_string('noguest');
     die(json_encode($err));

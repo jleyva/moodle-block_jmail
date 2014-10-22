@@ -30,7 +30,7 @@ class block_jmail extends block_list {
         // Default case: the block can be used in courses and site index, but not in activities
         return array('all' => true, 'mod' => false, 'tag' => false);
     }
-    
+
     public function has_config() {
         return true;
     }
@@ -38,9 +38,9 @@ class block_jmail extends block_list {
     public function instance_allow_config() {
         return true;
     }
-    
+
     public function specialization() {
-        
+
         if (empty($this->config->title)) {
             $this->title = get_string('pluginname','block_jmail');
         } else {
@@ -55,7 +55,7 @@ class block_jmail extends block_list {
             $this->content = '';
             return $this->content;
         }
-        
+
         if ($this->content !== null) {
             return $this->content;
         }
@@ -64,7 +64,7 @@ class block_jmail extends block_list {
         if (!isloggedin() or isguestuser()) {
             return '';
         }
-        
+
         require_once(dirname(__FILE__).'/block_jmail_mailbox.class.php');
 
         $this->content = new stdClass();
@@ -94,11 +94,12 @@ class block_jmail extends block_list {
                 }
             }
         } else {
-            $this->content->footer = $renderer->course_inbox($this->page->course);         
-            if ($mailbox = new block_jmail_mailbox($this->page->course)) {
+            $this->content->footer = $renderer->course_inbox($this->page->course);
+            $context = block_jmail_get_context(CONTEXT_COURSE, $this->page->course->id);
+            if ($mailbox = new block_jmail_mailbox($this->page->course, $context)) {
                 if ($unreadmails = $mailbox->count_unread_messages()) {
                     $mailbox->pagesize = 5;
-                    if ($messages = $mailbox->get_message_headers('unread', 0, 'date', 'desc', '')) {                        
+                    if ($messages = $mailbox->get_message_headers('unread', 0, 'date', 'desc', '')) {
                         foreach ($messages[1] as $m) {
                             $strfrom = get_string('from', 'block_jmail');
                             $messagetext = shorten_text($m->subject,25)." (<i>$strfrom: ".shorten_text($m->from,15).")</i>";
@@ -110,7 +111,7 @@ class block_jmail extends block_list {
                     $this->content->icons[] = $newmailicon;
                 }
             }
-        }        
+        }
 
         if (!count($this->content->items)) {
 			$this->content->items[] = get_string('nonewmessages', 'block_jmail');
@@ -124,7 +125,7 @@ class block_jmail extends block_list {
         $this->title = get_string('pluginname', 'block_jmail');
     }
 
-    public function instance_allow_multiple() {        
+    public function instance_allow_multiple() {
         return false;
     }
 

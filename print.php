@@ -44,7 +44,9 @@ require_login($course->id);
 $context = block_jmail_get_context(CONTEXT_COURSE, $course->id, MUST_EXIST);
 $PAGE->set_context($context);
 
-$mailbox = new block_jmail_mailbox($course, $context);
+if (!$mailbox = new block_jmail_mailbox($course, $context)) {
+    throw new moodle_exception('Invalid mailbox');
+}
 
 $message = block_jmail_message::get_from_id($messageid);
 

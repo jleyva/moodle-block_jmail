@@ -54,8 +54,11 @@ class block_jmail_mailbox {
     public $cansend = false;
     public $cansendtoall = false;
     public $cansendtomanagers = false;
-
     public $canmanagelabels = false;
+    public $canmanagepreferences = false;
+    public $canapprovemessages = false;
+
+    public $globalinbox = false;
 
     /** @var integer Current user unreaded messages in this mailbox */
     public $unreadcount = 0;
@@ -105,17 +108,17 @@ class block_jmail_mailbox {
         }
 
         if ($invisible = $DB->get_records('block_positions', array('blockinstanceid'=>$this->instance->id, 'visible'=>0))) {
-            throw new moodle_exception('invalidcourseid', 'error');
+            return false;
         }
 
         if ($this->course->id != SITEID and !has_capability('block/jmail:viewmailbox', $this->blockcontext)) {
-            throw new moodle_exception('invalidcourseid', 'error');
+            return false;
         }
 
         $this->globalinbox = ($this->course->id == SITEID)? true : false;
 
         if ($this->globalinbox and empty($CFG->block_jmail_enable_globalinbox)) {
-            throw new moodle_exception('invalidcourseid', 'error');
+            return false;
         }
 
         // Block settings.

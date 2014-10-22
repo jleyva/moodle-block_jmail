@@ -47,7 +47,9 @@ function block_jmail_pluginfile($course, $cm, $context, $filearea, $args, $force
     $coursecontext = block_jmail_get_context(CONTEXT_COURSE, $course->id, MUST_EXIST);
 
     // The mailbox constructor does the permission validation
-    $mailbox = new block_jmail_mailbox($course, $coursecontext, $context);
+    if (!$mailbox = new block_jmail_mailbox($course, $coursecontext, $context)) {
+        return;
+    }
 
     $messageid = (int)array_shift($args);
 
