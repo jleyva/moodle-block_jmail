@@ -252,3 +252,84 @@
 .composelist {
     display: inline;
 }
+
+/* Clear for low resolutions*/
+
+@media (max-width:959px) {
+	
+	
+
+	#jmailui, 
+	#jmailui .yui-layout, 
+	#jmailui .yui-layout-wrap,
+	#jmailui .yui-layout-resize, 
+	#jmailui .yui-layout-unit, 
+	#jmailui .yui-layout-bd,
+	#jmailui .yui-layout-doc{
+		position:initial !important;
+		height:auto !important;
+		width:auto !important;
+	}
+/*
+	#jmailui, #jmailui div {
+		height:auto !important;
+		width:auto !important;
+		/*float:none !important;	*/
+	/*}*/
+
+	#jmailui .yui-resize-handle {
+		display:none;	
+	}
+
+	#jmailui #contact_list_users {
+		height:150px !important;
+		overflow-y:auto;	
+	}
+
+	#mailarea, #mailarea table {
+		width:100% !important;
+	}
+
+	#mailarea .yui-dt-bd,
+	#mailarea .yui-dt-hd {
+		width:100% !important;
+	}
+
+        #newemailpanel {
+		clear:both;	
+	}
+
+	#newemailform #fitem_id_attachments{
+		display:none;
+	}
+
+	#newemailform .fitemtitle {
+		float:left;	
+		width:auto !important;
+	}
+		
+	#newemailform .fitemtitle label {
+		width: 70px !important;	
+	}
+
+	
+	#newemailpanel .hd {
+		display:none;	
+	}
+	
+	
+	#newemailform.mform .fitem .felement {
+	    border-width: 0;
+	    margin-left: 11%;
+	    width: 80%;
+	}
+
+	#newemailform .felement.feditor iframe {
+		max-height:none !important;	
+	}
+	
+	#mymailboxes .yui-module.yui-overlay.yuimenu.yui-button-menu.yui-menu-button-menu {
+		position:absolute !important;	
+	}
+	
+}

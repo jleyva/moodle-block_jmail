@@ -63,22 +63,38 @@ M.block_jmail.init = function(Y, cfg) {
     }
 
     Y.one('#newemailpanel').setStyle('display', 'block');
-    var panel = new YAHOO.widget.Panel("newemailpanel", {
-        draggable: true,
-        modal: false,
-        width: "800px",
-        height: panelHeight,
-        autofillheight: "body",
-        visible: false,
-        zindex:2,
-        top: "50px",
-        context: ['jmailui', 'tl', 'tl', null, [200, 0]]
-    });
+    var resWidth = Y.one('document').get('winWidth');
+    M.block_jmail.logInfo('Window width:'+resWidth);
+    var panel = null
+    if ( resWidth>= 960) {
+	M.block_jmail.logInfo('Loading Panel Config');
+	        panel = new YAHOO.widget.Panel("newemailpanel", {
+		draggable: true,
+		modal: false,
+		width: "800px",
+		height: panelHeight,
+		autofillheight: "body",
+		visible: false,
+		zindex:2,
+		top: "50px",
+		context: ['jmailui', 'tl', 'tl', null, [200, 0]]
+	    });
+	 panel.render(document.body);
+    }
+    else {
+	M.block_jmail.logInfo('Loading Module Config');
+	panel = new YAHOO.widget.Module("newemailpanel", {
+		visible: false,
+		context: ['jmailui', 'tl', 'tl', null, [200, 0]]
+	    });
+	 panel.render(Y.one('#jmailleft #action_buttons'),document.body);
+    }
+    
 
     panel.subscribe("hide", function (event) {
         M.block_jmail.newemailOpen = false;
     });
-    panel.render(document.body);
+    //panel.render(Y.one('#jmailleft #actionbuttons'),document.body);
     M.block_jmail.app.composePanel = panel;
 
     //var fptpl = Y.one("#filepickertpl");
