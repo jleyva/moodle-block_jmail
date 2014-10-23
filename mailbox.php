@@ -104,6 +104,13 @@ if ($CFG->version >= 2014051200) {
         }
     }
 }
+if (!$editor) {
+    require_once($CFG->libdir.'/editorlib.php');
+    $editors = array_keys(editors_get_enabled());
+    if (count($editors) > 1) {
+        $editor = array_shift($editors);
+    }
+}
 
 $usercontext = block_jmail_get_context(CONTEXT_USER, $USER->id);
 $privatefiles = has_capability('moodle/user:manageownfiles', $usercontext);
