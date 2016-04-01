@@ -49,8 +49,6 @@ if (!$mailbox = new block_jmail_mailbox($course, $context)) {
     throw new moodle_exception('Invalid mailbox');
 }
 
-add_to_log($course->id, 'jmail', 'view mailbox');
-
 // TODO, check block disabled or instance not visible?
 
 $PAGE->blocks->show_only_fake_blocks();

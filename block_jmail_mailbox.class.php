@@ -412,7 +412,6 @@ class block_jmail_mailbox {
             $message->timesent = $timesent;
             $message->update($destinataries, $attachments, $editoritemid);
 
-            add_to_log($this->course->id, 'jmail', 'message updated');
             $this->send_copy($message);
         } else {
 
@@ -433,7 +432,6 @@ class block_jmail_mailbox {
             $message = new block_jmail_message($message);
             $message->save($destinataries, $attachments, $editoritemid);
 
-            add_to_log($this->course->id, 'jmail', 'message saved');
             $this->send_copy($message);
         }
 
@@ -525,8 +523,6 @@ class block_jmail_mailbox {
         if (!$message->timesent or !$message->approved) {
             return false;
         }
-
-        add_to_log($this->course->id, 'jmail', 'message sent');
 
         $message = $message->full();
 
@@ -765,7 +761,6 @@ class block_jmail_mailbox {
 
 
         if ($labelid = $DB->insert_record('block_jmail_label', $label)) {
-            add_to_log($this->course->id, 'jmail', 'label created');
             return $labelid;
         }
         return false;
@@ -962,7 +957,10 @@ class block_jmail_mailbox {
         $params['courseid'] = $this->course->id;
 
         // performance hacks - we preload user contexts together with accounts
-        list($ccselect, $ccjoin) = context_instance_preload_sql('u.id', CONTEXT_USER, 'ctx');
+
+        $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
+        $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = u.id AND ctx.contextlevel = :contextlevel)";
+        $params['contextlevel'] = CONTEXT_USER;
         $select .= $ccselect;
         $joins[] = $ccjoin;
 
@@ -1052,12 +1050,11 @@ class block_jmail_mailbox {
      * @return object A single user
      */
     private function filter_contacts_initials($contact) {
-        $textlib = textlib_get_instance();
-        $firstname = $textlib->strtolower($contact->firstname);
-        $lastname = $textlib->strtolower($contact->lastname);
-        $currentsearch = $textlib->strtolower($this->currentsearch);
+        $firstname = core_text::strtolower($contact->firstname);
+        $lastname = core_text::strtolower($contact->lastname);
+        $currentsearch = core_text::strtolower($this->currentsearch);
 
-        return ($textlib->strpos($firstname, $currentsearch) === 0) or ($textlib->strpos($lastname, $currentsearch) === 0);
+        return (core_text::strpos($firstname, $currentsearch) === 0) or (core_text::strpos($lastname, $currentsearch) === 0);
 
     }
 
@@ -1068,12 +1065,11 @@ class block_jmail_mailbox {
      */
 
     private function filter_contacts_like($contact) {
-        $textlib = textlib_get_instance();
-        $firstname = $textlib->strtolower($contact->firstname);
-        $lastname = $textlib->strtolower($contact->lastname);
-        $currentsearch = $textlib->strtolower($this->currentsearch);
+        $firstname = core_text::strtolower($contact->firstname);
+        $lastname = core_text::strtolower($contact->lastname);
+        $currentsearch = core_text::strtolower($this->currentsearch);
 
-        return ($textlib->strpos($firstname, $currentsearch) !== false) or ($textlib->strpos($lastname, $currentsearch) !== false);
+        return (core_text::strpos($firstname, $currentsearch) !== false) or (core_text::strpos($lastname, $currentsearch) !== false);
 
     }
 
