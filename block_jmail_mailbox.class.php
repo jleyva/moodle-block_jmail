@@ -455,37 +455,41 @@ class block_jmail_mailbox {
         $this->refresh_contacts();
         $contacts = array_keys($this->get_contacts(0, '', '', 0));
         $unique = array();
-        foreach($destinataries as $key=>$dest) {
-            if(!in_array($dest->userid, $unique)){
-		        $unique[] = $dest->userid;
-             // Check if we are sending an email to a manager.
-                 if (!$this->cansendtoall) {
+        foreach ($destinataries as $key => $dest) {
+            if (!in_array($dest->userid, $unique)) {
+                $unique[] = $dest->userid;
+
+                // Check if we are sending an email to a manager.
+                if (!$this->cansendtoall) {
                     if (! has_capability('block/jmail:sendtoall', $this->blockcontext, $dest->userid) ) {
                         unset($destinataries[$key]);
                         continue;
                     }
-                 }
-            // Check for a valid user in agroup.
-            if ($this->isseparategroups) {
-                $ismember = false;
-                foreach ($this->groups as $group) {
-                    if ($ismember = groups_is_member($group, $dest->userid)) {
+                }
+
+                // Check for a valid user in agroup.
+                if ($this->isseparategroups) {
+                    $ismember = false;
+                    foreach ($this->groups as $group) {
+                        if ($ismember = groups_is_member($group, $dest->userid)) {
+                            continue;
+                        }
+                    }
+                    if (!$ismember) {
+                        unset($destinataries[$key]);
                         continue;
                     }
                 }
-                if (!$ismember) {
-                    unset($destinataries[$key]);
-                    continue;
-                }
-               }
-               // Finally check for valid user.
+
+                // Finally check for valid user.
                 if (!in_array($dest->userid, $contacts)) {
                     unset($destinataries[$key]);
                     continue;
-               }
-        	}else{
-	    	unset($destinataries[$key]);
-    	}
+                }
+
+            } else {
+                unset($destinataries[$key]);
+            }
         }
         return $destinataries;
     }
