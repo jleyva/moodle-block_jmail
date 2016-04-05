@@ -284,6 +284,7 @@ class block_jmail_mailbox {
                             JOIN {user} u ON u.id = s.userid
                             WHERE
                             sender = :sender AND courseid $coursein AND timesent > :timesent
+                            AND m.deleted = 0
                             AND u.deleted = :userdeleted
                             ORDER BY $sort $direction";
                         break;
@@ -661,8 +662,12 @@ class block_jmail_mailbox {
 
         $message = block_jmail_message::get_from_id($messageid);
 
-        if ($message and $message->userid == $USER->id) {
-            return $message->delete();
+        if ($message) {
+            if ($message->userid == $USER->id) {
+                return $message->delete();
+            } else if ($message->sender == $USER->id) {
+                return $message->delete_sent();
+            }
         }
         return false;
     }

@@ -386,6 +386,16 @@ class block_jmail_message {
     }
 
     /**
+     * Mark as deleted the current message sent by the current user in database
+     * @return boolean True if the message have been deleted succesfully
+     */
+    public function delete_sent() {
+        global $DB;
+
+        return $DB->set_field('block_jmail', 'deleted', 1, array('id' => $this->id));
+    }
+
+    /**
      * Mark as undeleted the current message in database
      * @return boolean True if the message have been undeleted succesfully
      */
