@@ -52,6 +52,8 @@ class block_jmail_message {
     public $deleted = 0;
     /** @var integer  */
     public $read = 1;
+    /** @var integer  */
+    public $deletedsender = 0;
 
 
     /**
@@ -82,6 +84,9 @@ class block_jmail_message {
         }
         if (!empty($message->approved)) {
             $this->approved = $message->approved;
+        }
+        if (isset($message->deletedsender)) {
+            $this->deletedsender = $message->deletedsender;
         }
         // Reference to message sent
         if (!empty($message->sentid)) {
@@ -400,7 +405,11 @@ class block_jmail_message {
      * @return boolean True if the message have been undeleted succesfully
      */
     public function undelete() {
-        global $DB;
+        global $DB, $USER;
+
+        if ($this->sender == $USER->id and $this->deletedsender) {
+            return $DB->set_field('block_jmail', 'deleted', 0, array('id' => $this->id));
+        }
 
         // TODO, there is no way for deleting drafts right now
         if (!$this->sentid) {
@@ -510,6 +519,7 @@ class block_jmail_message {
         global $DB, $USER;
 
         if ($message = $DB->get_record('block_jmail', array('id'=>$id))) {
+            $message->deletedsender = $message->deleted;
 
             if ($messagesent = $DB->get_record('block_jmail_sent', array('messageid'=>$id,'userid'=>$USER->id))) {
                 $message->userid = $messagesent->userid;

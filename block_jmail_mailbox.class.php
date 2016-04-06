@@ -289,14 +289,15 @@ class block_jmail_mailbox {
                             ORDER BY $sort $direction";
                         break;
             case 'trash' :
+                        $params['senderid'] = $USER->id;
                         $select .= ', s.mread';
-                        $params['deleted'] = 1;
                         $sql = "
                             FROM {block_jmail} m
                             JOIN {block_jmail_sent} s ON m.id = s.messageid
                             JOIN {user} u ON u.id = m.sender
                             WHERE
-                            m.timesent > :sent AND s.userid = :userid AND m.courseid $coursein AND s.deleted = :deleted
+                            m.timesent > :sent AND m.courseid $coursein
+                            AND ((s.userid = :userid AND s.deleted = 1) OR (m.sender = :senderid AND m.deleted = 1))
                             AND m.approved = :approved
                             AND u.deleted = :userdeleted
                             ORDER BY $sort $direction";
