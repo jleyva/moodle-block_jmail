@@ -47,7 +47,7 @@ function xmldb_block_jmail_upgrade($oldversion, $block) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2011122514.00) {
+    if ($oldversion < 2011122514) {
         $table = new xmldb_table('block_jmail');
 
         // New deleted field.
@@ -57,7 +57,7 @@ function xmldb_block_jmail_upgrade($oldversion, $block) {
         }
 
         // Main savepoint reached.
-        upgrade_block_savepoint(true, 2011122514.00, 'jmail');
+        upgrade_block_savepoint(true, 2011122514, 'jmail');
     }
 
     return true;
