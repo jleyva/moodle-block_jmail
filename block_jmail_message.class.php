@@ -108,7 +108,7 @@ class block_jmail_message {
      * @return object Message header
      */
     public function headers() {
-        global $DB;
+        global $DB, $USER;
 
         if (isset($SESSION->jmailcache->courses[$this->courseid])) {
             $course = $SESSION->jmailcache->courses[$this->courseid];
@@ -124,7 +124,7 @@ class block_jmail_message {
         $header->subject = format_string($this->subject);
         $time = (!empty($this->timesent)) ? $this->timesent : $this->timecreated;
         $header->date = userdate($time, get_string('strftimedatetimeshort', 'langconfig'));
-        $header->read = $this->read;
+        $header->read = ($this->sender == $USER->id)? 1 : $this->read;
         $header->approved = $this->approved;
         $header->courseid = $course->id;
         $header->courseshortname = $course->shortname;
@@ -380,7 +380,12 @@ class block_jmail_message {
      * @return boolean True if the message have been deleted succesfully
      */
     public function delete() {
-        global $DB;
+        global $DB, $USER;
+
+        // Maybe the sender was a destinatary to, this cover this case.
+        if ($this->sender == $USER->id) {
+            $DB->set_field('block_jmail', 'deleted', 1, array('id' => $this->id));
+        }
 
         // TODO, there is no way for deleting drafts right now
         if (!$this->sentid) {
@@ -518,10 +523,10 @@ class block_jmail_message {
     public static function get_from_id($id) {
         global $DB, $USER;
 
-        if ($message = $DB->get_record('block_jmail', array('id'=>$id))) {
+        if ($message = $DB->get_record('block_jmail', array('id' => $id))) {
             $message->deletedsender = $message->deleted;
 
-            if ($messagesent = $DB->get_record('block_jmail_sent', array('messageid'=>$id,'userid'=>$USER->id))) {
+            if ($messagesent = $DB->get_record('block_jmail_sent', array('messageid' => $id, 'userid' => $USER->id))) {
                 $message->userid = $messagesent->userid;
                 $message->sentid = $messagesent->id;
                 $message->deleted = $messagesent->deleted;
