@@ -975,7 +975,10 @@ class block_jmail_mailbox {
         $joins[] = $ccjoin;
 
         if ($roleid) {
-            $contextlist = get_related_contexts_string($this->context);
+            // Deprecated get_related_contexts_string -> get_parent_context_ids(true).
+            //$contextlist = get_related_contexts_string($this->context);
+            $contextlist = $this->context->get_parent_context_ids(true);
+            $contextlist = ' IN ('.implode(',', $contextlist).')';
             $wheres[] = "u.id IN (SELECT userid FROM {role_assignments} WHERE roleid = :roleid AND contextid $contextlist)";
             $params['roleid'] = $roleid;
         }
