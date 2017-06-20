@@ -185,10 +185,19 @@ class block_jmail_message {
 
         // Attachments
         $context = block_jmail_get_context(CONTEXT_COURSE, $this->courseid);
+        
 
+        // PATCH - Fix print attachments when block context display throughout the  entire site.
         // We need the block instance for getting the attachments
-        if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
-            $context = block_jmail_get_context(CONTEXT_BLOCK, $instance->id);
+        if (!$instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
+            // attachments
+            $system = block_jmail_get_context(CONTEXT_SYSTEM);
+            $instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid' => $system->id));
+            // A block can be present at multiple sites for a course.
+            $instance = array_shift($instances);
+        }  
+        if ($instance) {
+            $context = block_jmail_get_context(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
             $fs = get_file_storage();
             if ($files = $fs->get_area_files($context->id, 'block_jmail', 'attachment', $this->id, "timemodified", false)) {
                 foreach ($files as $file) {
@@ -199,11 +208,12 @@ class block_jmail_message {
                     $attachment->path = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$context->id.'/block_jmail/attachment/'.$this->id.'/'.$attachment->filename);
                     $message->attachments[] = $attachment;
                 }
+                $message->body = file_rewrite_pluginfile_urls($message->body, 'pluginfile.php', $context->id, 'block_jmail', 'body', $this->id);
+                $message->body = format_text($message->body);
             }
-            $message->body = file_rewrite_pluginfile_urls($message->body, 'pluginfile.php', $context->id, 'block_jmail', 'body', $this->id);
-            $message->body = format_text($message->body);
-        }
-
+        } 
+        // END PATCH.    
+        
         // Labels
         $sql = "SELECT l.id, l.name
                 FROM
@@ -284,12 +294,17 @@ class block_jmail_message {
 
             $context = block_jmail_get_context(CONTEXT_COURSE, $this->courseid);
 
+            // PATCH - Fix print attachments when block context display throughout the  entire site.
             // We need the block instance for saving the attachments
             if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
-
                 // attachments
-                $context = block_jmail_get_context(CONTEXT_BLOCK, $instance->id);
-
+                $system = block_jmail_get_context(CONTEXT_SYSTEM);
+                $instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid' => $system->id));
+                // A block can be present at multiple sites for a course.
+                $instance = array_shift($instances);
+            }  
+            if ($instance) {
+                $context = block_jmail_get_context(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
                 require_once($CFG->libdir.'/filelib.php');
 
                 $message->body = file_save_draft_area_files($editoritemid,  $context->id, 'block_jmail', 'body', $this->id, array('subdirs'=>true), $message->body);
@@ -301,6 +316,7 @@ class block_jmail_message {
 
                 $DB->set_field('block_jmail', 'attachment', $present, array('id'=>$this->id));
             }
+            // END PATCH.
 
             return $this->id;
         }
@@ -351,11 +367,17 @@ class block_jmail_message {
 
             $context = block_jmail_get_context(CONTEXT_COURSE, $this->courseid);
 
+            // PATCH - Fix print attachments when block context display throughout the  entire site.
             // We need the block instance for saving the attachments
-            if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
-
+            if (!$instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
                 // attachments
-                $context = block_jmail_get_context(CONTEXT_BLOCK, $instance->id);
+                $system = block_jmail_get_context(CONTEXT_SYSTEM);
+                $instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid' => $system->id));
+                // A block can be present at multiple sites for a course.
+                $instance = array_shift($instances);
+            }  
+            if ($instance) {
+                $context = block_jmail_get_context(CONTEXT_BLOCK, $instance->id, MUST_EXIST);
                 require_once($CFG->libdir.'/filelib.php');
 
                 $message->body = file_save_draft_area_files($editoritemid,  $context->id, 'block_jmail', 'body', $messageid, array('subdirs'=>true), $message->body);
@@ -367,6 +389,7 @@ class block_jmail_message {
 
                 $DB->set_field('block_jmail', 'attachment', $present, array('id'=>$messageid));
             }
+            // END PATCH.
 
             return $messageid;
         }
