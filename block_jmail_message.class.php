@@ -296,7 +296,7 @@ class block_jmail_message {
 
             // PATCH - Fix print attachments when block context display throughout the  entire site.
             // We need the block instance for saving the attachments
-            if ($instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
+            if (!$instance = $DB->get_record('block_instances', array('blockname'=>'jmail', 'parentcontextid'=>$context->id))) {
                 // attachments
                 $system = block_jmail_get_context(CONTEXT_SYSTEM);
                 $instances = $DB->get_records('block_instances', array('blockname'=>'jmail', 'parentcontextid' => $system->id));
